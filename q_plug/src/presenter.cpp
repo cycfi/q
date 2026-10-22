@@ -62,6 +62,7 @@ namespace cycfi::q_plug
       // after the fact, a host that has already read the declared size
       // may push it back, and then its window and the view disagree.
       auto const scale = zoom();
+      _declared = size_;
       size_ = {std::round(size_.x * scale), std::round(size_.y * scale)};
       Q_PLUG_LOG(window, "view opens at {}x{}, scale {}", size_.x, size_.y
        , scale);
@@ -172,6 +173,9 @@ namespace cycfi::q_plug
    {
       if (_view)
       {
+         // The zoom rides in the state: keep what the fit left it at
+         if (fits())
+            _ctl.view_scale(_view->scale());
          on_detach();
          _gestures.clear();
          _proxies.clear();
@@ -205,8 +209,35 @@ namespace cycfi::q_plug
          return;
       Q_PLUG_LOG(window, "zoom {}", scale_);
       _ctl.view_scale(scale_);
-      if (_view)
+      if (!_view)
+         return;
+
+      // Content that fits the view scales with its size: the window is
+      // resized to the declared size at the scale, and the fit sets the
+      // scale from it
+      if (fits())
+      {
+         auto const s = elements::extent{
+            std::round(_declared.x * scale_), std::round(_declared.y * scale_)};
+         if (request_resize(s))
+            resize(s);
+      }
+      else
+      {
          _view->scale(scale_);
+      }
+   }
+
+   // Content that fits the view sets the scale itself, from the view's
+   // size, however the window got that size: the scale is the zoom.
+   float presenter::zoom() const
+   {
+      return fits() ? _view->scale() : _ctl.view_scale();
+   }
+
+   bool presenter::fits() const
+   {
+      return _view && _view->aspect_ratio() > 0;
    }
 
    elements::extent presenter::size() const
@@ -233,10 +264,16 @@ namespace cycfi::q_plug
    {
       if (!_view)
          return false;
-      auto l = _view->limits();
+      auto l = limits();
       auto w = std::clamp(size_.x, std::floor(l.min.x), std::ceil(l.max.x));
       auto h = std::clamp(size_.y, std::floor(l.min.y), std::ceil(l.max.y));
       _view->size(elements::extent{w, h});
+
+      // Content that fits the view takes its scale from the size, and the
+      // zoom, which rides in the state, follows it: a reopened editor
+      // comes back at this size
+      if (fits() && _declared.x > 0 && _declared.y > 0)
+         _ctl.view_scale(std::min(w / _declared.x, h / _declared.y));
       return w == size_.x && h == size_.y;
    }
 }

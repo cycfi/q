@@ -15,6 +15,8 @@
 #include <cstdlib>
 #include <cstdio>
 #include <algorithm>
+#include <cmath>
+#include <numeric>
 #include <mutex>
 #include <vector>
 
@@ -1011,9 +1013,16 @@ namespace cycfi::q_plug
       auto l = to_integers(self(p).view_limits(), self(p).view_pixel_scale());
       hints->can_resize_horizontally = l.min_w != l.max_w;
       hints->can_resize_vertically = l.min_h != l.max_h;
-      hints->preserve_aspect_ratio = false;
-      hints->aspect_ratio_width = 1;
-      hints->aspect_ratio_height = 1;
+
+      // A view whose content fits it keeps its proportion, as a ratio of
+      // two whole numbers: the ratio in thousandths, reduced
+      auto const r = self(p).view_aspect_ratio();
+      hints->preserve_aspect_ratio = r > 0;
+      auto w = r > 0 ? std::uint32_t(std::lround(r * 1000)) : 1u;
+      auto h = r > 0 ? 1000u : 1u;
+      auto g = std::gcd(w, h);
+      hints->aspect_ratio_width = w / g;
+      hints->aspect_ratio_height = h / g;
       return true;
    }
 
@@ -1022,6 +1031,16 @@ namespace cycfi::q_plug
    {
       auto l = to_integers(self(p).view_limits(), self(p).view_pixel_scale());
       auto w = *width, h = *height;
+
+      // A view whose content fits it keeps its proportion: the size asked
+      // for is narrowed, or shortened, to it
+      if (auto const r = self(p).view_aspect_ratio(); r > 0 && h > 0)
+      {
+         if (*width > *height * r)
+            *width = std::uint32_t(std::lround(*height * r));
+         else
+            *height = std::uint32_t(std::lround(*width / r));
+      }
       *width = std::clamp(*width, l.min_w, l.max_w);
       *height = std::clamp(*height, l.min_h, l.max_h);
       Q_PLUG_LOG(window, "gui adjust size {}x{} to {}x{}"

@@ -73,13 +73,13 @@ namespace cycfi::q_plug
       // in the state, so a reopened editor and a restored session both
       // come back at the zoom they were left at.
       void                    zoom(float scale);
-      float                   zoom() const { return _ctl.view_scale(); }
+      float                   zoom() const;
       void                    zoom_in();
       void                    zoom_out();
       void                    actual_size();
 
-      static constexpr float  zoom_min = 0.5f;
-      static constexpr float  zoom_max = 2.0f;
+      static constexpr float  zoom_min = 0.75f;
+      static constexpr float  zoom_max = 1.5f;
 
       void                    sink(view_sink& s) { _sink = &s; }
       elements::view*         view() const { return _view.get(); }
@@ -130,6 +130,9 @@ namespace cycfi::q_plug
 
    private:
 
+      // The content fits the view: it scales with the view's size
+      bool                    fits() const;
+
       using deleter = void(*)(detail::plugin_view*);
       using view_ptr = std::unique_ptr<detail::plugin_view, deleter>;
 
@@ -158,6 +161,9 @@ namespace cycfi::q_plug
 
       // The proxies bound, held for as long as the view is: a proxy is
       // not in the tree, so nothing else keeps it.
+      // The size the plugin declares, at zoom 1
+      elements::extent        _declared = {0, 0};
+
       std::vector<std::shared_ptr<void>> _proxies;
    };
 

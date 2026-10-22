@@ -67,6 +67,7 @@ namespace cycfi::q_plug
       elements::extent        view_size() const override;
       elements::view_limits   view_limits() const override;
       bool                    resize_view(elements::extent size) override;
+      float                   view_aspect_ratio() const override;
       bool                    attach_view(void* parent) override;
       void                    detach_view() override;
       void                    show_view(bool show) override;
@@ -207,6 +208,9 @@ namespace cycfi::q_plug
 
    inline bool plugin::save_state(byte_ostream& out) const
    {
+      // An open editor whose content fits it holds the zoom in its scale
+      if (_presenter && _presenter->view())
+         _controller->view_scale(_presenter->zoom());
       return _controller->save_state(out);
    }
 
@@ -251,6 +255,13 @@ namespace cycfi::q_plug
    inline bool plugin::resize_view(elements::extent size)
    {
       return _presenter && _presenter->resize(size);
+   }
+
+   inline float plugin::view_aspect_ratio() const
+   {
+      if (_presenter && _presenter->view())
+         return _presenter->view()->aspect_ratio();
+      return 0;
    }
 
    inline bool plugin::attach_view(void* parent)

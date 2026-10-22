@@ -120,6 +120,10 @@ namespace cycfi::q_plug
       virtual elements::view_limits
                               view_limits() const = 0;
       virtual bool            resize_view(elements::extent size) = 0;
+
+      // The proportion, width to height, the view asks the host to keep
+      // while it is resized, its content fitting it; 0 for none.
+      virtual float           view_aspect_ratio() const = 0;
       virtual bool            attach_view(void* parent) = 0;
       virtual void            detach_view() = 0;
       virtual void            show_view(bool show) = 0;

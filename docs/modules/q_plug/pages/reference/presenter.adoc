@@ -422,8 +422,8 @@ public:
    void                    zoom_out();
    void                    actual_size();
 
-   static constexpr float  zoom_min = 0.5f;
-   static constexpr float  zoom_max = 2.0f;
+   static constexpr float  zoom_min = 0.75f;
+   static constexpr float  zoom_max = 1.5f;
 
    void                    sink(view_sink& s);
    elements::view*         view() const;

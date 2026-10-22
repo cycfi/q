@@ -8,7 +8,7 @@ Two scales stand between the size a plugin lays its editor out at and the
 size of the window the host puts on the screen.
 
 The zoom is the user's. It makes the whole editor larger or smaller, from
-half size to double, a tenth at a time, and it is the same in every QPlug
+three quarters to one and a half times its size, a tenth at a time, and it is the same in every QPlug
 plugin: the same keys, the same three menu items, the same two buttons at
 the right of the {header}. It rides in the state, so a session comes back
 at the zoom it was left at.
@@ -39,7 +39,7 @@ A plugin that adds a zoom control of its own calls the same functions.
 
 Zooming in and out steps through a grid of stops a tenth apart. Each step
 is counted from the nearest stop, so stepping up and back returns to the
-same value. The stops run from `zoom_min`, 0.5, to `zoom_max`, 2.0.
+same value. The stops run from `zoom_min`, 0.75, to `zoom_max`, 1.5.
 `zoom(scale)` rounds a scale to the nearest stop and clamps it to that
 range. A scale from anywhere else, an older state file or one edited by
 hand, is kept as it is, and the editor opens at it.
@@ -49,6 +49,22 @@ editor of 920 by 568 at a zoom of 1.5 has limits of 1380 by 852. The view
 updates its limits on its next draw, and the presenter requests a matching
 window size from the host. The host then sets a size, or leaves the window
 as it is.
+
+An editor whose content fits the view (see Elements' `fit`) scales with
+its window instead: the user resizes the window, and the content follows,
+keeping its proportion, which the host is told to keep. A fit given the
+zoom's range holds the window to the declared size times `zoom_min` to
+times `zoom_max`, so resizing and zooming agree:
+
+```c++
+view_.content(
+   fit(zoom_min, zoom_max, fixed_size({640, 400}, editor)),
+   box(bkd_color)
+);
+```
+
+Zooming then resizes the window to the declared size at the new zoom, and
+the zoom read back is the view's scale, however the window got its size.
 
 == Where the Zoom Lives
 
@@ -122,8 +138,8 @@ public:
    void                    zoom_out();
    void                    actual_size();
 
-   static constexpr float  zoom_min = 0.5f;
-   static constexpr float  zoom_max = 2.0f;
+   static constexpr float  zoom_min = 0.75f;
+   static constexpr float  zoom_max = 1.5f;
 
    float                   pixel_scale() const;
 };
@@ -183,8 +199,8 @@ A zoom already at `zoom_min` or `zoom_max` stays there.
 |===
 | Expression               | Semantics                          | Return Type
 
-| `presenter::zoom_min`    | Get the smallest scale, 0.5.       | `float`
-| `presenter::zoom_max`    | Get the largest scale, 2.0.        | `float`
+| `presenter::zoom_min`    | Get the smallest scale, 0.75.      | `float`
+| `presenter::zoom_max`    | Get the largest scale, 1.5.        | `float`
 |===
 
 The scale itself is kept by the {controller}, as its `view_scale`, which
