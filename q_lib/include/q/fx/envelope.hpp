@@ -159,7 +159,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct fast_rms_envelope_follower
    {
-      constexpr static auto threshold = lin_float(-120_dB);
+      constexpr static auto threshold = lin_float(-240_dB);
 
                fast_rms_envelope_follower(duration hold, float sps);
       float    operator()(float s);
@@ -203,13 +203,13 @@ namespace cycfi::q
    // that ratio two RMS levels or compare against a squared threshold can
    // stay in the mean-square domain and skip the square root entirely.
    //
-   // Readings below the -120 dB mean-square threshold (-60 dB RMS, the
+   // Readings below the -240 dB mean-square threshold (-120 dB RMS, the
    // same floor convention as the fast_rms_envelope_follower) return 0;
-   // the _db variant returns -60 dB.
+   // the _db variant returns -120 dB.
    ////////////////////////////////////////////////////////////////////////////
    struct true_rms_envelope_follower
    {
-      constexpr static auto threshold = lin_float(-120_dB);
+      constexpr static auto threshold = lin_float(-240_dB);
 
                true_rms_envelope_follower(duration window, float sps);
                true_rms_envelope_follower(std::size_t window_samples);
@@ -236,12 +236,12 @@ namespace cycfi::q
    // play, and pushes it exactly once per sample AFTER every view has read --
    // see basic_moving_sum_ref for the contract in full.
    //
-   // Readings below the -120 dB mean-square threshold return 0, the same
+   // Readings below the -240 dB mean-square threshold return 0, the same
    // floor convention as true_rms_envelope_follower.
    ////////////////////////////////////////////////////////////////////////////
    struct true_rms_envelope_follower_ref
    {
-      constexpr static auto threshold = lin_float(-120_dB);
+      constexpr static auto threshold = lin_float(-240_dB);
 
                true_rms_envelope_follower_ref(duration window, float sps)
                 : _ms{window, sps}
@@ -465,8 +465,7 @@ namespace cycfi::q
    // fast_rms_envelope_follower
    inline decibel fast_rms_envelope_follower_db::operator()(float s)
    {
-      // Floor at the threshold (not 0): lin_to_db(0) is undefined for
-      // the fast log. The output floor is -120 dB / 2 = -60 dB.
+      // Floor at the threshold: the output floor is -240 dB / 2 = -120 dB.
       auto e = std::max(_fenv(s * s), threshold);
 
       // Perform square-root in the dB domain:
@@ -520,8 +519,7 @@ namespace cycfi::q
 
    inline decibel true_rms_envelope_follower_db::operator()() const
    {
-      // Floor at the threshold (not 0): lin_to_db(0) is undefined for
-      // the fast log. The output floor is -120 dB / 2 = -60 dB.
+      // Floor at the threshold: the output floor is -240 dB / 2 = -120 dB.
       auto ms = std::max(_ma(), threshold);
 
       // Perform square-root in the dB domain:

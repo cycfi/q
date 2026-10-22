@@ -3,10 +3,11 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 
-   Micro-benchmark for the decibel <-> linear conversions: fast_log10,
-   faster_log10 (linear -> dB) and db2a (== lin_float), lin_double,
-   fast_pow10, faster_pow10 (dB -> linear). Build-only; not a CI test
-   (there is nothing to assert, just measure and print).
+   Micro-benchmark for the decibel <-> linear conversions: a2db (==
+   lin_to_db), std::log10, fast_log10, faster_log10 (linear -> dB) and
+   db2a (== lin_float), lin_double, fast_pow10, faster_pow10 (dB ->
+   linear). Build-only; not a CI test (there is nothing to assert, just
+   measure and print).
 
    Build and run (from the repo root):
 
@@ -127,12 +128,14 @@ int main()
    // may be auto-vectorized. Run a few times -- these are wall-clock and noisy.
    std::cout << "\n-- linear -> dB  (input: amplitude in [1, 1e6)) --\n";
    bench_log("std::log10  ", [](float a) { return 20.0f * std::log10(a); });
+   bench_log("a2db        ", [](float a) { return q::detail::a2db(a); });
+   bench_log("std::log10  ", [](float a) { return 20.0f * std::log10(a); });
    bench_log("fast_log10  ", [](float a) { return 20.0f * fast_log10(a); });
    bench_log("faster_log10", [](float a) { return 20.0f * faster_log10(a); });
 
    // db2a (== lin_float) is the fast table path; lin_double is its std-only,
    // exact counterpart (std::pow). Both compute 10^(db/20).
-   std::cout << "-- dB -> linear  (input: dB in [0, 120)) --\n";
+   std::cout << "-- dB -> linear  (input: dB in [-120, 120)) --\n";
    bench_pow("db2a        ", [](float db) { return q::detail::db2a(db); });
    bench_pow("lin_double  ", [](float db) { return float(q::lin_double(q::dB(db))); });
    bench_pow("fast_pow10  ", [](float db) { return fast_pow10(db / 20.0f); });

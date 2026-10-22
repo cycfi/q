@@ -19,8 +19,9 @@ namespace cycfi::q
    // decibel value is non-linear. It operates on the logarithmic domain. The
    // decibel class is perfectly suitable for dynamics processing (e.g.
    // compressors and limiters and envelopes). Q provides fast decibel
-   // computations using lookup tables and fast math computations for
-   // converting to and from scalars.
+   // computations using lookup tables for converting to and from scalars
+   // (see detail/db_table.hpp), exact to about 1e-5 dB over the whole
+   // float range, and a coarser bit-trick approximation, approx_db.
    ////////////////////////////////////////////////////////////////////////////
    struct decibel_unit;
 
@@ -75,7 +76,7 @@ namespace cycfi::q
 
    inline decibel lin_to_db(double val)
    {
-      return decibel{20.0f * fast_log10(val), direct_unit};
+      return decibel{detail::a2db(float(val)), direct_unit};
    }
 }
 

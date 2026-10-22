@@ -43,7 +43,7 @@ image::true-rms-envelope-follower-output.png[alt="True RMS envelope follower res
 ```c++
 struct true_rms_envelope_follower
 {
-    static constexpr auto threshold = lin_float(-120_dB);
+    static constexpr auto threshold = lin_float(-240_dB);
 
             true_rms_envelope_follower(duration window, float sps);
             true_rms_envelope_follower(std::size_t window_samples);
@@ -101,9 +101,9 @@ NOTE: C++ brace initialization may also be used.
                         samples (no square root).           | `float`
 |===
 
-NOTE: Readings whose mean square falls below `threshold` (-120 dB, an RMS
-level of -60 dB, the same floor as the {fast_rms_envelope_follower}) return
-0. The `_db` variant returns -60 dB.
+NOTE: Readings whose mean square falls below `threshold` (-240 dB, an RMS
+level of -120 dB, the same floor as the {fast_rms_envelope_follower}) return
+0. The `_db` variant returns -120 dB.
 
 TIP: Consumers that _ratio_ two RMS levels, or compare against a squared threshold, can stay in the mean-square domain via `mean_square()` and skip the square root entirely: the ratio of two RMS levels is the square root of the ratio of their mean squares.
 
@@ -114,7 +114,7 @@ TIP: Consumers that _ratio_ two RMS levels, or compare against a squared thresho
 | Expression          | Semantics                             | Return Type
 
 | `env_t::threshold`  | Get the floor of the mean square:
-                        -120 dB as a linear value.          | `float`
+                        -240 dB as a linear value.          | `float`
 |===
 
 ==== Example
@@ -152,7 +152,7 @@ for (auto s : in)
 ```c++
 struct true_rms_envelope_follower_ref
 {
-    static constexpr auto threshold = lin_float(-120_dB);
+    static constexpr auto threshold = lin_float(-240_dB);
 
              true_rms_envelope_follower_ref(duration window, float sps);
              true_rms_envelope_follower_ref(std::size_t window_samples);

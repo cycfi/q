@@ -18,7 +18,7 @@ where `out` represents the output amplitude, while `in` represents the input amp
 
 The decibel scale is expressed as the base 10 logarithm of the ratio between two amplitudes. For instance, a ratio of 2:1 (two times) corresponds to a 6 dB increase, while a ratio of 10:1 (ten times) corresponds to a 20 dB increase. In contrast, a ratio of 1:2 (one half) corresponds to a -6 dB decrease, whereas a ratio of 1:10 (one tenth) corresponds to a -20 dB decrease.
 
-Decibel is non-linear and operates on the logarithmic domain. The `decibel` class is perfectly suitable for dynamics processing (e.g. compressors and limiters and envelopes). Q provides fast `decibel` computations using fast math functions and lookup tables for converting to and from scalars.
+Decibel is non-linear and operates on the logarithmic domain. The `decibel` class is perfectly suitable for dynamics processing (e.g. compressors and limiters and envelopes). Q provides fast `decibel` computations using lookup tables for converting to and from scalars, exact to about 1e-5 dB over the whole `float` range, and a coarser bit-trick approximation.
 
 == Include
 
@@ -90,7 +90,23 @@ auto db = q::lin_to_db(2.0);  // 6 dB
 
 In addition to `lin_to_db`, `approx_db` is another free function that performs linear to `decibel` conversion. It is a faster, but less accurate conversion function from a linear value to `decibel`.
 
-`lin_float` and `lin_double` convert `decibel` to a linear value with `float` and `double` results, respectively.
+`lin_float` and `lin_double` convert `decibel` to a linear value with `float` and `double` results, respectively. `lin_float` is `constexpr`, so a floor or a threshold can be computed at compile time.
+
+=== Accuracy and speed
+
+`lin_float` and `lin_to_db` split the number the way a `float` is stored: a power of two, which is the exponent field, and a mantissa, read from a 256-entry table with linear interpolation. Both tables are built at compile time (3 KB in all), both conversions take any `float`, and the error is the same at every level because the power of two is exact. `lin_double` is the exact `std::pow` reference, for use outside the audio path. `approx_db` is a bit-trick logarithm, for when a third of a decibel is good enough.
+
+[cols="1,1,1,1"]
+|===
+| Conversion       | Error                  | Range                        | Latency
+
+| `lin_float`      | 2e-6 relative (2e-5 dB) | any `float`, held to the normal range at the extremes | about 15 ns
+| `lin_double`     | exact                  | any `double`                 | about 23 ns
+| `lin_to_db`      | 3e-5 dB                | any `float`; zero reads about -765 dB | about 13 ns
+| `approx_db`      | 0.35 dB                | any `float`                  | about 12 ns
+|===
+
+The errors are the maxima of fine sweeps over the whole range (`test/support/decibel.cpp`). The latencies are per call on a serial chain, each result feeding the next input, measured on an Apple M2 at -O3 by `test/benchmark/decibel_bench.cpp`; the harness itself accounts for several of those nanoseconds, and the figures are wall-clock, so read them relative to one another. On that chain, the figure of merit for a per-sample loop, `lin_to_db` is faster than the bit-trick `fast_log10` it replaced, and `lin_float` runs level with the 0.1 dB table it replaced on negative dB, with eight times the accuracy, the full range and less than half the memory.
 
 === Literals
 

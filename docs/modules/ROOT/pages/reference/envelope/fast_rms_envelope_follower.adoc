@@ -37,7 +37,7 @@ image::fast-rms-envelope-follower-output.png[alt="Fast RMS envelope follower res
 ```c++
 struct fast_rms_envelope_follower
 {
-    static constexpr auto threshold = lin_float(-120_dB);
+    static constexpr auto threshold = lin_float(-240_dB);
 
             fast_rms_envelope_follower(duration hold, float sps);
 
@@ -97,8 +97,8 @@ NOTE: C++ brace initialization may also be used.
                       radical (no square root).             | `float`
 |===
 
-NOTE: Readings whose smoothed peak square falls below `threshold` (-120 dB,
-an RMS level of -60 dB) return 0. The `_db` variant returns -60 dB.
+NOTE: Readings whose smoothed peak square falls below `threshold` (-240 dB,
+an RMS level of -120 dB) return 0. The `_db` variant returns -120 dB.
 
 TIP: `peak_square()` is the counterpart of `mean_square()` in the {true_rms_envelope_follower}. To compare against a squared threshold, stay in the squared domain and skip the square root.
 
@@ -109,7 +109,7 @@ TIP: `peak_square()` is the counterpart of `mean_square()` in the {true_rms_enve
 | Expression          | Semantics                             | Return Type
 
 | `env_t::threshold`  | Get the floor of the smoothed peak
-                        square: -120 dB as a linear value.  | `float`
+                        square: -240 dB as a linear value.  | `float`
 |===
 
 === Example

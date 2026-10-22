@@ -83,20 +83,20 @@ TEST_CASE("fast_rms: silence floors")
       v = env(0.0f);
       d = env_db(0.0f);
    }
-   // Below the -120 dB mean-square threshold the value is zeroed before the
+   // Below the -240 dB mean-square threshold the value is zeroed before the
    // square root; fast_sqrt (now std::sqrt) returns an exact 0 here; pin
    // "effectively silent" rather than "== 0", robust to the sqrt change.
    CHECK(v < 1e-10f);
-   // The _db variant floors at the threshold, not 0: -120 dB / 2.
-   CHECK(d.rep == Approx(-60.0f).margin(0.01));
-   CHECK(env_db().rep == Approx(-60.0f).margin(0.01));
+   // The _db variant floors at the threshold, not 0: -240 dB / 2.
+   CHECK(d.rep == Approx(-120.0f).margin(0.01));
+   CHECK(env_db().rep == Approx(-120.0f).margin(0.01));
 }
 
-TEST_CASE("fast_rms_db: reads the -60 dB floor before the first sample")
+TEST_CASE("fast_rms_db: reads the -120 dB floor before the first sample")
 {
    auto env_db =
       q::fast_rms_envelope_follower_db{q::duration{2.0 / f0}, sps};
-   CHECK(env_db().rep == Approx(-60.0f).margin(0.01));
+   CHECK(env_db().rep == Approx(-120.0f).margin(0.01));
 }
 
 TEST_CASE("fast_rms_db: sine reads its peak in dB")

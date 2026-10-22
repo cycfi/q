@@ -120,7 +120,7 @@ TEST_CASE("true_rms: mean_square exposes the squared domain")
    CHECK(v == Approx(std::sqrt(env.mean_square())).epsilon(0.005));
 }
 
-TEST_CASE("true_rms: silence floors at zero; db variant at -60 dB")
+TEST_CASE("true_rms: silence floors at zero; db variant at -120 dB")
 {
    auto env    = q::true_rms_envelope_follower{4 * period};
    auto env_db = q::true_rms_envelope_follower_db{4 * period};
@@ -133,7 +133,7 @@ TEST_CASE("true_rms: silence floors at zero; db variant at -60 dB")
       d = env_db(0.0f);
    }
    CHECK(v == 0.0f);
-   CHECK(d.rep == Approx(-60.0f).margin(0.1));
+   CHECK(d.rep == Approx(-120.0f).margin(0.1));
 }
 
 TEST_CASE("true_rms_db: sine reads 3 dB below its peak")
