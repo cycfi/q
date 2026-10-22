@@ -870,7 +870,7 @@ For periodic signals, a window spanning a whole number of periods nulls the ripp
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct true_rms_envelope_follower
 {
-    static constexpr auto threshold = lin_float(-120_dB);
+    static constexpr auto threshold = lin_float(-240_dB);
 
             true_rms_envelope_follower(duration window, float sps);
             true_rms_envelope_follower(std::size_t window_samples);
@@ -1011,9 +1011,9 @@ C++ brace initialization may also be used.
 <i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
-Readings whose mean square falls below <code>threshold</code> (-120 dB, an RMS
-level of -60 dB, the same floor as the <a href="fast_rms_envelope_follower.html" class="xref page">Fast RMS Envelope Follower</a>) return
-0. The <code>_db</code> variant returns -60 dB.
+Readings whose mean square falls below <code>threshold</code> (-240 dB, an RMS
+level of -120 dB, the same floor as the <a href="fast_rms_envelope_follower.html" class="xref page">Fast RMS Envelope Follower</a>) return
+0. The <code>_db</code> variant returns -120 dB.
 </td>
 </tr>
 </table>
@@ -1050,7 +1050,7 @@ Consumers that <em>ratio</em> two RMS levels, or compare against a squared thres
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>env_t::threshold</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the floor of the mean square:
-                        -120 dB as a linear value.</p></td>
+                        -240 dB as a linear value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 </tbody>
@@ -1111,7 +1111,7 @@ of 110 Hz, which nulls the ripple of a 110 Hz signal.</td>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct true_rms_envelope_follower_ref
 {
-    static constexpr auto threshold = lin_float(-120_dB);
+    static constexpr auto threshold = lin_float(-240_dB);
 
              true_rms_envelope_follower_ref(duration window, float sps);
              true_rms_envelope_follower_ref(std::size_t window_samples);

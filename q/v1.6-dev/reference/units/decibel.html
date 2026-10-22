@@ -809,7 +809,7 @@
 <p>The decibel scale is expressed as the base 10 logarithm of the ratio between two amplitudes. For instance, a ratio of 2:1 (two times) corresponds to a 6 dB increase, while a ratio of 10:1 (ten times) corresponds to a 20 dB increase. In contrast, a ratio of 1:2 (one half) corresponds to a -6 dB decrease, whereas a ratio of 1:10 (one tenth) corresponds to a -20 dB decrease.</p>
 </div>
 <div class="paragraph">
-<p>Decibel is non-linear and operates on the logarithmic domain. The <code>decibel</code> class is perfectly suitable for dynamics processing (e.g. compressors and limiters and envelopes). Q provides fast <code>decibel</code> computations using fast math functions and lookup tables for converting to and from scalars.</p>
+<p>Decibel is non-linear and operates on the logarithmic domain. The <code>decibel</code> class is perfectly suitable for dynamics processing (e.g. compressors and limiters and envelopes). Q provides fast <code>decibel</code> computations using lookup tables for converting to and from scalars, exact to about 1e-5 dB over the whole <code>float</code> range, and a coarser bit-trick approximation.</p>
 </div>
 </div>
 </div>
@@ -946,7 +946,58 @@ auto db = q::lin_to_db(2.0);  // 6 dB</code></pre>
 <p>In addition to <code>lin_to_db</code>, <code>approx_db</code> is another free function that performs linear to <code>decibel</code> conversion. It is a faster, but less accurate conversion function from a linear value to <code>decibel</code>.</p>
 </div>
 <div class="paragraph">
-<p><code>lin_float</code> and <code>lin_double</code> convert <code>decibel</code> to a linear value with <code>float</code> and <code>double</code> results, respectively.</p>
+<p><code>lin_float</code> and <code>lin_double</code> convert <code>decibel</code> to a linear value with <code>float</code> and <code>double</code> results, respectively. <code>lin_float</code> is <code>constexpr</code>, so a floor or a threshold can be computed at compile time.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_accuracy_and_speed"><a class="anchor" href="#_accuracy_and_speed"></a>Accuracy and speed</h3>
+<div class="paragraph">
+<p><code>lin_float</code> and <code>lin_to_db</code> split the number the way a <code>float</code> is stored: a power of two, which is the exponent field, and a mantissa, read from a 256-entry table with linear interpolation. Both tables are built at compile time (3 KB in all), both conversions take any <code>float</code>, and the error is the same at every level because the power of two is exact. <code>lin_double</code> is the exact <code>std::pow</code> reference, for use outside the audio path. <code>approx_db</code> is a bit-trick logarithm, for when a third of a decibel is good enough.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Conversion</th>
+<th class="tableblock halign-left valign-top">Error</th>
+<th class="tableblock halign-left valign-top">Range</th>
+<th class="tableblock halign-left valign-top">Latency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lin_float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2e-6 relative (2e-5 dB)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">any <code>float</code>, held to the normal range at the extremes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">about 15 ns</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lin_double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">exact</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">any <code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">about 23 ns</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lin_to_db</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3e-5 dB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">any <code>float</code>; zero reads about -765 dB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">about 13 ns</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>approx_db</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.35 dB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">any <code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">about 12 ns</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The errors are the maxima of fine sweeps over the whole range (<code>test/support/decibel.cpp</code>). The latencies are per call on a serial chain, each result feeding the next input, measured on an Apple M2 at -O3 by <code>test/benchmark/decibel_bench.cpp</code>; the harness itself accounts for several of those nanoseconds, and the figures are wall-clock, so read them relative to one another. On that chain, the figure of merit for a per-sample loop, <code>lin_to_db</code> is faster than the bit-trick <code>fast_log10</code> it replaced, and <code>lin_float</code> runs level with the 0.1 dB table it replaced on negative dB, with eight times the accuracy, the full range and less than half the memory.</p>
 </div>
 </div>
 <div class="sect2">

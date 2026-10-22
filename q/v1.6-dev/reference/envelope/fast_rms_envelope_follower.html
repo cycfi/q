@@ -864,7 +864,7 @@ The fast RMS envelope follower is a fast level <em>detector</em> computed in the
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct fast_rms_envelope_follower
 {
-    static constexpr auto threshold = lin_float(-120_dB);
+    static constexpr auto threshold = lin_float(-240_dB);
 
             fast_rms_envelope_follower(duration hold, float sps);
 
@@ -1005,8 +1005,8 @@ C++ brace initialization may also be used.
 <i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
-Readings whose smoothed peak square falls below <code>threshold</code> (-120 dB,
-an RMS level of -60 dB) return 0. The <code>_db</code> variant returns -60 dB.
+Readings whose smoothed peak square falls below <code>threshold</code> (-240 dB,
+an RMS level of -120 dB) return 0. The <code>_db</code> variant returns -120 dB.
 </td>
 </tr>
 </table>
@@ -1043,7 +1043,7 @@ an RMS level of -60 dB) return 0. The <code>_db</code> variant returns -60 dB.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>env_t::threshold</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the floor of the smoothed peak
-                        square: -120 dB as a linear value.</p></td>
+                        square: -240 dB as a linear value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 </tbody>
