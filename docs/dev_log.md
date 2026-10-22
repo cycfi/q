@@ -28,6 +28,14 @@ below -60 dB that now read true. `test/support/decibel.cpp` sweeps both
 conversions for accuracy, monotonicity across every table seam, the range
 extremes, the constexpr path and the round trip, and prints the latencies.
 
+`5b5aeded` QPlug takes Elements' `fit` (pin `61aa53b3`): an editor whose
+content fits its view scales with its window. The CLAP resize hints carry
+the view's aspect ratio and `adjust_size` keeps it; zoom resizes the window
+to the declared size at the new zoom and reads the zoom back from the
+view's scale, which `save_state` and `detach` store, so the editor reopens
+at the size it was left. The zoom range narrows to 0.75 to 1.5 (from 0.5 to
+2), which a plugin also passes to `fit` so resizing and zooming agree.
+
 `d0f7d151` QPlug's Elements pin moves to Elements develop `4c823cf4`:
 glowing fill tracks, the VU meter and pane styles, tooltips that switch off
 together, an editable `combo_box`, an `led`, the outlined question mark
