@@ -11,6 +11,23 @@ commits; the feature branches they first cited were squash-merged and no
 longer resolve. The full text before the trim: `git show
 308ddccb:docs/dev_log.md`.
 
+## 2026-10-22
+
+`08a145df` the decibel conversions split the number by exponent and mantissa,
+the way a float is stored: `lin_float` reads 2^f from a 256-entry table and
+the power of two from another, `lin_to_db` reads log2(1 + m) from a third
+with the exponent field as the integer part. Both are exact to about 1e-5
+dB over the whole float range (the old 0.1 dB table clamped at 120 dB and
+was 8x coarser; the bit-trick log was 35x coarser), the tables are built at
+compile time, 3 KB in all, and on the serial per-sample harness
+`lin_to_db` is faster than `fast_log10` and `lin_float` level with the old
+table. The RMS followers' floor drops from -60 to -120 dB RMS: a hiss floor
+at -70 dB read as digital silence before, which the Ascend noise reducer
+found. The `rms_envelope_follower` goldens are re-minted for the levels
+below -60 dB that now read true. `test/support/decibel.cpp` sweeps both
+conversions for accuracy, monotonicity across every table seam, the range
+extremes, the constexpr path and the round trip, and prints the latencies.
+
 ## 2026-10-05
 
 `210e85a6` QPlug's byte streams are `byte_ostream` and `byte_istream`, no
