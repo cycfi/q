@@ -15,13 +15,13 @@ namespace cycfi::q
     class smoothed_value
     {
     private:
-        float _value = 0.0f, _target = 0.0f;
+        float _target = 0.0f;
         bool _active = false;
         one_pole_lowpass _lp;
 
     public:
         smoothed_value(float value, duration smoothing_time, double sps)
-            : _value(value), _target(value), _lp(1.0f / (2_pi * as_float(smoothing_time)), sps)
+            : _target(value), _lp(1.0f / (2_pi * as_float(smoothing_time)), sps)
         {
             _lp = value;
         }
@@ -35,10 +35,10 @@ namespace cycfi::q
         {
             if (snap)
             {
-                _lp = _value = _target = target;
+                _lp = _target = target;
                 _active = false;
             }
-            else 
+            else
             {
                 _target = target;
                 _active = true;
@@ -48,21 +48,21 @@ namespace cycfi::q
         float operator()()
         {
             if (!_active)
-                return _value;
+                return _lp();
 
-            _value = _lp(_target);
+           _lp(_target);
 
             // Snap to value when close enough
-            if (std::abs(_value - _target) < 0.00001f)
+            if (std::abs(_lp() - _target) < 0.00001f)
             {
-                _value = _target;
+                _lp = _target;
                 _active = false;
             }
 
-            return _value;
+            return _lp();
         }
 
-        float value() const { return _value; }
+        float value() const { return _lp(); }
         float target() const { return _target; }
         bool active() const { return _active; }
     };
