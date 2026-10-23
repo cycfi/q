@@ -12,16 +12,41 @@
 
 namespace cycfi::q
 {
+    ///////////////////////////////////////////////////////////////////////////////
+    // Ensures float-safe snap
+    ///////////////////////////////////////////////////////////////////////////////
+    struct snap
+    {
+        explicit snap(float delta) : _delta(delta) {}
+
+        float operator()(float s, float target)
+        {
+            _settled = std::abs(s - target) <= _delta || s == _prev;
+            _prev = s;
+            return _settled? target : s;
+        }
+
+        bool settled() const { return _settled; }
+
+        float _delta;
+        float _prev = std::numeric_limits<float>::quiet_NaN();
+        bool  _settled = false;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // Smoothed value parameter that utilizes a one-pole lowpass
+    ///////////////////////////////////////////////////////////////////////////////
     class smoothed_value
     {
     private:
-        float _target = 0.0f;
-        bool _active = false;
-        one_pole_lowpass _lp;
+        float               _target = 0.0f;
+        bool                _active = false;
+        one_pole_lowpass    _lp;
+        snap                _snap;
 
     public:
         smoothed_value(float value, duration smoothing_time, double sps)
-            : _target(value), _lp(1.0f / (2_pi * as_float(smoothing_time)), sps)
+            : _target(value), _lp(1.0f / (2_pi * as_float(smoothing_time)), sps), _snap(1e-4f)
         {
             _lp = value;
         }
@@ -50,10 +75,10 @@ namespace cycfi::q
             if (!_active)
                 return _lp();
 
-           _lp(_target);
+           _snap(_lp(_target), _target);
 
             // Snap to value when close enough
-            if (std::abs(_lp() - _target) < 0.00001f)
+            if (_snap.settled())
             {
                 _lp = _target;
                 _active = false;
