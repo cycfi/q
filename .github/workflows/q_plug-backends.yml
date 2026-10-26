@@ -7,8 +7,9 @@
 # its own, chosen with Elements' switches: Skia everywhere, Cairo on macOS
 # and Windows. q_plug.yml covers each platform's own backend on every push;
 # these builds are long, so this runs weekly (GitHub schedules only the
-# default branch, master), by hand, and when this file changes. Linux
-# runners have no display, so its editor tests are skipped.
+# default branch, master, which then tests develop), by hand, and when this
+# file changes. Linux runners have no display, so its editor tests are
+# skipped.
 
 name: q_plug backends
 
@@ -57,6 +58,8 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v5
       with:
+        # A scheduled run starts from the default branch; test develop.
+        ref: ${{ github.event_name == 'schedule' && 'develop' || '' }}
         submodules: recursive
 
     - name: Install dependencies (macOS)
