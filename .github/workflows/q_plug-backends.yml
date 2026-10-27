@@ -94,8 +94,9 @@ jobs:
         ctest --test-dir build --output-on-failure
 
     # The runner has no GPU, and Windows' own OpenGL is 1.1, too old for Skia
-    # to open an editor. Mesa's opengl32.dll beside each validator takes the
-    # place of the system's, and draws with llvmpipe.
+    # to open an editor. Mesa's opengl32.dll beside each validator, and beside
+    # test_two_plugins, which opens editors too, takes the place of the
+    # system's, and draws with llvmpipe.
     - name: Mesa software OpenGL (Windows Skia)
       if: runner.os == 'Windows' && matrix.config.backend == 'ELEMENTS_SKIA'
       shell: bash
@@ -112,6 +113,7 @@ jobs:
         cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DQ_BUILD_PLUG=ON -D${{ matrix.config.backend }}=ON -DQ_PLUG_VALIDATOR_DIR=%CD%\validators || exit /b 1
         if exist mesa\x64 for /r validators %%f in (*.exe) do copy /y mesa\x64\*.dll "%%~dpf" >nul
         cmake --build build || exit /b 1
+        if exist mesa\x64 for /f "delims=" %%f in ('dir /s /b build\test_two_plugins.exe') do copy /y mesa\x64\*.dll "%%~dpf" >nul
         ctest --test-dir build --output-on-failure || exit /b 1
 
     - name: Build and Test (Linux)
