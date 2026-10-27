@@ -6,91 +6,65 @@
 #if !defined(CYCFI_Q_EXP_SMOOTHING_OCTOBER_22_2026)
 #define CYCFI_Q_EXP_SMOOTHING_OCTOBER_22_2026
 
+#include <cmath>
+#include <limits>
 #include <q/support/base.hpp>
 #include <q/support/literals.hpp>
 #include <q/fx/lowpass.hpp>
 
 namespace cycfi::q
 {
-    ///////////////////////////////////////////////////////////////////////////////
-    // Ensures float-safe snap
-    ///////////////////////////////////////////////////////////////////////////////
-    struct snap
-    {
-        explicit snap(float delta) : _delta(delta) {}
+   ///////////////////////////////////////////////////////////////////////////////
+   // Ensures float-safe snap
+   ///////////////////////////////////////////////////////////////////////////////
+   struct snap
+   {
+      explicit snap(float delta) : _delta(delta) {}
 
-        float operator()(float s, float target)
-        {
-            _settled = std::abs(s - target) <= _delta || s == _prev;
-            _prev = s;
-            return _settled? target : s;
-        }
+      float operator()(float s, float target)
+      {
+         _settled = std::abs(s - target) <= _delta || s == _prev;
+         _prev = s;
+         return _settled ? target : s;
+      }
 
-        bool settled() const { return _settled; }
+      bool settled() const { return _settled; }
 
-        float _delta;
-        float _prev = std::numeric_limits<float>::quiet_NaN();
-        bool  _settled = false;
-    };
+      float _delta;
+      float _prev = std::numeric_limits<float>::quiet_NaN();
+      bool _settled = false;
+   };
 
-    ///////////////////////////////////////////////////////////////////////////////
-    // Smoothed value parameter that utilizes a one-pole lowpass
-    ///////////////////////////////////////////////////////////////////////////////
-    class smoothed_value
-    {
-    private:
-        float               _target = 0.0f;
-        bool                _active = false;
-        one_pole_lowpass    _lp;
-        snap                _snap;
+   ///////////////////////////////////////////////////////////////////////////////
+   // Smoothed value parameter to be used with any compatible smoother
+   // eg.
+   // q::smoothed<q::one_pole_lowpass>  gain{10_ms, sps, 1e-4f};
+   // q::smoothed<q::dynamic_smoother>  cutoff{10_ms, sps, 0.1f};
+   //
+   // float g = gain(target);   // per sample
+   ///////////////////////////////////////////////////////////////////////////////
+   template <typename Smoother>
+   struct smoothed
+   {
+      smoothed(duration time, float sps, float delta)
+         : _smoother(1.0f / (2_pi * as_float(smoothing_time)), sps), _snap(delta)
+      {
+      }
 
-    public:
-        smoothed_value(float value, duration smoothing_time, double sps)
-            : _target(value), _lp(1.0f / (2_pi * as_float(smoothing_time)), sps), _snap(1e-4f)
-        {
-            _lp = value;
-        }
+      float operator()(float target)
+      {
+         return _snap(_smoother(_target), _target);
+      }
 
-        void config(duration smoothing_time, double sps)
-        {
-            _lp.cutoff(1.0f / (2_pi * as_float(smoothing_time)), sps);
-        }
+      float operator()() const { return _smoother(); }
 
-        void operator()(float target, bool snap = false)
-        {
-            if (snap)
-            {
-                _lp = _target = target;
-                _active = false;
-            }
-            else
-            {
-                _target = target;
-                _active = true;
-            }
-        }
+      smoothed &operator=(float v) { _smoother = v; }
 
-        float operator()()
-        {
-            if (!_active)
-                return _lp();
+      bool settled() const { return _snap.settled(); }
 
-           _snap(_lp(_target), _target);
-
-            // Snap to value when close enough
-            if (_snap.settled())
-            {
-                _lp = _target;
-                _active = false;
-            }
-
-            return _lp();
-        }
-
-        float value() const { return _lp(); }
-        float target() const { return _target; }
-        bool active() const { return _active; }
-    };
+      Smoother _smoother;
+      snap _snap;
+   };
 }
 
 #endif
