@@ -865,6 +865,22 @@ development headers first:</p>
 <pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">sudo apt-get install libasound2-dev</code></pre>
 </div>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+A GCC newer than the system&#8217;s own, installed beside it, builds
+programs that need its newer <code>libstdc&#43;&#43;</code> at run time. Run with the
+system&#8217;s older one, they stop with <code>GLIBCXX_3.4.x not found</code>. Put the newer
+compiler&#8217;s <code>lib64</code> on <code>LD_LIBRARY_PATH</code>, or install the <code>libstdc&#43;&#43;6</code>
+that came with it.
+</td>
+</tr>
+</table>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_midi_devices"><a class="anchor" href="#_midi_devices"></a>MIDI Devices</h3>
