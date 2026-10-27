@@ -43,6 +43,12 @@ development headers first:
 sudo apt-get install libasound2-dev
 ----
 
+NOTE: A GCC newer than the system's own, installed beside it, builds
+programs that need its newer `libstdc{plus}{plus}` at run time. Run with the
+system's older one, they stop with `GLIBCXX_3.4.x not found`. Put the newer
+compiler's `lib64` on `LD_LIBRARY_PATH`, or install the `libstdc{plus}{plus}6`
+that came with it.
+
 === MIDI Devices
 
 `q_io` reaches MIDI devices through libremidi, on each platform's own MIDI

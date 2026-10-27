@@ -11,6 +11,13 @@ the test suite with CTest:
 ctest --test-dir build
 ----
 
+Visual Studio and Xcode keep several configurations in one build tree, so
+name the one you built:
+
+----
+ctest --test-dir build -C Debug
+----
+
 == Running the Examples
 
 The examples are built by default. Each one lives in its own directory under
