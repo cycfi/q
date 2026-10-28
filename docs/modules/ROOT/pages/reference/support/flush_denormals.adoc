@@ -1,0 +1,148 @@
+= Flush Denormals
+
+include::../../common.adoc[]
+
+== Overview
+
+A filter, an envelope follower or a ramp that decays toward zero ends up,
+after a while, with values below about 1.2e-38 for a `float`: subnormal
+numbers, also called denormals. They are far below anything audible, around
+-758 dB, yet arithmetic on them is slow on many processors, up to around a
+hundred times slower on x86. A reverb tail or a closed gate can quietly
+turn a cheap loop into an expensive one. Plugin validators also reject
+subnormal output: clap-validator's parameter fuzz fails a plugin that
+writes even one subnormal sample.
+
+Processors have a mode that flushes subnormals to zero in hardware, in every
+operation, at no cost per sample. `flush_denormals` sets that mode on the
+current thread for as long as it lives, then puts back the mode it found.
+Put one at the top of an audio callback:
+
+```c++
+void process(in_channels const& in, out_channels const& out)
+{
+   q::flush_denormals guard;
+   // ... the processing, free of subnormals
+}
+```
+
+The mode belongs to the thread, and the guard restores exactly what it
+found, so it never leaks: a host that runs its audio thread with the mode
+off gets it back off, and one that already had it on keeps it on. The
+guard restores the mode on every way out of the scope, an exception
+included, and guards nest.
+
+== Where It Is Applied
+
+QPlug and QIO hold the guard for you. QPlug wraps every call to a plugin's
+`process`, and the parameter flush a host calls outside it; QIO wraps the
+audio stream's callback. Code that runs in neither, an offline render or a
+test, holds a guard of its own if it wants one.
+
+== Platforms
+
+[cols="1,3"]
+|===
+| Platform | Mode
+
+| x86 and x86-64
+| MXCSR: FTZ flushes subnormal results to zero, DAZ treats subnormal
+  inputs as zero.
+
+| ARM64, Apple Silicon included
+| FPCR: FZ flushes both inputs and results.
+
+| 32-bit ARM, Cortex-A and Cortex-M
+| FPSCR: FZ, as on ARM64. NEON on ARMv7 always flushes.
+
+| Others
+| The guard does nothing.
+|===
+
+NOTE: On Cortex-M, an interrupt starts with the mode held in FPDSCR, not
+the mode of the code it interrupted. Hold a guard in the interrupt handler
+that processes audio, or set FZ in FPDSCR once at startup.
+
+== Caveats
+
+Values below the smallest normal number become exactly zero. Code that
+guards a division with `x != 0` can then divide by a value that has
+flushed to zero; guard with a floor instead, `x > epsilon`. Doubles flush
+as well, below about 2.2e-308.
+
+== Include
+
+```c++
+#include <q/support/flush_denormals.hpp>
+```
+
+== Declaration
+
+```c++
+namespace cycfi::q
+{
+   class flush_denormals
+   {
+   public:
+                              flush_denormals();
+                              ~flush_denormals();
+
+                              flush_denormals(flush_denormals const&) = delete;
+      flush_denormals&        operator=(flush_denormals const&) = delete;
+   };
+}
+```
+
+== Expressions
+
+=== Notation
+
+`g`      :: Instance of `flush_denormals`.
+
+=== Constructors and Destructor
+
+[cols="1,2"]
+|===
+| Expression                    | Semantics
+
+| `flush_denormals g;`
+| Save the current thread's floating-point mode, and flush subnormals to
+  zero on this thread.
+
+| `g` goes out of scope
+| Restore the saved mode.
+|===
+
+`flush_denormals` is neither copyable nor assignable.
+
+=== Example
+
+An offline render that runs a processor, any function object taking a
+sample and returning one, over a recording, outside QPlug and QIO:
+
+```c++
+#include <q/support/flush_denormals.hpp>
+...
+namespace q = cycfi::q;
+...
+template <typename Processor>
+std::vector<float> render(
+   std::vector<float> const& in, Processor& proc)
+{
+   q::flush_denormals guard;                      <1>
+   std::vector<float> out(in.size());
+   for (std::size_t i = 0; i != in.size(); ++i)
+      out[i] = proc(in[i]);                       <2>
+   return out;
+}                                                 <3>
+```
+
+<1> Subnormals flush to zero on this thread from here.
+<2> The processor's filters and followers decay to zero, never into
+    subnormals.
+<3> The thread's own mode is back.
+
+'''
+
+_Copyright (c) 2014-2026 Joel de Guzman. All rights reserved._
+_Distributed under the https://opensource.org/licenses/MIT[MIT License]_

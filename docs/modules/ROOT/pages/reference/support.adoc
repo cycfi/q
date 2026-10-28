@@ -23,6 +23,9 @@ concepts.
 | xref:reference/support/multi_buffer.adoc[Multi Buffer]
 | Non-interleaved multichannel buffers.
 
+| xref:reference/support/flush_denormals.adoc[Flush Denormals]
+| Flushing subnormal numbers to zero while audio is processed.
+
 | xref:reference/support/audio_stream.adoc[Audio Stream]
 | The interface an audio stream presents to its processing code.
 
