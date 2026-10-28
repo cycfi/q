@@ -11,6 +11,19 @@ commits; the feature branches they first cited were squash-merged and no
 longer resolve. The full text before the trim: `git show
 308ddccb:docs/dev_log.md`.
 
+## 2026-10-28
+
+`3aa64210` `q::flush_denormals`, a scoped guard: it sets flush-to-zero on
+this thread (MXCSR FTZ and DAZ on x86, FPCR.FZ on ARM64, FPSCR.FZ on 32-bit
+ARM and Cortex-M) and restores the thread's own mode when it goes out of
+scope, so a host's mode never leaks. QPlug's CLAP `process` and parameter
+flush and q_io's audio callback hold one. Found when clap-validator's
+parameter fuzz failed Ascend Pre: deep expander cuts and a closing gate left
+subnormal output, and the validator rejects any. Subnormals are also slow
+arithmetic on many processors, which is why the guard is the fix and not
+snapping at the output; `q::snap` (#102) is for smoothers settling on their
+targets.
+
 ## 2026-10-22
 
 `08a145df` the decibel conversions split the number by exponent and mantissa,
