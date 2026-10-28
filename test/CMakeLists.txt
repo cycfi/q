@@ -250,6 +250,13 @@ add_test(NAME test_midi_loopback COMMAND test_midi_loopback)
 add_test(NAME test_midi2_loopback COMMAND test_midi2_loopback)
 add_test(NAME test_audio_file COMMAND test_audio_file)
 add_test(NAME test_audio_stream COMMAND test_audio_stream)
+
+# The device tests talk to the system's MIDI and audio, which can block
+# rather than fail. Each takes seconds; a hang fails at the timeout.
+set_tests_properties(
+   test_midi_loopback test_midi2_loopback test_midi2_endpoint_loopback
+   test_audio_stream
+   PROPERTIES TIMEOUT 60)
 add_test(NAME test_best_lag COMMAND test_best_lag)
 add_test(NAME test_moving_sum COMMAND test_moving_sum)
 add_test(NAME test_moving_sum_ref COMMAND test_moving_sum_ref)
