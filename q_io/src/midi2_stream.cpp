@@ -6,6 +6,7 @@
 #include <q_io/midi2_stream.hpp>
 #include <q_io/detail/event_queue.hpp>
 #include <libremidi/libremidi.hpp>
+#include <algorithm>
 #include <memory>
 
 namespace cycfi::q
@@ -19,9 +20,17 @@ namespace cycfi::q
          midi_device::protocol_type p, std::uint32_t id
        , libremidi::output_port& port);
 
+      // The platform's packet API, or DUMMY where libremidi was built
+      // without it, as against an ALSA older than 1.2.10. libremidi would
+      // otherwise open its dummy backend in its place, whose virtual ports
+      // open but never appear.
       libremidi::API packet_api()
       {
-         return libremidi::midi2::default_api();
+         auto const api = libremidi::midi2::default_api();
+         auto const apis = libremidi::available_ump_apis();
+         if (std::find(apis.begin(), apis.end(), api) == apis.end())
+            return libremidi::API::DUMMY;
+         return api;
       }
    }
 
