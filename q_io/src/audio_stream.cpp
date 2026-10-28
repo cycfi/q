@@ -4,6 +4,7 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q_io/audio_stream.hpp>
+#include <q/support/flush_denormals.hpp>
 #include <RtAudio.h>
 #include <atomic>
 #include <chrono>
@@ -99,12 +100,14 @@ namespace cycfi::q
       }
 
       // RtAudio hands over non-interleaved audio as one block, channel after
-      // channel; process() wants a pointer per channel.
+      // channel; process() wants a pointer per channel. Subnormals flush to
+      // zero for the callback.
       static int callback(
          void* out_, void* in_, unsigned int frames
        , double, RtAudioStreamStatus, void* user
       )
       {
+         q::flush_denormals guard;
          auto& self = *static_cast<audio_stream*>(user);
          auto& p = *self._impl;
          auto const start = std::chrono::steady_clock::now();

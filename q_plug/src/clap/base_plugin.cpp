@@ -9,6 +9,7 @@
 #include <q_plug/clap/midi_events.hpp>
 #include <q_plug/clap/event_slices.hpp>
 #include <q_plug/log.hpp>
+#include <q/support/flush_denormals.hpp>
 #include <clap/clap.h>
 #include <cstring>
 #include <exception>
@@ -421,9 +422,12 @@ namespace cycfi::q_plug
       }
    }
 
+   // Subnormals flush to zero on the audio thread while the plugin runs,
+   // and the host's own mode is back when it returns.
    clap_process_status base_plugin_impl::process(clap_plugin_t const* p
     , clap_process_t const* proc)
    {
+      q::flush_denormals guard;
       auto& plug = self(p);
       if (proc->out_events)
          impl(plug).send_edits(proc->out_events);
@@ -684,6 +688,7 @@ namespace cycfi::q_plug
    void base_plugin_impl::params_flush(clap_plugin_t const* p
     , clap_input_events_t const* in, clap_output_events_t const* out)
    {
+      q::flush_denormals guard;
       auto& plug = self(p);
       bool changed = false;
       auto const n = in? in->size(in) : 0;
