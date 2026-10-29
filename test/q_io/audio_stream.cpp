@@ -136,7 +136,9 @@ TEST_CASE("An output stream opens, runs its callback and reports its rates")
    stream.stop();
 
    // 300 ms at any block size is many callbacks, and the stream clock has
-   // moved with them.
+   // moved with them. A stream that opened but did not start says why in
+   // its error.
+   INFO("Audio system error: " << stream.error());
    CHECK(calls > 2);
    CHECK(elapsed.count() > 0.1);                 // seconds
    CHECK(stream.output_latency().count() >= 0.0);
