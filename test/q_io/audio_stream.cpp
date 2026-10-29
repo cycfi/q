@@ -129,9 +129,16 @@ TEST_CASE("An output stream opens, runs its callback and reports its rates")
    CHECK(stream.sampling_rate() > 0);
    CHECK(stream._calls == 0);
 
+   // Some devices take a while to start: WASAPI sets the device up on the
+   // stream's own thread before the first callback, and a USB interface
+   // can take seconds. The count starts from the first callback.
    stream.start();
+   auto const deadline = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+   while (stream._calls == 0 && std::chrono::steady_clock::now() < deadline)
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+   auto const first = stream._calls.load();
    std::this_thread::sleep_for(std::chrono::milliseconds(300));
-   auto const calls = stream._calls.load();
+   auto const calls = stream._calls.load() - first;
    auto const elapsed = stream.time();
    stream.stop();
 
