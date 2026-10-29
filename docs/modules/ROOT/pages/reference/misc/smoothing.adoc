@@ -1,0 +1,207 @@
+= Smoothing
+
+include::../../common.adoc[]
+
+== Overview
+
+`smoothed` provides a gradual slide to value for parameters that can change fast and thus cause artefacts. It allows for usage of different filters for different behaviour, such as the one-pole lowpass (`q::one_pole_lowpass`), Cyclops dynamic smoother (`q::dynamic_smoother`) or any other filter that complies to the same standard. 
+
+An exponential smoother like `q::one_pole_lowpass` only approaches the target asymptotically, and in floating point it can stall just short of it. `snap` solves this: once the smoothed value is within a small `delta` of the target, or stops changing, it returns the target itself and reports `settled()`. The caller can then skip work that is only needed while the value moves, such as recomputing filter coefficients.
+
+== Snap
+
+=== Include
+
+```c++
+#include <q/fx/smoothing.hpp>
+```
+
+=== Declaration
+
+```c++
+struct snap
+{
+   explicit          snap(float delta);
+
+   float             operator()(float s, float target);
+   bool              settled() const;
+
+   float             _delta;
+   float             _prev = NaN;
+   bool              _settled = false;
+};
+```
+
+=== Expressions
+
+==== Notation
+
+`sn`           :: Object of type `snap`.
+`delta`        :: Floating point value, the distance from the target within which the value snaps to the target.
+`s`            :: Floating point value for the smoothed input sample.
+`target`       :: Floating point value for the target.
+
+==== Constructors
+
+[cols="1,1"]
+|===
+| Expression        | Semantics
+
+| `snap(delta)`     | Construct a `snap` with the specified `delta`. The
+                      `snap` starts out unsettled.
+|===
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                               | Return Type
+
+| `sn(s, target)`       | Process the smoothed sample `s`. If
+                          `abs(s - target) <= delta`, or `s` is
+                          identical to the previous sample, the
+                          `snap` is settled and `target` is
+                          returned. Otherwise it is unsettled and
+                          `s` is returned unchanged.              | `float`
+| `sn.settled()`        | Return `true` if the latest call settled
+                          on the target.                          | `bool`
+|===
+
+NOTE: The identical-sample test catches a smoother that has stalled short of the target due to floating point precision, even when `delta` is very small or zero. The first sample is never considered stalled.
+
+==== Access
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                               | Return Type
+
+| `sn._delta`     | Direct access to `delta`.               | `float`
+|===
+
+== Smoothed
+
+`smoothed<Smoother>` owns a `Smoother` and a `snap`. Call it once per sample with the target; it returns the smoothed value, and the exact target once it has settled.
+
+The smoother is constructed with a cutoff of `1 / (2π time)`. For a one pole smoother this makes `time` the time constant: after `time` has passed since a step, the output has covered about 63% of the distance to the new target.
+
+=== Include
+
+```c++
+#include <q/fx/smoothing.hpp>
+```
+
+=== Declaration
+
+```c++
+template <typename Smoother>
+struct smoothed
+{
+                     smoothed(duration time, float sps, float delta);
+
+   float             operator()(float target);
+   float             operator()() const;
+   smoothed&         operator=(float v);
+
+   bool              settled() const;
+
+   Smoother          _smoother;
+   snap              _snap;
+};
+```
+
+=== Expressions
+
+==== Notation
+
+`S`            :: A `smoothed<Smoother>` type.
+`sm`           :: Object of type `S`.
+`time`         :: Object of type `duration`, the smoothing time constant.
+`sps`          :: Floating point value representing samples per second.
+`delta`        :: Floating point value, the distance from the target within which the output snaps to the target. It is in the units of the smoothed value.
+`target`       :: Floating point value for the target.
+`v`            :: Floating point value for a state.
+
+==== Requirements on `Smoother`
+
+`Smoother` must be a filter such as `q::one_pole_lowpass`, `q::dynamic_smoother` or any other filter that function the same way.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                   | Semantics
+
+| `S(time, sps, delta)`        | Construct a `smoothed` with the specified
+                                 smoothing time constant, `time`, samples per
+                                 second, `sps`, and snap distance, `delta`.
+| `sm = v`                     | Jump the smoother straight to `v`, with no
+                                 glide.
+|===
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                               | Return Type
+
+| `sm(target)`    | Advance the smoother one sample toward
+                    `target` and return the result, snapped
+                    to `target` once settled.               | `float`
+| `sm()`          | Return the smoother's latest result,
+                    without advancing it.                   | `float`
+|===
+
+NOTE: `sm()` returns the smoother's own state, not the snapped output. While settling, it can differ from the value last returned by `sm(target)` by up to `delta`.
+
+NOTE: Assigning with `sm = v` does not reset the `snap`. `settled()` keeps reporting the result of the last `sm(target)` call until the next one.
+
+==== Query
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                               | Return Type
+
+| `sm.settled()`  | Return `true` if the latest call to
+                    `sm(target)` returned the target
+                    exactly.                                | `bool`
+|===
+
+==== Access
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                               | Return Type
+
+| `sm._smoother`  | Direct access to the smoother.          | `Smoother`
+| `sm._snap`      | Direct access to the `snap`.            | `snap`
+|===
+
+==== Choosing `delta`
+
+`delta` is an absolute distance, so pick it relative to the range of the value. A smaller `delta` follows the exponential tail for longer before snapping. A larger one ends the glide sooner, but leaves a small audible step if it is too large. For a gain in the range 0 to 1, `1e-4` (-80 dB) is a good start. For a cutoff frequency in Hz, a value of `0.1` is more appropriate.
+
+==== Example
+
+Smooth a gain control applied to the input samples `in`, at `sps` samples per second, with a 10 ms time constant:
+
+```c++
+#include <q/fx/smoothing.hpp>
+#include <q/fx/lowpass.hpp>
+...
+namespace q = cycfi::q;
+using namespace q::literals;
+
+float gain;                                               // set by the user
+...
+q::smoothed<q::one_pole_lowpass> smooth{10_ms, sps, 1e-4f};   <1>
+
+for (auto& s : in)
+   s *= smooth(gain);                                     <2>
+
+if (smooth.settled())                                     <3>
+   // The gain has arrived. Skip any work needed only while it moves.
+```
+
+<1> Construct a smoothed value with a 10 ms time constant. The output snaps to the target within `1e-4`.
+<2> Smooth the gain and apply it to the sample. Once the gain reaches its target, `smooth` returns it exactly.
+<3> Check whether the glide is over, for example at the end of each block.

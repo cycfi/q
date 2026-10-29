@@ -47,18 +47,21 @@ namespace cycfi::q
    struct smoothed
    {
       smoothed(duration time, float sps, float delta)
-         : _smoother(1.0f / (2_pi * as_float(smoothing_time)), sps), _snap(delta)
+         : _smoother(1.0f / (2_pi * as_float(time)), sps), _snap(delta)
       {
       }
 
       float operator()(float target)
       {
-         return _snap(_smoother(_target), _target);
+         return _snap(_smoother(target), target);
       }
 
       float operator()() const { return _smoother(); }
 
-      smoothed &operator=(float v) { _smoother = v; }
+      smoothed &operator=(float v) {
+         _smoother = v;
+         return *this;
+      }
 
       bool settled() const { return _snap.settled(); }
 
