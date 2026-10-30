@@ -150,6 +150,7 @@ set(APP_SOURCES
    fx/signal_conditioner.cpp
    fx/signal_conditioner_bypass.cpp
    fx/slope.cpp
+   fx/smoothing.cpp
    fx/zero_crossing.cpp
    fx/dynamic_smoother.cpp
    fx/signal_slope.cpp
@@ -283,6 +284,7 @@ add_test(NAME test_sync COMMAND test_sync)
 add_test(NAME test_chamberlin_filter COMMAND test_chamberlin_filter)
 add_test(NAME test_lowpass COMMAND test_lowpass)
 add_test(NAME test_highpass COMMAND test_highpass)
+add_test(NAME test_smoothing COMMAND test_smoothing)
 add_test(NAME test_comb COMMAND test_comb)
 add_test(NAME test_compressor_expander COMMAND test_compressor_expander)
 add_test(NAME test_compressor_expander2 COMMAND test_compressor_expander2)
