@@ -11,6 +11,34 @@ commits; the feature branches they first cited were squash-merged and no
 longer resolve. The full text before the trim: `git show
 308ddccb:docs/dev_log.md`.
 
+## 2026-10-31 (later)
+
+`a0679ed9` breaking: the FFT is an object built with its size.
+`q::fft` and `q::rfft` (`basic_fft<T>`, `basic_rfft<T>` for double)
+replace `fft<N>`, `ifft<N>`, `rfft<N>`, `irfft<N>` and `magspec<N>`, so a
+size can follow the sample rate and a program pays only for the sizes it
+builds. Layouts and scaling are unchanged. An object owns its PFFFT setup
+and aligned scratch, or Q's own tables: it allocates at construction, a
+transform never does. Q's own FFT is now an iterative radix-2 with
+precomputed twiddles, about 3x faster than the old template recursion
+(2048-point complex frame 20.7 vs 62.7 us on an M2) and about 15x more
+accurate in float. A generic `fft(n, data)` dispatch over 2 to 16384 was
+tried first and dropped: it cost 100 KB of code and 640 KB at load. hz's
+parked `dry_run` branch still calls `q::fft<N>`. Migration notes are on
+the FFT page (`490aa709`) and in NEWS.
+
+`0cd14b78` `principal_arg`, `fast_sincos` and `fast_atan2`. The wrap
+subtracts 2 pi in two parts, 6.28125 (exact when multiplied) and the
+remainder, and corrects a one-off k by a full turn: `fast_sincos` errs by
+about 2e-7 to 100 rad, `fast_atan2` by 1.2e-5 (Abramowitz and Stegun
+4.4.47), each about 3x faster than std.
+
+`6451b4b5`, `5eab9a2e`, `f05a41e3` the STFT building blocks for qWhammy:
+`stft_window` (Hann, and Mauler and Martin's low-delay pair, whose
+latency is `delay`, not n), `stft` (one sample in, one out, a bin
+callback a hop), `phase_tracker` (per-bin instantaneous frequency) and
+`spectral_peaks` (Laroche and Dolson's peaks and the bins each owns).
+
 ## 2026-10-31
 
 `143e6138` with `Q_USE_PFFFT` (a CMake option, on by default) the float
