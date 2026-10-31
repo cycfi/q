@@ -4,30 +4,91 @@ include::../../common.adoc[]
 
 == Overview
 
-The Fast Fourier Transform (FFT) converts a block of time-domain samples into its frequency-domain representation and back. Q provides a compact, header-only, in-place FFT built with template metaprogramming: the transform size is a compile-time constant, so the recursion, twiddle factors, and bit-reversal are all resolved at compile time. The implementation follows the Danielson-Lanczos form of the Cooley-Tukey algorithm.
+The Fast Fourier Transform (FFT) converts a block of time-domain samples into its frequency-domain representation and back. Q provides compact, header-only, in-place transforms whose size is a compile-time constant. Q's own implementation follows the Danielson-Lanczos form of the Cooley-Tukey algorithm, built with template metaprogramming. Float transforms of practical sizes run on PFFFT instead, a SIMD FFT, when Q is built with it (see <<_backends,Backends>>).
 
-Three functions are provided:
+Five functions are provided:
 
-`fft<N>`      :: Forward transform (time -> frequency), in place.
+`fft<N>`      :: Forward transform (time -> frequency) of `N` complex points, in place.
 `ifft<N>`     :: Inverse transform (frequency -> time), in place, normalized by `N`.
+`rfft<N>`     :: Forward transform of `N` real samples to the `N/2+1` bins from DC to Nyquist, in place.
+`irfft<N>`    :: Inverse of `rfft`, back to `N` real samples, in place, normalized by `N`.
 `magspec<N>`  :: Forward transform followed by an in-place magnitude spectrum.
 
-`N` is the number of complex points and *must be a power of two* (enforced by a `static_assert`). All three operate on a plain array of scalars and modify it in place.
+`N` *must be a power of two* (enforced by a `static_assert`). All five operate on a plain array of scalars and modify it in place.
 
 image::fft-spectrum.svg[alt="FFT magnitude spectrum", width=700px, align=center, title="A composite of three tones and its magnitude spectrum"]
 
 == Data Layout
 
-The transform works on *complex* data packed as interleaved real and imaginary parts:
+=== Complex Data
+
+`fft`, `ifft` and `magspec` work on *complex* data packed as interleaved real and imaginary parts:
 
 [none]
 * `data = [ re(0), im(0), re(1), im(1), ... , re(N-1), im(N-1) ]`
 
-So an `N`-point transform needs an array of *`2N` scalars*, for `fft`, `ifft` and `magspec` alike. Bin `k` occupies `data[2k]` (real) and `data[2k+1]` (imaginary). To transform a purely real signal, place the samples in the real slots and zero the imaginary slots.
+So an `N`-point transform needs an array of *`2N` scalars*. Bin `k` occupies `data[2k]` (real) and `data[2k+1]` (imaginary).
 
 The forward transform applies no scaling: a unit-amplitude complex exponential at bin `k` produces a peak of magnitude `N` at that bin. For a real input, the energy splits between the bin `k` and its conjugate mirror `N-k`, so a real tone of amplitude `A` reads `A * N/2` at its bin. The inverse transform divides by `N`, so `fft` followed by `ifft` restores the input to within rounding error.
 
+=== Real Data
+
+The spectrum of a real signal is conjugate-symmetric, so its upper half repeats the lower half. `rfft` computes only the bins that carry information, DC through Nyquist, at about half the cost of `fft`. It takes an array of *`N+2` scalars*:
+
+[none]
+* On input, the `N` samples: `data = [ x(0), x(1), ... , x(N-1), _, _ ]`
+* On output, `N/2+1` bins: `data = [ re(0), im(0), re(1), im(1), ... , re(N/2), im(N/2) ]`
+
+The two extra scalars make room for the Nyquist bin. The imaginary parts of the DC and Nyquist bins are always zero; `irfft` ignores them. Scaling is the same as `fft` and `ifft`: `rfft` applies none, and `irfft` divides by `N`, so `rfft` followed by `irfft` restores the samples.
+
+To remove everything above 5 kHz from a frame of 1024 samples at `sps` samples per second, zero the bins above it and transform back:
+
+```c++
+#include <q/fft/fft.hpp>
+#include <array>
+...
+namespace q = cycfi::q;
+
+float sps;                                // samples per second
+...
+constexpr std::size_t N = 1024;
+std::array<float, N + 2> data;            // N samples, then room for N/2+1 bins
+...
+q::rfft<N>(data.data());
+
+auto cutoff = std::size_t(5000.0f * N / sps);    // the bin at 5 kHz
+for (auto k = cutoff + 1; k <= N/2; ++k)
+   data[2*k] = data[2*k + 1] = 0.0f;
+
+q::irfft<N>(data.data());                 // data[0 .. N-1]: the filtered frame
+```
+
 WARNING: The transforms are *in place*: they overwrite the input array with the result. Keep a copy if you still need the original samples.
+
+== Backends
+
+With the CMake option `Q_USE_PFFFT` on (the default), the `float` transforms run on https://github.com/marton78/pffft[PFFFT], a SIMD FFT using NEON on ARM and SSE on x86: `fft` and `ifft` from 16 points up, `rfft` and `irfft` from 32. `double`, and the smaller sizes, use Q's own implementation. The API, the data layout and the scaling are the same either way. Results agree to within rounding, but are not bit-identical between the two.
+
+The time for one frame (copy a frame in, forward transform, inverse transform), in µs, measured with `test/benchmark/fft_bench` on an Apple M2:
+
+[cols="1,1,1,1,1"]
+|===
+| `N`  | `fft` + `ifft`, Q's own | `fft` + `ifft`, PFFFT | `rfft` + `irfft`, Q's own | `rfft` + `irfft`, PFFFT
+
+| 256  | 4.5   | 0.56 | 1.9  | 0.28
+| 512  | 11.5  | 1.2  | 4.7  | 0.55
+| 1024 | 27.2  | 2.4  | 12.1 | 1.1
+| 2048 | 62.7  | 5.6  | 28.2 | 2.6
+| 4096 | 141   | 11.6 | 64.9 | 5.4
+|===
+
+Treat these as ratios: other machines, compilers and sizes give other numbers. Run `fft_bench` on your own target.
+
+On either backend, a transform never allocates, so it is safe on the audio thread. PFFFT's per-size setup is made when the program, or the plugin, loads. Its scratch space lives on the stack: up to `2N` floats for `fft`, plus the same again when the buffer needs the copy below.
+
+PFFFT on x86 needs its buffers 16-byte aligned. Any `float` pointer still works: a misaligned one goes through an aligned copy. Declaring the buffer `alignas(16)` avoids the copy. ARM has no such requirement.
+
+Q is header-only, and so is PFFFT as Q uses it: with the option on, Q's CMake fetches PFFFT and gives `libq` the `Q_USE_PFFFT` definition and PFFFT's include paths, and nothing is compiled. A build that does not use CMake gets Q's own implementation, unless it defines `Q_USE_PFFFT` and adds PFFFT's `include/pffft` and `src` directories to its include path. Turn PFFFT off with `-DQ_USE_PFFFT=OFF`.
 
 == Include
 
@@ -45,6 +106,12 @@ template <std::size_t N, std::floating_point T>
 void ifft(T* data);
 
 template <std::size_t N, std::floating_point T>
+void rfft(T* data);
+
+template <std::size_t N, std::floating_point T>
+void irfft(T* data);
+
+template <std::size_t N, std::floating_point T>
 void magspec(T* data);
 ```
 
@@ -54,9 +121,10 @@ The template parameter order is `<N, T>`, and `T` is deduced from the pointer: w
 
 === Notation
 
-`N`         :: A compile-time `std::size_t`, a power of two: the number of complex points.
-`T`         :: A floating-point type (e.g. `float`, `double`), deduced from `data`.
+`N`         :: A compile-time `std::size_t`, a power of two: the number of complex points (`fft`, `ifft`, `magspec`) or real samples (`rfft`, `irfft`, at least 2).
+`T`         :: A floating-point type (e.g. `float`, `double`), deduced from `data` or `rdata`.
 `data`      :: A pointer to an array of `2N` elements of type `T` (`N` interleaved complex numbers).
+`rdata`     :: A pointer to an array of `N+2` elements of type `T` (`N` real samples, or `N/2+1` interleaved complex bins).
 
 === Functions
 
@@ -68,6 +136,12 @@ The template parameter order is `<N, T>`, and `T` is deduced from the pointer: w
                          points in `data`, in place.                       | `void`
 | `ifft<N>(data)`      | Compute the inverse FFT of the `N`-bin spectrum
                          in `data`, in place, normalized by `N`.           | `void`
+| `rfft<N>(rdata)`     | Compute the forward FFT of the `N` real samples
+                         in `rdata`, in place, giving the `N/2+1` bins
+                         from DC through Nyquist.                          | `void`
+| `irfft<N>(rdata)`    | Compute the inverse of `rfft` from the `N/2+1`
+                         bins in `rdata`, in place, giving `N` real
+                         samples normalized by `N`.                        | `void`
 | `magspec<N>(data)`   | Compute the forward FFT of `data`, then the
                          magnitude spectrum of a real input in the
                          leading `N/2+1` elements of `data`, DC through
@@ -78,31 +152,47 @@ NOTE: For a real input signal, the magnitude at bin `k` can be computed directly
 
 === Example
 
-Transform `N` samples of a real signal, read the magnitude of one bin, then transform back:
+A guitar tuner's display wants the strongest partial in the input. Window a frame of 2048 samples of `in` at `sps` samples per second, transform it, and find the bin with the most energy:
 
 ```c++
 #include <q/fft/fft.hpp>
 #include <array>
+#include <cmath>
+#include <numbers>
 #include <span>
 ...
 namespace q = cycfi::q;
 
-std::span<float const> input;       // the real signal, N samples
-std::size_t k;                      // the bin to read
+std::span<float const> in;              // the guitar input, at least N samples
+float sps;                              // samples per second
 ...
-constexpr std::size_t N = 1024;          // complex points (power of two)
-std::array<float, 2 * N> data{};         // 2N scalars, zero-initialized
+constexpr std::size_t N = 2048;
+alignas(16) std::array<float, N + 2> data;
 
-// Load a real signal into the real slots; imaginary slots stay zero.
-for (std::size_t i = 0; i != N; ++i)
-   data[2 * i] = input[i];
+for (std::size_t i = 0; i != N; ++i)                                     <1>
+   data[i] = in[i] * 0.5f * (1 - std::cos(2 * std::numbers::pi_v<float> * i / N));
 
-q::fft<N>(data.data());                                    <1>
-auto mag_k = std::hypot(data[2 * k], data[2 * k + 1]);     <2>
+q::rfft<N>(data.data());                                                 <2>
 
-q::ifft<N>(data.data());                                   <3>
+std::size_t peak = 1;
+for (std::size_t k = 2; k < N/2; ++k)                                    <3>
+{
+   if (std::hypot(data[2*k], data[2*k + 1])
+      > std::hypot(data[2*peak], data[2*peak + 1]))
+      peak = k;
+}
+auto freq = peak * sps / N;                                              <4>
 ```
 
-<1> Compute the forward FFT in place: bin `k` is at `data[2 * k]` (real) and `data[2 * k + 1]` (imaginary).
-<2> Get the magnitude of bin `k`.
-<3> Compute the inverse FFT in place: the real slots hold `input` again, to within rounding error.
+<1> Load the samples with a Hann window, which keeps a partial's energy from spreading across distant bins.
+<2> Compute the forward FFT in place: bin `k` is at `data[2 * k]` (real) and `data[2 * k + 1]` (imaginary).
+<3> Find the bin with the largest magnitude, skipping DC and Nyquist.
+<4> Convert the bin to Hz: bin `k` is centred on `k * sps / N`, here within 11 Hz at 44.1 kHz. A tuner refines this further.
+
+== Implementation Details
+
+NOTE: Implementation details are subject to change without notice. Rely only on the expressions above.
+
+Q's own `rfft` reads the `N` samples as `N/2` complex values, `z(m) = x(2m) + i x(2m+1)`, and transforms those with the complex FFT. Each pair of bins `k` and `N/2-k` of the result then separates into the transforms of the even and the odd samples, `E(k)` and `O(k)`, and `X(k) = E(k) + exp(-2πik/N) O(k)`. `irfft` runs the same steps backwards.
+
+PFFFT comes from Cycfi's fork, https://github.com/cycfi/pffft[cycfi/pffft], and is compiled into each translation unit that includes `fft.hpp`, inside a namespace of Q's, with internal linkage. With `Q_USE_PFFFT` and without it, the public functions live in different inline namespaces, so translation units built with and without it still link together, each with its own implementation.
