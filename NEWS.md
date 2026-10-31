@@ -5,7 +5,19 @@ High-level, user-facing changes only. For the day-to-day detail, see
 
 ## v1.6.0 (in development, on `develop`)
 
-Nothing yet.
+**Breaking: the FFT is an object.** The compile-time functions
+`q::fft<N>`, `ifft<N>`, `rfft<N>`, `irfft<N>` and `magspec<N>` are gone.
+In their place, `q::fft` (complex) and `q::rfft` (real) are built once
+with their size and transform in place: `q::fft f{N};` then
+`f.forward(data)` and `f.inverse(data)`. The data layouts and the scaling
+are unchanged. `basic_fft<double>` and `basic_rfft<double>` cover double.
+Build the object outside the audio callback, since it allocates; a
+transform never does. See the FFT reference page, "Migrating from v1.5".
+
+**PFFFT.** Float transforms run on PFFFT, a SIMD FFT, about 4x faster
+than Q's own, which is also new and about 3x faster than v1.5's. It is
+header-only as Q uses it and on by default; `-DQ_USE_PFFFT=OFF` leaves it
+out.
 
 ## v1.5.4 (2026-10-09)
 

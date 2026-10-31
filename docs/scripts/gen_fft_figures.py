@@ -1,10 +1,10 @@
 #!/usr/bin/env /usr/bin/python3
 """Generate the FFT magnitude-spectrum figure for the q FFT reference page.
 
-q's `fft<N>` is a standard N-point complex DFT (verified against the header:
-bin k lands at data[2k] (real), data[2k+1] (imag), no forward scaling). For a
-real input signal, the magnitude spectrum |X[k]| = sqrt(re^2 + im^2) is exactly
-numpy's rfft magnitude, so numpy faithfully reproduces what q computes. We plot
+q's `rfft` is a standard n-point real DFT (verified against the header: bin
+k lands at data[2k] (real), data[2k+1] (imag), no forward scaling), so its
+magnitude spectrum |X[k]| = sqrt(re^2 + im^2) is exactly numpy's rfft
+magnitude, and numpy faithfully reproduces what q computes. We plot
 a composite of three tones so the peaks land on known bins.
 
 Palette + style per docs/scripts/gen_interpolation_figures.py.
