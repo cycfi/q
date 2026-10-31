@@ -825,7 +825,7 @@ programming techniques, especially function composition using fine-grained and r
 <p><a href="reference/q_lib.html#_contents" class="xref page">Highly Reusable, Modular Building Blocks</a></p>
 </li>
 <li>
-<p><a href="#_dependencies">Header-Only DSP Core, No Third-Party Dependencies</a></p>
+<p><a href="#_dependencies">Header-Only DSP Core, Third-Party Code Optional</a></p>
 </li>
 <li>
 <p><a href="https://github.com/cycfi/q/blob/develop/LICENSE">MIT License</a></p>
@@ -992,7 +992,9 @@ you configure.</p>
 <dd>
 <p>Only the C&#43;&#43; standard library and the header-only
 <a href="https://github.com/cycfi/infra">Cycfi infra</a>, a git submodule. A clone
-without the submodule still builds: CMake fetches infra instead.</p>
+without the submodule still builds: CMake fetches infra instead. The float
+FFTs run on <a href="https://github.com/marton78/pffft">PFFFT</a>, from a Cycfi fork,
+used header-only; <code>-D Q_USE_PFFFT=OFF</code> leaves it out.</p>
 </dd>
 <dt class="hdlist1">QIO (<code>q_io</code>)</dt>
 <dd>

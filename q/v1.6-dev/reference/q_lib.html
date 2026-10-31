@@ -796,7 +796,9 @@
 <p><strong>q_lib</strong> is the core of Q: the DSP library itself. It is header-only, and it
 depends on nothing but the C&#43;&#43; standard library and the header-only Cycfi
 infra, so the same code runs on a desktop, inside a plugin, or on a small
-microcontroller with no operating system. <a href="q_io.html" class="xref page">q_io</a> and
+microcontroller with no operating system. Its float FFTs run on PFFFT, also
+header-only as Q uses it, unless <code>Q_USE_PFFFT</code> is off (see
+<a href="spectral/fft.html#_backends" class="xref page">FFT Backends</a>). <a href="q_io.html" class="xref page">q_io</a> and
 <a href="../q_plug/index.html" class="xref page">QPlug</a> build on it; it builds on neither.</p>
 </div>
 <div class="paragraph">

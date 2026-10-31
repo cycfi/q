@@ -795,7 +795,8 @@
 <div class="sectionbody">
 <div class="paragraph">
 <p>The DSP core, <code>q_lib</code>, is header-only and needs only the C&#43;&#43; standard
-library and the header-only Cycfi infra, so it builds for a microcontroller
+library and the header-only Cycfi infra (with PFFFT turned off, as below),
+so it builds for a microcontroller
 with any cross compiler that supports C&#43;&#43;20. It is tested on an STM32H7
 (Cortex-M7) with Arm GCC 12.3, the compiler in ST&#8217;s STM32CubeCLT, in a
 firmware that runs Q&#8217;s MIDI 2.0 stack over USB, and runs in Infinity&#8217;s
@@ -824,6 +825,7 @@ M33 and M55, each with its FPU.</p>
 <pre class="highlightjs highlight"><code class="language-cmake hljs" data-lang="cmake">set(Q_BUILD_EXAMPLES OFF CACHE BOOL "")
 set(Q_BUILD_TEST OFF CACHE BOOL "")
 set(Q_BUILD_IO OFF CACHE BOOL "")       # q_io needs a desktop OS
+set(Q_USE_PFFFT OFF CACHE BOOL "")      # Q's own FFT, no heap at startup
 add_compile_definitions(Q_DONT_USE_THREADS)
 add_subdirectory(q)
 
@@ -833,6 +835,9 @@ target_link_libraries(my_firmware libq)</code></pre>
 <div class="paragraph">
 <p><code>Q_DONT_USE_THREADS</code> leaves out the few facilities that need
 <code>std::thread</code>, such as <code>q::sleep</code>, for a target with no threads.
+<code>Q_USE_PFFFT</code> off keeps the FFTs on Q&#8217;s own implementation. A Cortex-M has
+no NEON, so PFFFT would run its plain scalar code there, and it allocates a
+setup on the heap for each transform size it uses when the firmware starts.
 <code>Q_BUILD_PLUG</code> is off by default.</p>
 </div>
 <hr>

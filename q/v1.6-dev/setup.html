@@ -821,8 +821,10 @@ dependencies; see <a href="#_dependencies">Dependencies</a>)</p>
 <td class="content">
 The core of the library (<code>q_lib</code>), excluding the audio and MIDI I/O layer
 (<code>q_io</code>), is header-only and depends only on a conforming C++20 standard
-library. This core subset has been successfully used on bare-metal embedded
-targets, including the Teensy and STM32 series, with no operating system.
+library, and on PFFFT for its float FFTs unless you turn that off (see
+<a href="#_dependencies">Dependencies</a>). This core subset has been successfully used on bare-metal
+embedded targets, including the Teensy and STM32 series, with no operating
+system.
 </td>
 </tr>
 </table>
@@ -949,7 +951,7 @@ used. ALSA MIDI still works on a system running PipeWire.
 <h2 id="_dependencies"><a class="anchor" href="#_dependencies"></a>Dependencies</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Q depends on three libraries, brought in two different ways:</p>
+<p>Q depends on four libraries, brought in two different ways:</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -974,6 +976,14 @@ used. ALSA MIDI still works on a system running PipeWire.
   builds.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/marton78/pffft">PFFFT</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CMake FetchContent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SIMD FFT that the float transforms of <a href="reference/spectral/fft.html" class="xref page">FFT</a>
+  run on, from <a href="https://github.com/cycfi/pffft">Cycfi&#8217;s fork</a>. Used
+  header-only: nothing of it is compiled into a library. Downloaded
+  automatically at configure time, unless <code>Q_USE_PFFFT</code> is off.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/thestk/rtaudio">RtAudio</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">CMake FetchContent</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Cross-platform audio I/O. Downloaded automatically at configure time.</p></td>
@@ -988,8 +998,8 @@ used. ALSA MIDI still works on a system running PipeWire.
 </table>
 <div class="paragraph">
 <p>You do not install any of these by hand. RtAudio and libremidi are always
-fetched by CMake; <code>infra</code> is used from the submodule when present and fetched
-otherwise.</p>
+fetched by CMake, and PFFFT unless <code>Q_USE_PFFFT</code> is off; <code>infra</code> is used from
+the submodule when present and fetched otherwise.</p>
 </div>
 <div class="paragraph">
 <p>QPlug, the optional audio plugin layer, brings its own dependencies
@@ -1048,9 +1058,9 @@ cmake --build build</code></pre>
 </div>
 <div class="paragraph">
 <p><code>cmake -B build</code> generates the build system into a <code>build/</code> directory using
-your platform&#8217;s default generator. The first configure downloads RtAudio,
-libremidi, and (if the submodule is absent) <code>infra</code>, so it takes longer than
-subsequent runs. <code>cmake --build build</code> then compiles the library, the tests,
+your platform&#8217;s default generator. The first configure downloads PFFFT,
+RtAudio, libremidi, and (if the submodule is absent) <code>infra</code>, so it takes
+longer than subsequent runs. <code>cmake --build build</code> then compiles the library, the tests,
 and the examples; <a href="testing.html" class="xref page">Testing Q</a> runs them.</p>
 </div>
 <div class="paragraph">
@@ -1103,8 +1113,9 @@ Pass the matching generator with <code>-G</code>:</p>
 <p>You can turn off parts of the build with CMake options:
 <code>-D Q_BUILD_EXAMPLES=OFF</code>, <code>-D Q_BUILD_TEST=OFF</code>, and <code>-D Q_BUILD_IO=OFF</code>
 (the last drops the audio/MIDI I/O layer and its RtAudio and libremidi
-dependencies, leaving the header-only <code>q_lib</code> core). QPlug is off unless
-you turn it on with <code>-D Q_BUILD_PLUG=ON</code>.</p>
+dependencies, leaving the header-only <code>q_lib</code> core). <code>-D Q_USE_PFFFT=OFF</code>
+runs the FFTs on Q&#8217;s own implementation and leaves PFFFT out. QPlug is off
+unless you turn it on with <code>-D Q_BUILD_PLUG=ON</code>.</p>
 </div>
 <hr>
 <div class="paragraph">
