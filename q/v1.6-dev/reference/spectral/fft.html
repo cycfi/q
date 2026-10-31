@@ -794,37 +794,37 @@
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The Fast Fourier Transform (FFT) converts a block of time-domain samples into its frequency-domain representation and back. Q provides compact, header-only, in-place transforms whose size is a compile-time constant. Q&#8217;s own implementation follows the Danielson-Lanczos form of the Cooley-Tukey algorithm, built with template metaprogramming. Float transforms of practical sizes run on PFFFT instead, a SIMD FFT, when Q is built with it (see <a href="#_backends">Backends</a>).</p>
-</div>
-<div class="paragraph">
-<p>Five functions are provided:</p>
+<p>The Fast Fourier Transform (FFT) converts a block of time-domain samples into its frequency-domain representation and back. Q provides two transforms, each an object built for one size:</p>
 </div>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>fft&lt;N&gt;</code>      </dt>
+<dt class="hdlist1"><code>fft</code>   </dt>
 <dd>
-<p>Forward transform (time &#8594; frequency) of <code>N</code> complex points, in place.</p>
+<p>An FFT of <code>n</code> complex values, in place.</p>
 </dd>
-<dt class="hdlist1"><code>ifft&lt;N&gt;</code>     </dt>
+<dt class="hdlist1"><code>rfft</code>  </dt>
 <dd>
-<p>Inverse transform (frequency &#8594; time), in place, normalized by <code>N</code>.</p>
-</dd>
-<dt class="hdlist1"><code>rfft&lt;N&gt;</code>     </dt>
-<dd>
-<p>Forward transform of <code>N</code> real samples to the <code>N/2+1</code> bins from DC to Nyquist, in place.</p>
-</dd>
-<dt class="hdlist1"><code>irfft&lt;N&gt;</code>    </dt>
-<dd>
-<p>Inverse of <code>rfft</code>, back to <code>N</code> real samples, in place, normalized by <code>N</code>.</p>
-</dd>
-<dt class="hdlist1"><code>magspec&lt;N&gt;</code>  </dt>
-<dd>
-<p>Forward transform followed by an in-place magnitude spectrum.</p>
+<p>An FFT of <code>n</code> real samples to the <code>n/2+1</code> bins from DC to Nyquist, in place.</p>
 </dd>
 </dl>
 </div>
 <div class="paragraph">
-<p><code>N</code> <strong>must be a power of two</strong> (enforced by a <code>static_assert</code>). All five operate on a plain array of scalars and modify it in place.</p>
+<p>Both are built once with their size, which must be a power of two, and then transform any number of blocks of that size. Building one allocates everything it needs; a transform never allocates, so it is safe on the audio thread. A size can follow the sample rate: a frame of a given duration takes twice the samples at 96 kHz as at 48 kHz.</p>
+</div>
+<div class="paragraph">
+<p><code>fft</code> and <code>rfft</code> work in <code>float</code>. <code>basic_fft&lt;T&gt;</code> and <code>basic_rfft&lt;T&gt;</code> are the templates they come from, for <code>double</code> as well. Float transforms of practical sizes run on PFFFT, a SIMD FFT, when Q is built with it (see <a href="#_backends">Backends</a>).</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="⚠️ &#160;WARNING"></i>
+</td>
+<td class="content">
+<strong>Breaking change in v1.6.</strong> The compile-time functions <code>fft&lt;N&gt;</code>, <code>ifft&lt;N&gt;</code>, <code>rfft&lt;N&gt;</code>, <code>irfft&lt;N&gt;</code> and <code>magspec&lt;N&gt;</code> of v1.5 and earlier are gone, replaced by the <code>fft</code> and <code>rfft</code> objects. Code that calls them no longer compiles. See <a href="#_migrating_from_v1_5">Migrating from v1.5</a> for the changes a client makes.
+</td>
+</tr>
+</table>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -840,39 +840,39 @@
 <div class="sect2">
 <h3 id="_complex_data"><a class="anchor" href="#_complex_data"></a>Complex Data</h3>
 <div class="paragraph">
-<p><code>fft</code>, <code>ifft</code> and <code>magspec</code> work on <strong>complex</strong> data packed as interleaved real and imaginary parts:</p>
+<p><code>fft</code> works on <strong>complex</strong> data packed as interleaved real and imaginary parts:</p>
 </div>
 <div class="ulist none">
 <ul class="none">
 <li>
-<p><code>data = [ re(0), im(0), re(1), im(1), &#8230;&#8203; , re(N-1), im(N-1) ]</code></p>
+<p><code>data = [ re(0), im(0), re(1), im(1), &#8230;&#8203; , re(n-1), im(n-1) ]</code></p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>So an <code>N</code>-point transform needs an array of <strong><code>2N</code> scalars</strong>. Bin <code>k</code> occupies <code>data[2k]</code> (real) and <code>data[2k+1]</code> (imaginary).</p>
+<p>So an <code>n</code>-point transform needs an array of <strong><code>2n</code> scalars</strong>. Bin <code>k</code> occupies <code>data[2k]</code> (real) and <code>data[2k+1]</code> (imaginary).</p>
 </div>
 <div class="paragraph">
-<p>The forward transform applies no scaling: a unit-amplitude complex exponential at bin <code>k</code> produces a peak of magnitude <code>N</code> at that bin. For a real input, the energy splits between the bin <code>k</code> and its conjugate mirror <code>N-k</code>, so a real tone of amplitude <code>A</code> reads <code>A * N/2</code> at its bin. The inverse transform divides by <code>N</code>, so <code>fft</code> followed by <code>ifft</code> restores the input to within rounding error.</p>
+<p>The forward transform applies no scaling: a unit-amplitude complex exponential at bin <code>k</code> produces a peak of magnitude <code>n</code> at that bin. For a real input, the energy splits between the bin <code>k</code> and its conjugate mirror <code>n-k</code>, so a real tone of amplitude <code>A</code> reads <code>A * n/2</code> at its bin. The inverse divides by <code>n</code>, so a forward transform followed by the inverse restores the input to within rounding error.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_real_data"><a class="anchor" href="#_real_data"></a>Real Data</h3>
 <div class="paragraph">
-<p>The spectrum of a real signal is conjugate-symmetric, so its upper half repeats the lower half. <code>rfft</code> computes only the bins that carry information, DC through Nyquist, at about half the cost of <code>fft</code>. It takes an array of <strong><code>N+2</code> scalars</strong>:</p>
+<p>The spectrum of a real signal is conjugate-symmetric, so its upper half repeats the lower half. <code>rfft</code> computes only the bins that carry information, DC through Nyquist, at about half the cost of <code>fft</code>. It takes an array of <strong><code>n+2</code> scalars</strong>:</p>
 </div>
 <div class="ulist none">
 <ul class="none">
 <li>
-<p>On input, the <code>N</code> samples: <code>data = [ x(0), x(1), &#8230;&#8203; , x(N-1), _, _ ]</code></p>
+<p>On input, the <code>n</code> samples: <code>data = [ x(0), x(1), &#8230;&#8203; , x(n-1), _, _ ]</code></p>
 </li>
 <li>
-<p>On output, <code>N/2+1</code> bins: <code>data = [ re(0), im(0), re(1), im(1), &#8230;&#8203; , re(N/2), im(N/2) ]</code></p>
+<p>On output, <code>n/2+1</code> bins: <code>data = [ re(0), im(0), re(1), im(1), &#8230;&#8203; , re(n/2), im(n/2) ]</code></p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>The two extra scalars make room for the Nyquist bin. The imaginary parts of the DC and Nyquist bins are always zero; <code>irfft</code> ignores them. Scaling is the same as <code>fft</code> and <code>ifft</code>: <code>rfft</code> applies none, and <code>irfft</code> divides by <code>N</code>, so <code>rfft</code> followed by <code>irfft</code> restores the samples.</p>
+<p>The two extra scalars make room for the Nyquist bin. The imaginary parts of the DC and Nyquist bins are always zero, and the inverse ignores them. Scaling is the same as <code>fft&#8217;s: the forward transform applies none, and the inverse divides by `n</code>.</p>
 </div>
 <div class="paragraph">
 <p>To remove everything above 5 kHz from a frame of 1024 samples at <code>sps</code> samples per second, zero the bins above it and transform back:</p>
@@ -880,22 +880,23 @@
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fft/fft.hpp&gt;
-#include &lt;array&gt;
+#include &lt;vector&gt;
 ...
 namespace q = cycfi::q;
 
 float sps;                                // samples per second
 ...
-constexpr std::size_t N = 1024;
-std::array&lt;float, N + 2&gt; data;            // N samples, then room for N/2+1 bins
+constexpr std::size_t n = 1024;
+q::rfft f{n};                             // build it once
+std::vector&lt;float&gt; data(n + 2);           // n samples, then room for n/2+1 bins
 ...
-q::rfft&lt;N&gt;(data.data());
+f.forward(data.data());
 
-auto cutoff = std::size_t(5000.0f * N / sps);    // the bin at 5 kHz
-for (auto k = cutoff + 1; k &lt;= N/2; ++k)
+auto cutoff = std::size_t(5000.0f * n / sps);    // the bin at 5 kHz
+for (auto k = cutoff + 1; k &lt;= n/2; ++k)
    data[2*k] = data[2*k + 1] = 0.0f;
 
-q::irfft&lt;N&gt;(data.data());                 // data[0 .. N-1]: the filtered frame</code></pre>
+f.inverse(data.data());                   // data[0 .. n-1]: the filtered frame</code></pre>
 </div>
 </div>
 <div class="admonitionblock warning">
@@ -917,7 +918,7 @@ The transforms are <strong>in place</strong>: they overwrite the input array wit
 <h2 id="_backends"><a class="anchor" href="#_backends"></a>Backends</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>With the CMake option <code>Q_USE_PFFFT</code> on (the default), the <code>float</code> transforms run on <a href="https://github.com/marton78/pffft">PFFFT</a>, a SIMD FFT using NEON on ARM and SSE on x86: <code>fft</code> and <code>ifft</code> from 16 points up, <code>rfft</code> and <code>irfft</code> from 32. <code>double</code>, and the smaller sizes, use Q&#8217;s own implementation. The API, the data layout and the scaling are the same either way. Results agree to within rounding, but are not bit-identical between the two.</p>
+<p>With the CMake option <code>Q_USE_PFFFT</code> on (the default), the <code>float</code> transforms run on <a href="https://github.com/marton78/pffft">PFFFT</a>, a SIMD FFT using NEON on ARM and SSE on x86: <code>fft</code> from 16 points up, <code>rfft</code> from 32. <code>double</code>, and the smaller sizes, use Q&#8217;s own implementation. The API, the data layout and the scaling are the same either way. Results agree to within rounding, but are not bit-identical between the two.</p>
 </div>
 <div class="paragraph">
 <p>The time for one frame (copy a frame in, forward transform, inverse transform), in µs, measured with <code>test/benchmark/fft_bench</code> on an Apple M2:</p>
@@ -932,48 +933,48 @@ The transforms are <strong>in place</strong>: they overwrite the input array wit
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top"><code>N</code></th>
-<th class="tableblock halign-left valign-top"><code>fft</code> + <code>ifft</code>, Q&#8217;s own</th>
-<th class="tableblock halign-left valign-top"><code>fft</code> + <code>ifft</code>, PFFFT</th>
-<th class="tableblock halign-left valign-top"><code>rfft</code> + <code>irfft</code>, Q&#8217;s own</th>
-<th class="tableblock halign-left valign-top"><code>rfft</code> + <code>irfft</code>, PFFFT</th>
+<th class="tableblock halign-left valign-top"><code>n</code></th>
+<th class="tableblock halign-left valign-top"><code>fft</code>, Q&#8217;s own</th>
+<th class="tableblock halign-left valign-top"><code>fft</code>, PFFFT</th>
+<th class="tableblock halign-left valign-top"><code>rfft</code>, Q&#8217;s own</th>
+<th class="tableblock halign-left valign-top"><code>rfft</code>, PFFFT</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">256</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">4.5</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.56</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.9</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.55</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0.28</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">512</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">11.5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.4</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">4.7</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.3</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0.55</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1024</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">27.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9.6</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2.4</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">12.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5.1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.1</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2048</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">62.7</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20.7</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">5.6</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">28.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10.9</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2.6</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">4096</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">141</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">11.6</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">64.9</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">5.4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">44.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11.4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">23.5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5.3</p></td>
 </tr>
 </tbody>
 </table>
@@ -981,13 +982,87 @@ The transforms are <strong>in place</strong>: they overwrite the input array wit
 <p>Treat these as ratios: other machines, compilers and sizes give other numbers. Run <code>fft_bench</code> on your own target.</p>
 </div>
 <div class="paragraph">
-<p>On either backend, a transform never allocates, so it is safe on the audio thread. PFFFT&#8217;s per-size setup is made when the program, or the plugin, loads. Its scratch space lives on the stack: up to <code>2N</code> floats for <code>fft</code>, plus the same again when the buffer needs the copy below.</p>
+<p>An object owns everything a transform uses: PFFFT&#8217;s setup for its size and its work space, or the tables of Q&#8217;s own implementation. Each object therefore makes one setup, for the one size it was built with. Because the work space is the object&#8217;s, two threads transforming at the same time need two objects.</p>
 </div>
 <div class="paragraph">
-<p>PFFFT on x86 needs its buffers 16-byte aligned. Any <code>float</code> pointer still works: a misaligned one goes through an aligned copy. Declaring the buffer <code>alignas(16)</code> avoids the copy. ARM has no such requirement.</p>
+<p>PFFFT on x86 needs its buffers 16-byte aligned. Any <code>float</code> pointer still works: a misaligned one goes through a buffer in the object, at the cost of a copy. Declaring the data <code>alignas(16)</code> avoids the copy. ARM has no such requirement.</p>
 </div>
 <div class="paragraph">
 <p>Q is header-only, and so is PFFFT as Q uses it: with the option on, Q&#8217;s CMake fetches PFFFT and gives <code>libq</code> the <code>Q_USE_PFFFT</code> definition and PFFFT&#8217;s include paths, and nothing is compiled. A build that does not use CMake gets Q&#8217;s own implementation, unless it defines <code>Q_USE_PFFFT</code> and adds PFFFT&#8217;s <code>include/pffft</code> and <code>src</code> directories to its include path. Turn PFFFT off with <code>-DQ_USE_PFFFT=OFF</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_migrating_from_v1_5"><a class="anchor" href="#_migrating_from_v1_5"></a>Migrating from v1.5</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Up to v1.5, the transforms were free functions with the size as a template argument. From v1.6 they are objects built with the size. Each call changes as follows:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">v1.5</th>
+<th class="tableblock halign-left valign-top">v1.6</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q::fft&lt;N&gt;(data)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q::fft f{N};</code> once, then <code>f.forward(data)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q::ifft&lt;N&gt;(data)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>f.inverse(data)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A real signal through <code>fft&lt;N&gt;</code>,
+  imaginary slots zeroed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q::rfft r{N};</code> once, then <code>r.forward(rdata)</code>
+                                      (<code>N+2</code> scalars, the samples first)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q::magspec&lt;N&gt;(data)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r.forward(rdata)</code>, then <code>std::hypot</code> on each bin</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code> data</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q::basic_fft&lt;double&gt;</code>, <code>q::basic_rfft&lt;double&gt;</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Build the object where you set up, not in the audio callback: its constructor allocates. The data layouts, and the scaling (none on the forward transform, <code>1/n</code> on the inverse), are unchanged, so the code around the call stays the same.</p>
+</div>
+<div class="paragraph">
+<p>A magnitude spectrum, before and after:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fft/fft.hpp&gt;
+#include &lt;algorithm&gt;
+#include &lt;cmath&gt;
+#include &lt;vector&gt;
+...
+namespace q = cycfi::q;
+
+constexpr std::size_t n = 1024;
+std::vector&lt;float&gt; samples(n);          // a frame of real samples
+std::vector&lt;float&gt; mag(n/2 + 1);        // the magnitude of each bin
+...
+// v1.5: std::array&lt;float, 2*n&gt; d{}; real slots only, then
+//       q::magspec&lt;n&gt;(d.data()); mag[k] = d[k];
+
+q::rfft f{n};
+std::vector&lt;float&gt; data(n + 2);
+std::copy(samples.begin(), samples.end(), data.begin());
+f.forward(data.data());
+for (std::size_t k = 0; k &lt;= n/2; ++k)
+   mag[k] = std::hypot(data[2*k], data[2*k + 1]);</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -1006,24 +1081,62 @@ The transforms are <strong>in place</strong>: they overwrite the input array wit
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;std::size_t N, std::floating_point T&gt;
-void fft(T* data);
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;std::floating_point T&gt;
+class basic_fft
+{
+public:
 
-template &lt;std::size_t N, std::floating_point T&gt;
-void ifft(T* data);
+   explicit       basic_fft(std::size_t n);
 
-template &lt;std::size_t N, std::floating_point T&gt;
-void rfft(T* data);
+   std::size_t    size() const;
+   void           forward(T* data);
+   void           inverse(T* data);
+};
 
-template &lt;std::size_t N, std::floating_point T&gt;
-void irfft(T* data);
+template &lt;std::floating_point T&gt;
+class basic_rfft
+{
+public:
 
-template &lt;std::size_t N, std::floating_point T&gt;
-void magspec(T* data);</code></pre>
+   explicit       basic_rfft(std::size_t n);
+
+   std::size_t    size() const;
+   void           forward(T* data);
+   void           inverse(T* data);
+};
+
+using fft = basic_fft&lt;float&gt;;
+using rfft = basic_rfft&lt;float&gt;;</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The template parameter order is <code>&lt;N, T&gt;</code>, and <code>T</code> is deduced from the pointer: write <code>fft&lt;N&gt;(data)</code>.</p>
+<p><code>T</code> is <code>float</code> or <code>double</code>. Copying an object makes a new setup for the same size, which allocates; moving one does not.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_template_instantiations"><a class="anchor" href="#_template_instantiations"></a>Template Instantiations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>fft</code> and <code>rfft</code> are the template instantiations of <code>basic_fft</code> and <code>basic_rfft</code> for <code>float</code>:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>fft</code></dt>
+<dd>
+<p>An FFT of <code>n</code> complex <code>float</code> values.</p>
+</dd>
+<dt class="hdlist1"><code>rfft</code></dt>
+<dd>
+<p>An FFT of <code>n</code> real <code>float</code> samples.</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using fft = basic_fft&lt;float&gt;;
+using rfft = basic_rfft&lt;float&gt;;</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -1034,23 +1147,76 @@ void magspec(T* data);</code></pre>
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>N</code>         </dt>
+<dt class="hdlist1"><code>T</code>       </dt>
 <dd>
-<p>A compile-time <code>std::size_t</code>, a power of two: the number of complex points (<code>fft</code>, <code>ifft</code>, <code>magspec</code>) or real samples (<code>rfft</code>, <code>irfft</code>, at least 2).</p>
+<p>A floating-point type, <code>float</code> or <code>double</code>.</p>
 </dd>
-<dt class="hdlist1"><code>T</code>         </dt>
+<dt class="hdlist1"><code>n</code>       </dt>
 <dd>
-<p>A floating-point type (e.g. <code>float</code>, <code>double</code>), deduced from <code>data</code> or <code>rdata</code>.</p>
+<p>A <code>std::size_t</code>, a power of two: the number of complex values (<code>basic_fft</code>) or real samples (<code>basic_rfft</code>, at least 2).</p>
 </dd>
-<dt class="hdlist1"><code>data</code>      </dt>
+<dt class="hdlist1"><code>f</code>       </dt>
 <dd>
-<p>A pointer to an array of <code>2N</code> elements of type <code>T</code> (<code>N</code> interleaved complex numbers).</p>
+<p>An object of type <code>basic_fft&lt;T&gt;</code>.</p>
 </dd>
-<dt class="hdlist1"><code>rdata</code>     </dt>
+<dt class="hdlist1"><code>r</code>       </dt>
 <dd>
-<p>A pointer to an array of <code>N+2</code> elements of type <code>T</code> (<code>N</code> real samples, or <code>N/2+1</code> interleaved complex bins).</p>
+<p>An object of type <code>basic_rfft&lt;T&gt;</code>.</p>
+</dd>
+<dt class="hdlist1"><code>data</code>    </dt>
+<dd>
+<p>A pointer to <code>2n</code> elements of type <code>T</code> (<code>n</code> interleaved complex values).</p>
+</dd>
+<dt class="hdlist1"><code>rdata</code>   </dt>
+<dd>
+<p>A pointer to <code>n+2</code> elements of type <code>T</code> (<code>n</code> real samples, or <code>n/2+1</code> interleaved complex bins).</p>
 </dd>
 </dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_constructors"><a class="anchor" href="#_constructors"></a>Constructors</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_fft&lt;T&gt;(n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>basic_fft</code> of <code>n</code> points. Allocates.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_rfft&lt;T&gt;(n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>basic_rfft</code> of <code>n</code> samples. Allocates.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fft(n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct an <code>fft</code> (<code>float</code>) of <code>n</code> points.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rfft(n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct an <code>rfft</code> (<code>float</code>) of <code>n</code> samples.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+C++ brace initialization may also be used.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
@@ -1070,38 +1236,40 @@ void magspec(T* data);</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fft&lt;N&gt;(data)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Compute the forward FFT of the <code>N</code> complex
-                         points in <code>data</code>, in place.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>f.forward(data)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Compute the forward FFT of the <code>n</code> complex
+                         values in <code>data</code>, in place.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ifft&lt;N&gt;(data)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Compute the inverse FFT of the <code>N</code>-bin spectrum
-                         in <code>data</code>, in place, normalized by <code>N</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>f.inverse(data)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Compute the inverse FFT of the <code>n</code> bins in
+                         <code>data</code>, in place, normalized by <code>n</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rfft&lt;N&gt;(rdata)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Compute the forward FFT of the <code>N</code> real samples
-                         in <code>rdata</code>, in place, giving the <code>N/2+1</code> bins
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r.forward(rdata)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Compute the forward FFT of the <code>n</code> real samples
+                         in <code>rdata</code>, in place, giving the <code>n/2+1</code> bins
                          from DC through Nyquist.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>irfft&lt;N&gt;(rdata)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Compute the inverse of <code>rfft</code> from the <code>N/2+1</code>
-                         bins in <code>rdata</code>, in place, giving <code>N</code> real
-                         samples normalized by <code>N</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r.inverse(rdata)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Compute the inverse of <code>r.forward</code> from the
+                         <code>n/2+1</code> bins in <code>rdata</code>, in place, giving <code>n</code>
+                         real samples normalized by <code>n</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>magspec&lt;N&gt;(data)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Compute the forward FFT of <code>data</code>, then the
-                         magnitude spectrum of a real input in the
-                         leading <code>N/2+1</code> elements of <code>data</code>, DC through
-                         the Nyquist bin.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>f.size()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the number of points.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r.size()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the number of samples.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -1112,7 +1280,7 @@ void magspec(T* data);</code></pre>
 <i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
-For a real input signal, the magnitude at bin <code>k</code> can be computed directly from a forward transform as <code>std::hypot(data[2*k], data[2*k+1])</code>. <code>magspec</code> folds the forward transform and this computation into one in-place pass.
+For a real input signal, the magnitude at bin <code>k</code> is <code>std::hypot(rdata[2*k], rdata[2*k+1])</code> after <code>r.forward(rdata)</code>.
 </td>
 </tr>
 </table>
@@ -1126,51 +1294,56 @@ For a real input signal, the magnitude at bin <code>k</code> can be computed dir
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fft/fft.hpp&gt;
-#include &lt;array&gt;
 #include &lt;cmath&gt;
 #include &lt;numbers&gt;
 #include &lt;span&gt;
+#include &lt;vector&gt;
 ...
 namespace q = cycfi::q;
 
-std::span&lt;float const&gt; in;              // the guitar input, at least N samples
+std::span&lt;float const&gt; in;              // the guitar input, at least n samples
 float sps;                              // samples per second
 ...
-constexpr std::size_t N = 2048;
-alignas(16) std::array&lt;float, N + 2&gt; data;
+constexpr std::size_t n = 2048;
+q::rfft f{n};                                                            <i class="conum" data-value="1"></i><b>(1)</b>
+std::vector&lt;float&gt; data(n + 2);
 
-for (std::size_t i = 0; i != N; ++i)                                     <i class="conum" data-value="1"></i><b>(1)</b>
-   data[i] = in[i] * 0.5f * (1 - std::cos(2 * std::numbers::pi_v&lt;float&gt; * i / N));
+for (std::size_t i = 0; i != n; ++i)                                     <i class="conum" data-value="2"></i><b>(2)</b>
+   data[i] = in[i] * 0.5f * (1 - std::cos(2 * std::numbers::pi_v&lt;float&gt; * i / n));
 
-q::rfft&lt;N&gt;(data.data());                                                 <i class="conum" data-value="2"></i><b>(2)</b>
+f.forward(data.data());                                                  <i class="conum" data-value="3"></i><b>(3)</b>
 
 std::size_t peak = 1;
-for (std::size_t k = 2; k &lt; N/2; ++k)                                    <i class="conum" data-value="3"></i><b>(3)</b>
+for (std::size_t k = 2; k &lt; n/2; ++k)                                    <i class="conum" data-value="4"></i><b>(4)</b>
 {
    if (std::hypot(data[2*k], data[2*k + 1])
       &gt; std::hypot(data[2*peak], data[2*peak + 1]))
       peak = k;
 }
-auto freq = peak * sps / N;                                              <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+auto freq = peak * sps / n;                                              <i class="conum" data-value="5"></i><b>(5)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Load the samples with a Hann window, which keeps a partial&#8217;s energy from spreading across distant bins.</td>
+<td>Build the <code>rfft</code> once, where the tuner is set up: it allocates.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Compute the forward FFT in place: bin <code>k</code> is at <code>data[2 * k]</code> (real) and <code>data[2 * k + 1]</code> (imaginary).</td>
+<td>Load the samples with a Hann window, which keeps a partial&#8217;s energy from spreading across distant bins.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Find the bin with the largest magnitude, skipping DC and Nyquist.</td>
+<td>Compute the forward FFT in place: bin <code>k</code> is at <code>data[2 * k]</code> (real) and <code>data[2 * k + 1]</code> (imaginary).</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Convert the bin to Hz: bin <code>k</code> is centred on <code>k * sps / N</code>, here within 11 Hz at 44.1 kHz. A tuner refines this further.</td>
+<td>Find the bin with the largest magnitude, skipping DC and Nyquist.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Convert the bin to Hz: bin <code>k</code> is centred on <code>k * sps / n</code>, here within 11 Hz at 44.1 kHz. A tuner refines this further.</td>
 </tr>
 </table>
 </div>
@@ -1193,10 +1366,10 @@ Implementation details are subject to change without notice. Rely only on the ex
 </table>
 </div>
 <div class="paragraph">
-<p>Q&#8217;s own <code>rfft</code> reads the <code>N</code> samples as <code>N/2</code> complex values, <code>z(m) = x(2m) + i x(2m+1)</code>, and transforms those with the complex FFT. Each pair of bins <code>k</code> and <code>N/2-k</code> of the result then separates into the transforms of the even and the odd samples, <code>E(k)</code> and <code>O(k)</code>, and <code>X(k) = E(k) + exp(-2πik/N) O(k)</code>. <code>irfft</code> runs the same steps backwards.</p>
+<p>Q&#8217;s own complex FFT is an iterative radix-2 Cooley-Tukey transform. Its twiddle factors are computed once, in double precision, and its bit-reversal order is a table; both are made by the constructor. Its own real FFT reads the <code>n</code> samples as <code>n/2</code> complex values, <code>z(m) = x(2m) + i x(2m+1)</code>, and transforms those with a complex FFT of half the size. Each pair of bins <code>k</code> and <code>n/2-k</code> of the result then separates into the transforms of the even and the odd samples, <code>E(k)</code> and <code>O(k)</code>, and <code>X(k) = E(k) + exp(-2πik/n) O(k)</code>. The inverse runs the same steps backwards.</p>
 </div>
 <div class="paragraph">
-<p>PFFFT comes from Cycfi&#8217;s fork, <a href="https://github.com/cycfi/pffft">cycfi/pffft</a>, and is compiled into each translation unit that includes <code>fft.hpp</code>, inside a namespace of Q&#8217;s, with internal linkage. With <code>Q_USE_PFFFT</code> and without it, the public functions live in different inline namespaces, so translation units built with and without it still link together, each with its own implementation.</p>
+<p>PFFFT comes from Cycfi&#8217;s fork, <a href="https://github.com/cycfi/pffft">cycfi/pffft</a>, and is compiled into each translation unit that includes <code>fft.hpp</code>, inside a namespace of Q&#8217;s, with internal linkage. With <code>Q_USE_PFFFT</code> and without it, the classes live in different inline namespaces, so translation units built with and without it still link together, each with its own implementation.</p>
 </div>
 </div>
 </div>
