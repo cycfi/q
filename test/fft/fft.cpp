@@ -180,6 +180,10 @@ TEST_CASE("magspec: DC and Nyquist magnitudes", "[fft][magspec]")
    }
 }
 
+// The float transforms of 16 points (complex) or 32 points (real) and up
+// run on PFFFT when Q_USE_PFFFT is defined. fft_native.cpp builds this
+// same file without it, so both backends face the same tests.
+
 namespace
 {
    // Naive O(N^2) DFT of a real signal, bins 0 .. N/2.
@@ -332,4 +336,41 @@ TEST_CASE("irfft ignores the imaginary parts of DC and Nyquist", "[fft][rfft]")
    q::irfft<N>(b.data());
    for (std::size_t t = 0; t != N; ++t)
       REQUIRE(a[t] == b[t]);
+}
+
+TEST_CASE("float transforms work on a misaligned buffer", "[fft][rfft]")
+{
+   // One float past a 16-byte boundary: PFFFT on x86 needs its SIMD
+   // alignment, so this case goes through the aligned copy.
+   constexpr std::size_t N = 256;
+   alignas(16) float base[2*N + 4] = {};
+   float* p = base + 1;
+
+   std::vector<float> ref(2*N);
+   for (std::size_t i = 0; i != 2*N; ++i)
+      p[i] = ref[i] = float(std::sin(0.37 * i));
+
+   q::fft<N>(ref.data());
+   q::fft<N>(p);
+   for (std::size_t i = 0; i != 2*N; ++i)
+      REQUIRE(p[i] == ref[i]);
+
+   q::ifft<N>(ref.data());
+   q::ifft<N>(p);
+   for (std::size_t i = 0; i != 2*N; ++i)
+      REQUIRE(p[i] == ref[i]);
+
+   std::vector<float> rref(N + 2);
+   for (std::size_t i = 0; i != N; ++i)
+      p[i] = rref[i] = float(std::cos(0.21 * i));
+
+   q::rfft<N>(rref.data());
+   q::rfft<N>(p);
+   for (std::size_t i = 0; i != N + 2; ++i)
+      REQUIRE(p[i] == rref[i]);
+
+   q::irfft<N>(rref.data());
+   q::irfft<N>(p);
+   for (std::size_t i = 0; i != N; ++i)
+      REQUIRE(p[i] == rref[i]);
 }

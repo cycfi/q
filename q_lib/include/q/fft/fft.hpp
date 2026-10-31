@@ -38,6 +38,10 @@
 #include <numbers>
 #include <utility>
 
+#if defined(Q_USE_PFFFT)
+# include <q/fft/detail/pffft.hpp>
+#endif
+
 namespace cycfi::q
 {
    namespace detail
@@ -352,16 +356,86 @@ namespace cycfi::q
 
          native_ifft<m>(data);
       }
-   }
 
+#if defined(Q_USE_PFFFT)
+      // One PFFFT setup per size and kind, made when the program (or
+      // plugin) loads, so a transform never allocates.
+      template <std::size_t N, pffft::pffft_transform_t K>
+      struct pffft_setup
+      {
+                              pffft_setup()
+                               : _p{pffft::pffft_new_setup(N, K)}
+                              {}
+
+                              ~pffft_setup()
+                              {
+                                 pffft::pffft_destroy_setup(_p);
+                              }
+
+                              pffft_setup(pffft_setup const&) = delete;
+         pffft_setup&         operator=(pffft_setup const&) = delete;
+
+         pffft::PFFFT_Setup*  _p;
+      };
+
+      template <std::size_t N, pffft::pffft_transform_t K>
+      inline pffft_setup<N, K> const pffft_setup_v;
+
+      // PFFFT's smallest power-of-2 sizes. Smaller ones stay native.
+      constexpr std::size_t pffft_min_complex = 16;
+      constexpr std::size_t pffft_min_real = 32;
+
+      // An ordered PFFFT transform in place. PFFFT's scratch lives on the
+      // stack (2N floats complex, N real). A buffer that is misaligned for
+      // PFFFT's SIMD goes through an aligned copy on the stack.
+      template <std::size_t N, pffft::pffft_transform_t K>
+      inline void pffft_run(float* data, pffft::pffft_direction_t dir)
+      {
+         constexpr auto n = (K == pffft::PFFFT_COMPLEX)? 2*N : N;
+         auto setup = pffft_setup_v<N, K>._p;
+
+         if (pffft::is_aligned(data))
+         {
+            pffft::pffft_transform_ordered(setup, data, data, nullptr, dir);
+         }
+         else
+         {
+            alignas(64) float tmp[n];
+            std::copy(data, data+n, tmp);
+            pffft::pffft_transform_ordered(setup, tmp, tmp, nullptr, dir);
+            std::copy(tmp, tmp+n, data);
+         }
+      }
+
+      template <std::size_t N>
+      inline void scale(float* data, std::size_t n)
+      {
+         constexpr float s = 1.0f / N;
+         for (std::size_t i = 0; i != n; ++i)
+            data[i] *= s;
+      }
+#endif
+   }
+}
+
+// With Q_USE_PFFFT, the float transforms run on PFFFT and everything else
+// stays native. The two builds live in different inline namespaces, so
+// translation units that disagree on Q_USE_PFFFT still link, each with its
+// own implementation.
+#if defined(Q_USE_PFFFT)
+namespace cycfi::q::inline fft_pffft
+#else
+namespace cycfi::q::inline fft_native
+#endif
+{
    /**
     * \brief
     *    Performs an in-place Fast Fourier Transform (FFT) on the input data
     *    array.
     *
-    *    The input data array is first scrambled to reorder the elements,
-    *    and then the recursive Danielson-Lanczos algorithm is applied to
-    *    compute the FFT.
+    *    Natively, the input is scrambled to bit-reversed order and the
+    *    recursive Danielson-Lanczos algorithm computes the FFT. With
+    *    Q_USE_PFFFT, float transforms of 16 points or more run on PFFFT.
     *
     * \tparam N
     *    The number of complex points. Must be a power of 2.
@@ -380,6 +454,14 @@ namespace cycfi::q
    template <std::size_t N, std::floating_point T>
    inline void fft(T* data)
    {
+#if defined(Q_USE_PFFFT)
+      if constexpr (std::same_as<T, float> && N >= detail::pffft_min_complex)
+      {
+         detail::pffft_run<N, detail::pffft::PFFFT_COMPLEX>(
+            data, detail::pffft::PFFFT_FORWARD);
+         return;
+      }
+#endif
       detail::native_fft<N>(data);
    }
 
@@ -408,6 +490,15 @@ namespace cycfi::q
    template <std::size_t N, std::floating_point T>
    inline void ifft(T* data)
    {
+#if defined(Q_USE_PFFFT)
+      if constexpr (std::same_as<T, float> && N >= detail::pffft_min_complex)
+      {
+         detail::pffft_run<N, detail::pffft::PFFFT_COMPLEX>(
+            data, detail::pffft::PFFFT_BACKWARD);
+         detail::scale<N>(data, 2*N);
+         return;
+      }
+#endif
       detail::native_ifft<N>(data);
    }
 
@@ -417,7 +508,8 @@ namespace cycfi::q
     *
     *    The result is the N/2+1 bins from DC through Nyquist, as
     *    interleaved complex numbers. The imaginary parts of the DC and
-    *    Nyquist bins are zero.
+    *    Nyquist bins are zero. With Q_USE_PFFFT, float transforms of 32
+    *    points or more run on PFFFT.
     *
     * \tparam N
     *    The number of real samples. Must be a power of 2, at least 2.
@@ -435,6 +527,19 @@ namespace cycfi::q
    {
       static_assert(is_pow2(N) && N >= 2, "N must be a power of 2, >= 2");
 
+#if defined(Q_USE_PFFFT)
+      if constexpr (std::same_as<T, float> && N >= detail::pffft_min_real)
+      {
+         detail::pffft_run<N, detail::pffft::PFFFT_REAL>(
+            data, detail::pffft::PFFFT_FORWARD);
+
+         // PFFFT packs the Nyquist bin into the imaginary slot of DC.
+         data[N] = data[1];
+         data[N+1] = 0;
+         data[1] = 0;
+         return;
+      }
+#endif
       detail::native_rfft<N>(data);
    }
 
@@ -463,6 +568,16 @@ namespace cycfi::q
    {
       static_assert(is_pow2(N) && N >= 2, "N must be a power of 2, >= 2");
 
+#if defined(Q_USE_PFFFT)
+      if constexpr (std::same_as<T, float> && N >= detail::pffft_min_real)
+      {
+         data[1] = data[N];
+         detail::pffft_run<N, detail::pffft::PFFFT_REAL>(
+            data, detail::pffft::PFFFT_BACKWARD);
+         detail::scale<N>(data, N);
+         return;
+      }
+#endif
       detail::native_irfft<N>(data);
    }
 

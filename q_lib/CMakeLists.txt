@@ -103,3 +103,29 @@ target_include_directories(libq INTERFACE include/)
 target_link_libraries(libq INTERFACE cycfi::infra)
 
 
+###############################################################################
+# PFFFT
+#
+# Cycfi's fork of PFFFT, used header-only: q/fft/detail/pffft.hpp compiles
+# its float sources into each translation unit, so nothing is built here.
+# With Q_USE_PFFFT on, q::fft, ifft, rfft and irfft run on PFFFT for float.
+
+option(Q_USE_PFFFT "use PFFFT for the float FFTs" ON)
+
+if (Q_USE_PFFFT)
+   include(FetchContent)
+   FetchContent_Declare(
+      pffft
+      GIT_REPOSITORY https://github.com/cycfi/pffft.git
+      GIT_TAG f5ce5e279cec907382d5f45071d145e0160f628b
+      GIT_SUBMODULES ""                # benchmark comparators, not needed
+      SOURCE_SUBDIR do-not-add         # header-only, its CMake is not used
+   )
+   FetchContent_MakeAvailable(pffft)
+
+   target_include_directories(libq INTERFACE
+      ${pffft_SOURCE_DIR}/include/pffft
+      ${pffft_SOURCE_DIR}/src
+   )
+   target_compile_definitions(libq INTERFACE Q_USE_PFFFT)
+endif()

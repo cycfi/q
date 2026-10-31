@@ -22,3 +22,8 @@ foreach(benchsourcefile ${BENCH_SOURCES})
    add_executable(${benchname} ${benchsourcefile})
    target_link_libraries(${benchname} libq libqio)
 endforeach(benchsourcefile ${BENCH_SOURCES})
+
+# The FFT benchmark compares two builds of the same transforms, so it is
+# two translation units: fft_bench_native.cpp builds without Q_USE_PFFFT.
+add_executable(fft_bench fft_bench.cpp fft_bench_native.cpp)
+target_link_libraries(fft_bench libq libqio)
