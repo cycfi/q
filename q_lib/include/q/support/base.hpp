@@ -12,6 +12,7 @@
 #include <cstring>
 #include <algorithm>
 #include <cmath>
+#include <utility>
 #include <infra/support.hpp>
 #include <q/detail/fast_math.hpp>
 #include <q/utility/interpolation_primitives.hpp>
@@ -86,6 +87,88 @@ namespace cycfi::q
    inline float faster_cos(float x)
    {
       return fastercos(x);
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // principal_arg: an angle wrapped to [-pi, pi], for a phase that keeps
+   // growing, such as a phase vocoder's. 2 pi is subtracted in two parts
+   // (Cody and Waite): 6.28125 has so few significant bits that k times it
+   // is exact, and the small remainder carries the rest.
+   ////////////////////////////////////////////////////////////////////////////
+   inline float principal_arg(float x)
+   {
+      constexpr float two_pi_hi = 6.28125f;
+      constexpr float two_pi_lo = float(2 * pi - 6.28125);
+      constexpr float inv_two_pi = float(1 / (2 * pi));
+
+      // k can come out one off right at the edges; a turn puts r back.
+      float k = std::floor(x * inv_two_pi + 0.5f);
+      float r = (x - k * two_pi_hi) - k * two_pi_lo;
+      if (r > float(pi))
+         r = (r - two_pi_hi) - two_pi_lo;
+      else if (r < -float(pi))
+         r = (r + two_pi_hi) + two_pi_lo;
+      return r;
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // fast_sincos: the sine and cosine of any angle, as {sin, cos}, sharing
+   // one evaluation. The angle is wrapped to [-pi, pi], folded to [-pi/2,
+   // pi/2], and both come from Taylor polynomials to x^11 and x^12.
+   ////////////////////////////////////////////////////////////////////////////
+   inline std::pair<float, float> fast_sincos(float x)
+   {
+      constexpr float half_pi = float(pi / 2);
+
+      // sin(pi - x) = sin(x) and cos(pi - x) = -cos(x), on either side.
+      x = principal_arg(x);
+      float sign = 1.0f;
+      if (x > half_pi)
+      {
+         x = float(pi) - x;
+         sign = -1.0f;
+      }
+      else if (x < -half_pi)
+      {
+         x = -float(pi) - x;
+         sign = -1.0f;
+      }
+
+      float x2 = x * x;
+      float s = x * (1 + x2 * (-1.0f/6 + x2 * (1.0f/120 + x2 * (-1.0f/5040
+         + x2 * (1.0f/362880 + x2 * (-1.0f/39916800))))));
+      float c = 1 + x2 * (-0.5f + x2 * (1.0f/24 + x2 * (-1.0f/720
+         + x2 * (1.0f/40320 + x2 * (-1.0f/3628800
+         + x2 * (1.0f/479001600))))));
+      return {s, sign * c};
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // fast_atan2: atan2(y, x), in [-pi, pi]. The arctangent of the smaller
+   // over the larger of |y| and |x| comes from Abramowitz and Stegun 4.4.47
+   // (error at most 1e-5 on [-1, 1]); the octant then sets the angle.
+   // fast_atan2(0, 0) is 0.
+   ////////////////////////////////////////////////////////////////////////////
+   inline float fast_atan2(float y, float x)
+   {
+      constexpr float half_pi = float(pi / 2);
+
+      float ax = std::abs(x);
+      float ay = std::abs(y);
+      if (ax == 0 && ay == 0)
+         return 0.0f;
+
+      bool steep = ay > ax;
+      float z = steep? ax / ay : ay / ax;
+      float z2 = z * z;
+      float a = z * (0.9998660f + z2 * (-0.3302995f + z2 * (0.1801410f
+         + z2 * (-0.0851330f + z2 * 0.0208351f))));
+
+      if (steep)
+         a = half_pi - a;
+      if (x < 0)
+         a = float(pi) - a;
+      return (y < 0)? -a : a;
    }
 
    ////////////////////////////////////////////////////////////////////////////

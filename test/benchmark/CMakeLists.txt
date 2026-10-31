@@ -11,6 +11,7 @@
 
 set(BENCH_SOURCES
    decibel_bench.cpp
+   fast_trig_bench.cpp
    interpolation_bench.cpp
    log2_bench.cpp
    sin_bench.cpp
