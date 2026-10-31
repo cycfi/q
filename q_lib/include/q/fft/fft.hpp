@@ -30,9 +30,13 @@
 #include <q/support/literals.hpp>
 #include <infra/support.hpp>
 
-#include <utility>
+#include <algorithm>
 #include <array>
+#include <cmath>
+#include <complex>
 #include <concepts>
+#include <numbers>
+#include <utility>
 
 namespace cycfi::q
 {
@@ -225,26 +229,149 @@ namespace cycfi::q
             j += m;
          }
       }
+
+      template <std::size_t N, std::floating_point T>
+      inline void native_fft(T* data)
+      {
+         detail::danielson_lanczos<T, N> recursion;
+         detail::scramble<T, N>(data);
+         recursion.apply(data);
+      }
+
+      template <std::size_t N, std::floating_point T>
+      inline void native_ifft(T* data)
+      {
+         constexpr std::size_t _2n = N*2;
+
+         // Swap the real and imaginary parts of the i-th and (N-i)-th
+         // complex numbers.
+         for (std::size_t i = 1; i < N/2; ++i)
+         {
+            auto _2i = 2*i;
+            std::swap(data[2*i], data[_2n-_2i]);
+            std::swap(data[2*i+1], data[(_2n+1)-_2i]);
+         }
+
+         // Perform FFT in-situ
+         native_fft<N>(data);
+
+         // Normalize the data by dividing each element by N.
+         for (std::size_t i = 0; i < 2*N; ++i)
+            data[i] /= N;
+      }
+
+      // w[k] = exp(-2 pi i k / N), k = 0 .. N/4, for the real FFT's
+      // split step. Computed once, in double, when the program loads.
+      template <std::size_t N, std::floating_point T>
+      inline std::array<std::complex<T>, N/4+1> const rfft_twiddles = []
+      {
+         std::array<std::complex<T>, N/4+1> w;
+         for (std::size_t k = 0; k != w.size(); ++k)
+         {
+            double a = -2 * std::numbers::pi * k / N;
+            w[k] = {T(std::cos(a)), T(std::sin(a))};
+         }
+         return w;
+      }();
+
+      // A real N-point FFT from a complex N/2-point one. The N samples,
+      // read as N/2 complex values z[m] = x[2m] + i x[2m+1], transform to
+      // Z. Bin pairs (k, N/2-k) of Z then split into the transforms of the
+      // even and odd samples, E and O, and X[k] = E[k] + w[k] O[k].
+      template <std::size_t N, std::floating_point T>
+      inline void native_rfft(T* data)
+      {
+         constexpr std::size_t m = N/2;
+         auto const& w = rfft_twiddles<N, T>;
+
+         native_fft<m>(data);
+
+         T r0 = data[0];
+         T i0 = data[1];
+         data[0] = r0 + i0;
+         data[1] = 0;
+         data[N] = r0 - i0;
+         data[N+1] = 0;
+
+         for (std::size_t k = 1; 2*k < m; ++k)
+         {
+            T* xk = data + 2*k;
+            T* xj = data + 2*(m-k);
+
+            T er = (xk[0] + xj[0]) / 2;
+            T ei = (xk[1] - xj[1]) / 2;
+            T or_ = (xk[1] + xj[1]) / 2;
+            T oi = (xj[0] - xk[0]) / 2;
+            T tr = w[k].real()*or_ - w[k].imag()*oi;
+            T ti = w[k].real()*oi + w[k].imag()*or_;
+
+            xk[0] = er + tr;
+            xk[1] = ei + ti;
+            xj[0] = er - tr;
+            xj[1] = ti - ei;
+         }
+
+         // The middle bin pairs with itself: X[N/4] = conj(Z[N/4]).
+         if constexpr (m >= 2)
+            data[m+1] = -data[m+1];
+      }
+
+      // The inverse of native_rfft: rebuild Z from the bin pairs, then a
+      // complex N/2-point inverse FFT gives the samples back.
+      template <std::size_t N, std::floating_point T>
+      inline void native_irfft(T* data)
+      {
+         constexpr std::size_t m = N/2;
+         auto const& w = rfft_twiddles<N, T>;
+
+         T e0 = (data[0] + data[N]) / 2;
+         T o0 = (data[0] - data[N]) / 2;
+         data[0] = e0;
+         data[1] = o0;
+
+         for (std::size_t k = 1; 2*k < m; ++k)
+         {
+            T* xk = data + 2*k;
+            T* xj = data + 2*(m-k);
+
+            T er = (xk[0] + xj[0]) / 2;
+            T ei = (xk[1] - xj[1]) / 2;
+            T tr = (xk[0] - xj[0]) / 2;
+            T ti = (xk[1] + xj[1]) / 2;
+            T or_ = w[k].real()*tr + w[k].imag()*ti;
+            T oi = w[k].real()*ti - w[k].imag()*tr;
+
+            xk[0] = er - oi;
+            xk[1] = ei + or_;
+            xj[0] = er + oi;
+            xj[1] = or_ - ei;
+         }
+
+         if constexpr (m >= 2)
+            data[m+1] = -data[m+1];
+
+         native_ifft<m>(data);
+      }
    }
 
    /**
     * \brief
     *    Performs an in-place Fast Fourier Transform (FFT) on the input data
-    *    array using the Danielson-Lanczos algorithm.
+    *    array.
     *
-    *    The input data array is first scrambled to reorder the elements, and
-    *    then the recursive Danielson-Lanczos algorithm is applied to compute
-    *    the FFT.
+    *    The input data array is first scrambled to reorder the elements,
+    *    and then the recursive Danielson-Lanczos algorithm is applied to
+    *    compute the FFT.
     *
     * \tparam N
-    *    The size of the input data array. Must be a power of 2.
+    *    The number of complex points. Must be a power of 2.
     *
     * \tparam T
     *    The floating-point type of the input data (e.g., float, double).
     *
     * \param data
-    *    A pointer to the input data array. The array must have at least N
-    *    elements.
+    *    A pointer to 2N elements: N complex numbers, interleaved real and
+    *    imaginary parts.
     *
     * \note
     *    The input data array is modified in place. After the function
@@ -253,9 +380,7 @@ namespace cycfi::q
    template <std::size_t N, std::floating_point T>
    inline void fft(T* data)
    {
-      detail::danielson_lanczos<T, N> recursion;
-      detail::scramble<T, N>(data);
-      recursion.apply(data);
+      detail::native_fft<N>(data);
    }
 
    /**
@@ -263,20 +388,18 @@ namespace cycfi::q
     *    Performs an in-place Inverse Fast Fourier Transform (IFFT) on the
     *    input data array.
     *
-    *    This function performs an in-place IFFT on the input data array. It
-    *    first swaps the real and imaginary parts of the i-th and (N-i)-th
-    *    complex numbers, then performs an FFT, and finally normalizes the
-    *    data by dividing each element by N.
+    *    The result is normalized by 1/N, so `fft` followed by `ifft`
+    *    restores the input.
     *
     * \tparam N
-    *    The size of the input data array. Must be a power of 2.
+    *    The number of complex points. Must be a power of 2.
     *
     * \tparam T
     *    The floating-point type of the input data (e.g., float, double).
     *
     * \param data
-    *    A pointer to the input data array. The array must have at least 2*N
-    *    elements.
+    *    A pointer to 2N elements: N complex numbers, interleaved real and
+    *    imaginary parts.
     *
     * \note
     *    The input data array is modified in place. After the function
@@ -285,20 +408,62 @@ namespace cycfi::q
    template <std::size_t N, std::floating_point T>
    inline void ifft(T* data)
    {
-      constexpr std::size_t _2n = N*2;
-      // Swap the real and imaginary parts of the i-th and (N-i)-th complex
-      // numbers.
-      for (auto i = 1; i < N/2; ++i)
-      {
-         auto _2i = 2*i;
-         std::swap(data[2*i], data[_2n-_2i]);
-         std::swap(data[2*i+1], data[(_2n+1)-_2i]);
-      }
-      // Perform FFT in-situ
-      fft<N>(data);
-      // Normalize the data by dividing each element by N.
-      for (auto i = 0; i < 2*N; ++i)
-         data[i] /= N;
+      detail::native_ifft<N>(data);
+   }
+
+   /**
+    * \brief
+    *    Performs an in-place FFT of N real samples.
+    *
+    *    The result is the N/2+1 bins from DC through Nyquist, as
+    *    interleaved complex numbers. The imaginary parts of the DC and
+    *    Nyquist bins are zero.
+    *
+    * \tparam N
+    *    The number of real samples. Must be a power of 2, at least 2.
+    *
+    * \tparam T
+    *    The floating-point type of the input data (e.g., float, double).
+    *
+    * \param data
+    *    A pointer to N+2 elements. On input, the N samples occupy
+    *    data[0] .. data[N-1]. On output, bin k is at (data[2k],
+    *    data[2k+1]).
+   */
+   template <std::size_t N, std::floating_point T>
+   inline void rfft(T* data)
+   {
+      static_assert(is_pow2(N) && N >= 2, "N must be a power of 2, >= 2");
+
+      detail::native_rfft<N>(data);
+   }
+
+   /**
+    * \brief
+    *    Performs an in-place inverse of `rfft`, from N/2+1 bins back to N
+    *    real samples.
+    *
+    *    The result is normalized by 1/N, so `rfft` followed by `irfft`
+    *    restores the input. The imaginary parts of the DC and Nyquist bins
+    *    are ignored.
+    *
+    * \tparam N
+    *    The number of real samples. Must be a power of 2, at least 2.
+    *
+    * \tparam T
+    *    The floating-point type of the input data (e.g., float, double).
+    *
+    * \param data
+    *    A pointer to N+2 elements. On input, bin k is at (data[2k],
+    *    data[2k+1]). On output, the N samples occupy data[0] ..
+    *    data[N-1].
+   */
+   template <std::size_t N, std::floating_point T>
+   inline void irfft(T* data)
+   {
+      static_assert(is_pow2(N) && N >= 2, "N must be a power of 2, >= 2");
+
+      detail::native_irfft<N>(data);
    }
 
    /**
@@ -311,14 +476,14 @@ namespace cycfi::q
     *    component in the input data.
     *
     * \tparam N
-    *    The size of the input data array. Must be a power of 2.
+    *    The number of complex points. Must be a power of 2.
     *
     * \tparam T
     *    The floating-point type of the input data (e.g., float, double).
     *
     * \param data
-    *    A pointer to the input data array. The array must have at least N
-    *    elements.
+    *    A pointer to 2N elements: N complex numbers, interleaved real and
+    *    imaginary parts.
     *
     * \note
     *    The input data array is modified in place. After the function
