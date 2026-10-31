@@ -7,7 +7,9 @@ include::../common.adoc[]
 *q_lib* is the core of Q: the DSP library itself. It is header-only, and it
 depends on nothing but the {cpp} standard library and the header-only Cycfi
 infra, so the same code runs on a desktop, inside a plugin, or on a small
-microcontroller with no operating system. {q_io} and
+microcontroller with no operating system. Its float FFTs run on PFFFT, also
+header-only as Q uses it, unless `Q_USE_PFFFT` is off (see
+xref:reference/spectral/fft.adoc#_backends[FFT Backends]). {q_io} and
 xref:q_plug:index.adoc[QPlug] build on it; it builds on neither.
 
 Everything lives in namespace `cycfi::q`, which the reference writes as

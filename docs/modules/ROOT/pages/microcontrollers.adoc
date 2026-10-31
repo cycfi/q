@@ -5,7 +5,8 @@ include::common.adoc[]
 == Overview
 
 The DSP core, `q_lib`, is header-only and needs only the {cpp} standard
-library and the header-only Cycfi infra, so it builds for a microcontroller
+library and the header-only Cycfi infra (with PFFFT turned off, as below),
+so it builds for a microcontroller
 with any cross compiler that supports {cpp}20. It is tested on an STM32H7
 (Cortex-M7) with Arm GCC 12.3, the compiler in ST's STM32CubeCLT, in a
 firmware that runs Q's MIDI 2.0 stack over USB, and runs in Infinity's
@@ -26,6 +27,7 @@ A firmware project adds Q as a subdirectory and builds only the core:
 set(Q_BUILD_EXAMPLES OFF CACHE BOOL "")
 set(Q_BUILD_TEST OFF CACHE BOOL "")
 set(Q_BUILD_IO OFF CACHE BOOL "")       # q_io needs a desktop OS
+set(Q_USE_PFFFT OFF CACHE BOOL "")      # Q's own FFT, no heap at startup
 add_compile_definitions(Q_DONT_USE_THREADS)
 add_subdirectory(q)
 
@@ -34,6 +36,9 @@ target_link_libraries(my_firmware libq)
 
 `Q_DONT_USE_THREADS` leaves out the few facilities that need
 `std::thread`, such as `q::sleep`, for a target with no threads.
+`Q_USE_PFFFT` off keeps the FFTs on Q's own implementation. A Cortex-M has
+no NEON, so PFFFT would run its plain scalar code there, and it allocates a
+setup on the heap for each transform size it uses when the firmware starts.
 `Q_BUILD_PLUG` is off by default.
 
 '''

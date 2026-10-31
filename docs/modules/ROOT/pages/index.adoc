@@ -22,7 +22,7 @@ https://opensource.org/licenses/MIT[MIT License].
 * xref:reference/units.adoc#_overview[Type-Safe Units: 440_Hz, 10_ms, -6_dB]
 * xref:fundamentals.adoc#_function_objects[{cpp}20 Concepts and Composable Function Objects]
 * xref:reference/q_lib.adoc#_contents[Highly Reusable, Modular Building Blocks]
-* <<_dependencies,Header-Only DSP Core, No Third-Party Dependencies>>
+* <<_dependencies,Header-Only DSP Core, Third-Party Code Optional>>
 * https://github.com/cycfi/q/blob/develop/LICENSE[MIT License]
 
 *Desktop to Microcontroller*
@@ -94,7 +94,9 @@ you configure.
 
 Q, the core (`q_lib`):: Only the {cpp} standard library and the header-only
 https://github.com/cycfi/infra[Cycfi infra], a git submodule. A clone
-without the submodule still builds: CMake fetches infra instead.
+without the submodule still builds: CMake fetches infra instead. The float
+FFTs run on https://github.com/marton78/pffft[PFFFT], from a Cycfi fork,
+used header-only; `-D Q_USE_PFFFT=OFF` leaves it out.
 
 QIO (`q_io`):: https://github.com/thestk/rtaudio[RtAudio] for audio and
 https://github.com/celtera/libremidi[libremidi] for MIDI 1.0 and 2.0,

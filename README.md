@@ -32,7 +32,7 @@ The library is Open Source and released under the very liberal
 * [Type-Safe Units: 440_Hz, 10_ms, -6_dB](https://cycfi.github.io/q/q/v1.6-dev/reference/units.html#_overview)
 * [C++20 Concepts and Composable Function Objects](https://cycfi.github.io/q/q/v1.6-dev/fundamentals.html#_function_objects)
 * [Highly Reusable, Modular Building Blocks](https://cycfi.github.io/q/q/v1.6-dev/reference/q_lib.html#_contents)
-* [Header-Only DSP Core, No Third-Party Dependencies](#dependencies)
+* [Header-Only DSP Core, Third-Party Code Optional](#dependencies)
 * [MIT License](LICENSE)
 
 **Desktop to Microcontroller**
@@ -81,7 +81,7 @@ Q comes in three layers. The core stands on its own; the other two are optional 
 <img src="docs/modules/ROOT/images/q-layers.svg" width="680">
 </p>
 
-**Q, the core (`q_lib`):** The DSP library proper: filters, envelopes and dynamics, oscillators and synthesis, pitch detection, MIDI 1.0 and 2.0, and the support facilities they share. It is header-only and needs only the C++ standard library and the header-only Cycfi infra, so it runs on small microcontrollers as readily as on a desktop. See the [Q Reference](https://cycfi.github.io/q/q/v1.6-dev/reference/q_lib.html).
+**Q, the core (`q_lib`):** The DSP library proper: filters, envelopes and dynamics, oscillators and synthesis, pitch detection, MIDI 1.0 and 2.0, and the support facilities they share. It is header-only and needs only the C++ standard library and the header-only Cycfi infra, so it runs on small microcontrollers as readily as on a desktop. Its float FFTs run on [PFFFT](https://github.com/marton78/pffft), also header-only as Q uses it, unless `Q_USE_PFFFT` is off. See the [Q Reference](https://cycfi.github.io/q/q/v1.6-dev/reference/q_lib.html).
 
 **QIO (`q_io`):** Audio and MIDI input and output for a desktop application: devices, streams and audio files, built on RtAudio and libremidi. The tests and examples use it; an application with its own I/O, a plugin for one, does without it. See the [QIO Reference](https://cycfi.github.io/q/q/v1.6-dev/reference/q_io.html).
 

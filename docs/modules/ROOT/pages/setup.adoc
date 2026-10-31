@@ -14,8 +14,10 @@ To build the Q library, its tests, and its examples, you need:
 
 NOTE: The core of the library (`q_lib`), excluding the audio and MIDI I/O layer
 (`q_io`), is header-only and depends only on a conforming C++20 standard
-library. This core subset has been successfully used on bare-metal embedded
-targets, including the Teensy and STM32 series, with no operating system.
+library, and on PFFFT for its float FFTs unless you turn that off (see
+<<_dependencies>>). This core subset has been successfully used on bare-metal
+embedded targets, including the Teensy and STM32 series, with no operating
+system.
 
 === Supported Platforms and Compilers
 
@@ -82,7 +84,7 @@ xref:microcontrollers.adoc[Microcontrollers].
 
 == Dependencies
 
-Q depends on three libraries, brought in two different ways:
+Q depends on four libraries, brought in two different ways:
 
 [cols="1,1,2", options="header"]
 |===
@@ -95,6 +97,13 @@ Q depends on three libraries, brought in two different ways:
   is not checked out, CMake fetches it automatically, so a plain clone still
   builds.
 
+| https://github.com/marton78/pffft[PFFFT]
+| CMake FetchContent
+| SIMD FFT that the float transforms of xref:reference/spectral/fft.adoc[FFT]
+  run on, from https://github.com/cycfi/pffft[Cycfi's fork]. Used
+  header-only: nothing of it is compiled into a library. Downloaded
+  automatically at configure time, unless `Q_USE_PFFFT` is off.
+
 | https://github.com/thestk/rtaudio[RtAudio]
 | CMake FetchContent
 | Cross-platform audio I/O. Downloaded automatically at configure time.
@@ -106,8 +115,8 @@ Q depends on three libraries, brought in two different ways:
 |===
 
 You do not install any of these by hand. RtAudio and libremidi are always
-fetched by CMake; `infra` is used from the submodule when present and fetched
-otherwise.
+fetched by CMake, and PFFFT unless `Q_USE_PFFFT` is off; `infra` is used from
+the submodule when present and fetched otherwise.
 
 QPlug, the optional audio plugin layer, brings its own dependencies
 (Elements, CLAP, clap-wrapper and nlohmann json). CMake fetches them only
@@ -143,9 +152,9 @@ cmake --build build
 ----
 
 `cmake -B build` generates the build system into a `build/` directory using
-your platform's default generator. The first configure downloads RtAudio,
-libremidi, and (if the submodule is absent) `infra`, so it takes longer than
-subsequent runs. `cmake --build build` then compiles the library, the tests,
+your platform's default generator. The first configure downloads PFFFT,
+RtAudio, libremidi, and (if the submodule is absent) `infra`, so it takes
+longer than subsequent runs. `cmake --build build` then compiles the library, the tests,
 and the examples; xref:testing.adoc[Testing Q] runs them.
 
 To build a single target instead of everything, name it:
@@ -175,8 +184,9 @@ Open the generated project in `build/` and build from the IDE as usual.
 You can turn off parts of the build with CMake options:
 `-D Q_BUILD_EXAMPLES=OFF`, `-D Q_BUILD_TEST=OFF`, and `-D Q_BUILD_IO=OFF`
 (the last drops the audio/MIDI I/O layer and its RtAudio and libremidi
-dependencies, leaving the header-only `q_lib` core). QPlug is off unless
-you turn it on with `-D Q_BUILD_PLUG=ON`.
+dependencies, leaving the header-only `q_lib` core). `-D Q_USE_PFFFT=OFF`
+runs the FFTs on Q's own implementation and leaves PFFFT out. QPlug is off
+unless you turn it on with `-D Q_BUILD_PLUG=ON`.
 
 '''
 
