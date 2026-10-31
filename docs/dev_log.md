@@ -11,6 +11,25 @@ commits; the feature branches they first cited were squash-merged and no
 longer resolve. The full text before the trim: `git show
 308ddccb:docs/dev_log.md`.
 
+## 2026-10-31
+
+`143e6138` with `Q_USE_PFFFT` (a CMake option, on by default) the float
+`fft`, `ifft`, `rfft` and `irfft` run on PFFFT, from 16 complex or 32 real
+points up; `double` and smaller sizes stay native. PFFFT comes from Cycfi's
+fork (cycfi/pffft `f5ce5e2`, three internal functions made `static`) and is
+compiled header-only into `detail::pffft`, so libq still builds nothing.
+The two builds live in different inline namespaces, so translation units
+that disagree on the macro still link. On an M2, a 2048-point complex
+frame (forward and inverse) went from 62.7 to 5.6 µs, a real one from 28.2
+to 2.6 µs (`test/benchmark/fft_bench`). Accelerate was measured and
+dropped: no faster than PFFFT for float once its split layout is converted
+to Q's interleaved one.
+
+`1fcc1beb` `rfft` and `irfft`: N real samples to the N/2+1 bins from DC to
+Nyquist and back, in place in N+2 scalars, built on a half-size complex
+FFT. Until now a real signal went through the full complex transform with
+its imaginary slots zeroed.
+
 ## 2026-10-28
 
 `3aa64210` `q::flush_denormals`, a scoped guard: it sets flush-to-zero on
