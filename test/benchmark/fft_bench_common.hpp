@@ -20,8 +20,8 @@ namespace fft_bench
 {
    struct frame_times
    {
-      double fft;       // copy in, fft, ifft: N complex points
-      double rfft;      // copy in, rfft, irfft: N real samples
+      double fft;       // copy in, forward, inverse: n complex points
+      double rfft;      // copy in, forward, inverse: n real samples
    };
 
    // Summed and printed by main to keep the loops from being elided.
@@ -51,45 +51,34 @@ namespace fft_bench
       return runs[runs.size()/2];
    }
 
-   template <std::size_t N>
-   frame_times measure()
+   frame_times measure(std::size_t n)
    {
       namespace q = cycfi::q;
-      int iters = std::max(200, int(2'000'000 / N));
+      int iters = std::max(200, int(2'000'000 / n));
 
-      std::vector<float> src(2*N), buf(2*N + 2);
-      for (std::size_t i = 0; i != 2*N; ++i)
+      std::vector<float> src(2*n), buf(2*n + 2);
+      for (std::size_t i = 0; i != 2*n; ++i)
          src[i] = float(std::sin(0.37 * i) + 0.2 * std::cos(0.013 * i * i));
 
+      q::fft cf{n};
       auto cframe = [&]
       {
-         std::memcpy(buf.data(), src.data(), 2*N*sizeof(float));
-         q::fft<N>(buf.data());
-         q::ifft<N>(buf.data());
+         std::memcpy(buf.data(), src.data(), 2*n*sizeof(float));
+         cf.forward(buf.data());
+         cf.inverse(buf.data());
          sink += buf[3];
       };
 
+      q::rfft rf{n};
       auto rframe = [&]
       {
-         std::memcpy(buf.data(), src.data(), N*sizeof(float));
-         q::rfft<N>(buf.data());
-         q::irfft<N>(buf.data());
+         std::memcpy(buf.data(), src.data(), n*sizeof(float));
+         rf.forward(buf.data());
+         rf.inverse(buf.data());
          sink += buf[3];
       };
 
       return {median_ns(cframe, iters), median_ns(rframe, iters)};
-   }
-
-   frame_times measure(std::size_t n)
-   {
-      switch (n)
-      {
-         case 256:  return measure<256>();
-         case 512:  return measure<512>();
-         case 1024: return measure<1024>();
-         case 2048: return measure<2048>();
-         default:   return measure<4096>();
-      }
    }
    }
 }

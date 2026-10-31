@@ -3,7 +3,7 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 
-   Micro-benchmark for q::fft/ifft and q::rfft/irfft, float: the native
+   Micro-benchmark for q::fft and q::rfft, float: the native
    implementation vs PFFFT (Q_USE_PFFFT). A frame is what a phase vocoder
    does per hop: copy a frame in, forward, inverse. Times are the median of
    15 runs, in ns per frame. Build-only; not a CI test.
