@@ -148,6 +148,7 @@ set(APP_SOURCES
    fft/fft.cpp
    fft/fft_native.cpp
    fft/stft.cpp
+   fft/phase_tracker.cpp
    support/bypassable.cpp
    support/flush_denormals.cpp
    support/fast_trig.cpp
@@ -201,6 +202,7 @@ include(CTest)
 add_test(NAME test_fft COMMAND test_fft)
 add_test(NAME test_fft_native COMMAND test_fft_native)
 add_test(NAME test_stft COMMAND test_stft)
+add_test(NAME test_phase_tracker COMMAND test_phase_tracker)
 add_test(NAME test_fast_trig COMMAND test_fast_trig)
 add_test(NAME test_bitset COMMAND test_bitset)
 add_test(NAME test_decibel COMMAND test_decibel)
