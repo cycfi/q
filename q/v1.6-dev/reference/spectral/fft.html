@@ -918,77 +918,19 @@ The transforms are <strong>in place</strong>: they overwrite the input array wit
 <h2 id="_backends"><a class="anchor" href="#_backends"></a>Backends</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>With the CMake option <code>Q_USE_PFFFT</code> on (the default), the <code>float</code> transforms run on <a href="https://github.com/marton78/pffft">PFFFT</a>, a SIMD FFT using NEON on ARM and SSE on x86: <code>fft</code> from 16 points up, <code>rfft</code> from 32. <code>double</code>, and the smaller sizes, use Q&#8217;s own implementation. The API, the data layout and the scaling are the same either way. Results agree to within rounding, but are not bit-identical between the two.</p>
+<p>With the CMake option <code>Q_USE_PFFFT</code> on (the default), the <code>float</code> transforms run on <a href="https://github.com/marton78/pffft">PFFFT</a>, a SIMD FFT using NEON on ARM and SSE on x86: <code>fft</code> from 16 points up, <code>rfft</code> from 32. <code>double</code>, and the smaller sizes, use the Q native implementation. The API, the data layout and the scaling are the same either way. Results agree to within rounding, but are not bit-identical between the two.</p>
 </div>
 <div class="paragraph">
-<p>The time for one frame (copy a frame in, forward transform, inverse transform), in µs, measured with <code>test/benchmark/fft_bench</code> on an Apple M2:</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col style="width: 20%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top"><code>n</code></th>
-<th class="tableblock halign-left valign-top"><code>fft</code>, Q&#8217;s own</th>
-<th class="tableblock halign-left valign-top"><code>fft</code>, PFFFT</th>
-<th class="tableblock halign-left valign-top"><code>rfft</code>, Q&#8217;s own</th>
-<th class="tableblock halign-left valign-top"><code>rfft</code>, PFFFT</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">256</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.9</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.55</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.28</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">512</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">4.4</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2.3</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.55</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1024</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">9.6</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2.4</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">5.1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.1</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2048</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">20.7</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">5.6</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10.9</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2.6</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">4096</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">44.2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">11.4</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">23.5</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">5.3</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>Treat these as ratios: other machines, compilers and sizes give other numbers. Run <code>fft_bench</code> on your own target.</p>
+<p>Which is faster depends on the processor. On a computer, PFFFT&#8217;s SIMD makes it about three times faster than Q native. On a microcontroller without SIMD, such as an Arm Cortex-M7, PFFFT runs in scalar form and Q native is as fast or faster: leave <code>Q_USE_PFFFT</code> undefined there. See <a href="#_performance">Performance</a>, and run <code>test/benchmark/fft_bench</code> on your own target.</p>
 </div>
 <div class="paragraph">
-<p>An object owns everything a transform uses: PFFFT&#8217;s setup for its size and its work space, or the tables of Q&#8217;s own implementation. Each object therefore makes one setup, for the one size it was built with. Because the work space is the object&#8217;s, two threads transforming at the same time need two objects.</p>
+<p>An object owns everything a transform uses: PFFFT&#8217;s setup for its size and its work space, or the tables of the Q native implementation. Each object therefore makes one setup, for the one size it was built with. Because the work space is the object&#8217;s, two threads transforming at the same time need two objects.</p>
 </div>
 <div class="paragraph">
 <p>PFFFT on x86 needs its buffers 16-byte aligned. Any <code>float</code> pointer still works: a misaligned one goes through a buffer in the object, at the cost of a copy. Declaring the data <code>alignas(16)</code> avoids the copy. ARM has no such requirement.</p>
 </div>
 <div class="paragraph">
-<p>Q is header-only, and so is PFFFT as Q uses it: with the option on, Q&#8217;s CMake fetches PFFFT and gives <code>libq</code> the <code>Q_USE_PFFFT</code> definition and PFFFT&#8217;s include paths, and nothing is compiled. A build that does not use CMake gets Q&#8217;s own implementation, unless it defines <code>Q_USE_PFFFT</code> and adds PFFFT&#8217;s <code>include/pffft</code> and <code>src</code> directories to its include path. Turn PFFFT off with <code>-DQ_USE_PFFFT=OFF</code>.</p>
+<p>Q is header-only, and so is PFFFT as Q uses it: with the option on, Q&#8217;s CMake fetches PFFFT and gives <code>libq</code> the <code>Q_USE_PFFFT</code> definition and PFFFT&#8217;s include paths, and nothing is compiled. A build that does not use CMake gets the Q native implementation, unless it defines <code>Q_USE_PFFFT</code> and adds PFFFT&#8217;s <code>include/pffft</code> and <code>src</code> directories to its include path. Turn PFFFT off with <code>-DQ_USE_PFFFT=OFF</code>.</p>
 </div>
 </div>
 </div>
@@ -1366,10 +1308,86 @@ Implementation details are subject to change without notice. Rely only on the ex
 </table>
 </div>
 <div class="paragraph">
-<p>Q&#8217;s own complex FFT is an iterative radix-2 Cooley-Tukey transform. Its twiddle factors are computed once, in double precision, and its bit-reversal order is a table; both are made by the constructor. Its own real FFT reads the <code>n</code> samples as <code>n/2</code> complex values, <code>z(m) = x(2m) + i x(2m+1)</code>, and transforms those with a complex FFT of half the size. Each pair of bins <code>k</code> and <code>n/2-k</code> of the result then separates into the transforms of the even and the odd samples, <code>E(k)</code> and <code>O(k)</code>, and <code>X(k) = E(k) + exp(-2πik/n) O(k)</code>. The inverse runs the same steps backwards.</p>
+<p>The Q native complex FFT is an iterative Cooley-Tukey transform, its radix-2 stages taken two at a time as radix-4 butterflies: three twiddle multiplies for four points. The first two stages, whose twiddles are 1 and -i, need no multiplies at all. The twiddle factors are computed once, in double precision, and the bit-reversal order is a list of the pairs to swap; both are made by the constructor. The Q native real FFT reads the <code>n</code> samples as <code>n/2</code> complex values, <code>z(m) = x(2m) + i x(2m+1)</code>, and transforms those with a complex FFT of half the size. Each pair of bins <code>k</code> and <code>n/2-k</code> of the result then separates into the transforms of the even and the odd samples, <code>E(k)</code> and <code>O(k)</code>, and <code>X(k) = E(k) + exp(-2πik/n) O(k)</code>. The inverse runs the same steps backwards, its <code>1/n</code> folded into the separation.</p>
 </div>
 <div class="paragraph">
 <p>PFFFT comes from Cycfi&#8217;s fork, <a href="https://github.com/cycfi/pffft">cycfi/pffft</a>, and is compiled into each translation unit that includes <code>fft.hpp</code>, inside a namespace of Q&#8217;s, with internal linkage. With <code>Q_USE_PFFFT</code> and without it, the classes live in different inline namespaces, so translation units built with and without it still link together, each with its own implementation.</p>
+</div>
+<div class="sect2">
+<h3 id="_performance"><a class="anchor" href="#_performance"></a>Performance</h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+Measured at 48 kHz in blocks of 32 samples (0.67 ms), on an Apple M2 and on an STM32H723 at 550 MHz with caches on. Average: the time a sample, and its share of a sample period. Worst: the slowest block, and its share of the block&#8217;s 0.67 ms; over 100%, it runs late. Figures are rounded and vary with the build and the input.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>An FFT runs a frame at a time, so its cost is given per transform: a forward real FFT of <code>n</code> samples. The inverse takes within a few percent of the forward.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 11.1111%;">
+<col style="width: 22.2222%;">
+<col style="width: 22.2222%;">
+<col style="width: 22.2222%;">
+<col style="width: 22.2223%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"><code>n</code></th>
+<th class="tableblock halign-left valign-top">Apple M2, Q native</th>
+<th class="tableblock halign-left valign-top">Apple M2, PFFFT</th>
+<th class="tableblock halign-left valign-top">STM32H723, Q native</th>
+<th class="tableblock halign-left valign-top">STM32H723, PFFFT (scalar)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">256</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">290 ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">83 ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">15 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">16 µs</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1024</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.7 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">460 ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">69 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">67 µs</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2048</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.9 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.2 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">144 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">165 µs</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4096</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8.1 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.4 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">324 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">371 µs</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8192</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">18 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5.1 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.81 ms</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.08 ms</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>On the H723 the two are even up to 1024 points, and Q native is faster above: by 13% at 2048 and 25% at 8192. CMSIS-DSP&#8217;s <code>arm_rfft_fast_f32</code> (version 1.6.0, built the same way) takes 172 µs at 2048, slower than both.</p>
+</div>
 </div>
 </div>
 </div>

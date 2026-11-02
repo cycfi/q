@@ -825,7 +825,7 @@ M33 and M55, each with its FPU.</p>
 <pre class="highlightjs highlight"><code class="language-cmake hljs" data-lang="cmake">set(Q_BUILD_EXAMPLES OFF CACHE BOOL "")
 set(Q_BUILD_TEST OFF CACHE BOOL "")
 set(Q_BUILD_IO OFF CACHE BOOL "")       # q_io needs a desktop OS
-set(Q_USE_PFFFT OFF CACHE BOOL "")      # Q's own FFT, no heap at startup
+set(Q_USE_PFFFT OFF CACHE BOOL "")      # Q native FFT, faster on a Cortex-M
 add_compile_definitions(Q_DONT_USE_THREADS)
 add_subdirectory(q)
 
@@ -835,9 +835,11 @@ target_link_libraries(my_firmware libq)</code></pre>
 <div class="paragraph">
 <p><code>Q_DONT_USE_THREADS</code> leaves out the few facilities that need
 <code>std::thread</code>, such as <code>q::sleep</code>, for a target with no threads.
-<code>Q_USE_PFFFT</code> off keeps the FFTs on Q&#8217;s own implementation. A Cortex-M has
-no NEON, so PFFFT would run its plain scalar code there, and it allocates a
-setup on the heap for each transform size it uses when the firmware starts.
+<code>Q_USE_PFFFT</code> off keeps the FFTs on the Q native implementation. A Cortex-M has
+no NEON, so PFFFT would run its plain scalar code there, which the Q native FFT
+matches or beats (see the <a href="reference/spectral/fft.html#_performance" class="xref page">FFT&#8217;s
+performance</a>). Either allocates its tables when a transform object is built,
+never while it transforms.
 <code>Q_BUILD_PLUG</code> is off by default.</p>
 </div>
 <hr>
