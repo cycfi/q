@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-`smoothed` provides a gradual slide to value for parameters that can change fast and thus cause artefacts. It allows for usage of different filters for different behaviour, such as the one-pole lowpass (`q::one_pole_lowpass`), Cyclops dynamic smoother (`q::dynamic_smoother`) or any other filter that complies to the same standard. 
+`smoothed` provides a gradual slide to value for parameters that can change fast and thus cause artefacts. It allows for usage of different filters for different behaviour, such as the one-pole lowpass (`q::one_pole_lowpass`), Cytomic's (Andrew Simper) dynamic smoother (`q::dynamic_smoother`) or any other filter that complies to the same standard. 
 
 An exponential smoother like `q::one_pole_lowpass` only approaches the target asymptotically, and in floating point it can stall just short of it. `snap` solves this: once the smoothed value is within a small `delta` of the target, or stops changing, it returns the target itself and reports `settled()`. The caller can then skip work that is only needed while the value moves, such as recomputing filter coefficients.
 
@@ -120,10 +120,22 @@ struct smoothed
 `delta`        :: Floating point value, the distance from the target within which the output snaps to the target. It is in the units of the smoothed value.
 `target`       :: Floating point value for the target.
 `v`            :: Floating point value for a state.
+`C`            :: Arbitrary smoothing filter implementation
 
 ==== Requirements on `Smoother`
 
-`Smoother` must be a filter such as `q::one_pole_lowpass`, `q::dynamic_smoother` or any other filter that function the same way.
+`Smoother` must be a filter such as `q::one_pole_lowpass`, `q::dynamic_smoother` or any other filter that functions the same way. The requirements for the implementation of such a filter are the following:
+
+[cols="1,1"]
+|===
+| Expression                      | Semantics
+
+| `C(frequency, float)`           | Construct an object with cutoff frequency 
+                                    of type `frequency` and sample rate.
+| `operator()(float)`             | Per-sample processing function that returns the current state.
+| `operator()() const`            | Return the current state of the filter.
+| `operator=(float)`              | Reset the filter state to a given value.
+|===
 
 ==== Constructors and Assignment
 
@@ -150,8 +162,6 @@ struct smoothed
 | `sm()`          | Return the smoother's latest result,
                     without advancing it.                   | `float`
 |===
-
-NOTE: `sm()` returns the smoother's own state, not the snapped output. While settling, it can differ from the value last returned by `sm(target)` by up to `delta`.
 
 NOTE: Assigning with `sm = v` does not reset the `snap`. `settled()` keeps reporting the result of the last `sm(target)` call until the next one.
 
@@ -193,13 +203,15 @@ using namespace q::literals;
 
 float gain;                                               // set by the user
 ...
-q::smoothed<q::one_pole_lowpass> smooth{10_ms, sps, 1e-4f};   <1>
+q::smoothed<q::one_pole_lowpass> smooth{10_ms, sps, 1e-4f};    <1>
 
 for (auto& s : in)
-   s *= smooth(gain);                                     <2>
+   s *= smooth(gain);                                          <2>
 
-if (smooth.settled())                                     <3>
-   // The gain has arrived. Skip any work needed only while it moves.
+if (smooth.settled())                                          <3>
+{
+   // Do something, eg. reporting backing to the UI.
+}
 ```
 
 <1> Construct a smoothed value with a 10 ms time constant. The output snaps to the target within `1e-4`.

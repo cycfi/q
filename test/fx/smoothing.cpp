@@ -91,13 +91,15 @@ TEST_CASE("smoothed: a step never overshoots and rises monotonically")
    q::smoothed<q::one_pole_lowpass> sm{10_ms, sps, 1e-4f};
 
    float prev = 0.0f;
+   float y_invalid = false;
    for (int i = 0; i != 100000; ++i)
    {
       float y = sm(1.0f);
-      CHECK(y >= prev);
-      CHECK(y <= 1.0f);
+      if (!(y >= prev && y <= 1.0f))
+         y_invalid = true;
       prev = y;
    }
+   CHECK(!y_invalid);
    CHECK(prev == 1.0f);
 }
 
