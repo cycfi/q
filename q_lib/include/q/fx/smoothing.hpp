@@ -53,9 +53,10 @@ namespace cycfi::q
 
       float operator()(float target)
       {
+         auto val = _snap(_smoother(target), target);
          if (_snap.settled())
-            _smoother = target;
-         return _snap(_smoother(target), target);
+            _smoother = val = target;
+         return val;
       }
 
       float operator()() const { return _smoother(); }

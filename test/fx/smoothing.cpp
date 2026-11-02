@@ -99,7 +99,7 @@ TEST_CASE("smoothed: a step never overshoots and rises monotonically")
          y_invalid = true;
       prev = y;
    }
-   CHECK(!y_invalid);
+   CHECK_FALSE(y_invalid);
    CHECK(prev == 1.0f);
 }
 
