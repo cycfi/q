@@ -13,6 +13,12 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-11-03
 
+`1a8c4639`: `mirrored_ring_buffer(size, mirror)` repeats only the first
+`mirror` elements after the end, so windows of up to mirror + 1 elements
+stay contiguous at that many extra elements instead of a doubled store.
+The default mirror is the size, the old behavior; reads now wrap their
+start with one compare. A 4-point interpolated read wants a mirror of 3.
+
 `1f60b3b2`: `bitstream_acf` counts its mismatches with Harley-Seal where
 the target has no hardware popcount (a Cortex-M, baseline x86-64):
 carry-save adders sum eight XORed words bitwise and one count serves the
