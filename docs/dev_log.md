@@ -13,6 +13,16 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-11-02
 
+`aca757e1`, `63c12d05`, `83e2ceae`: the phase vocoder's per-bin math for
+small cores, where a float compare and its flag transfer cost far more than
+the arithmetic. `fast_sincos` reduces to the nearest quarter turn and picks
+the quadrant by bit masks (error 9e-8); `fast_atan2` picks its octant from
+sign bits with fmin and fmax (error 1.2e-5; `fast_atan2(0, -0.0)` is now
+pi, as IEEE has it); `principal_arg` clamps with fmin and fmax.
+`spectral_peaks` compares magnitudes as integers, which order as
+non-negative floats do. `phase_tracker` gains `step()` and `next_frame()`,
+so a caller can fold the tracking into a pass of its own over the bins.
+
 `eee24034`: the native FFT at half the cost on a Cortex-M7. Its radix-2
 stages run two to a pass as radix-4 butterflies (three twiddle multiplies
 for four points), the first pass (twiddles 1 and -i) with none; the bit
