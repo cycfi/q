@@ -151,6 +151,29 @@ TEST_CASE("mirrored_ring_buffer: any window is contiguous")
    }
 }
 
+TEST_CASE("mirrored_ring_buffer: a short mirror keeps short windows contiguous")
+{
+   q::mirrored_ring_buffer<float> b(7, 3);
+   CHECK(b.size() == 7);
+   CHECK(b.mirror() == 3);
+   CHECK(b.store().size() == 10);
+
+   for (int n = 0; n != 30; ++n)            // several wraps
+   {
+      b.push(float(n));
+      for (std::size_t age = 0; age != b.size() && age <= std::size_t(n); ++age)
+         CHECK(b[age] == float(n - int(age)));
+
+      // span(age)[k] is the element age + k back, for k <= mirror.
+      for (std::size_t age = 0; age != b.size(); ++age)
+      {
+         auto const* p = b.span(age);
+         for (std::size_t k = 0; k <= b.mirror() && age + k != b.size(); ++k)
+            CHECK(p[k] == b[age + k]);
+      }
+   }
+}
+
 TEST_CASE("mirrored_ring_buffer: clear zeroes the contents")
 {
    q::mirrored_ring_buffer<float> b(4);

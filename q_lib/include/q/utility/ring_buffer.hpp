@@ -6,6 +6,7 @@
 #if !defined(CYCFI_Q_BUFFER_JULY_12_2014)
 #define CYCFI_Q_BUFFER_JULY_12_2014
 
+#include <algorithm>
 #include <vector>
 #include <array>
 #include <q/support/base.hpp>
@@ -166,21 +167,21 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // mirrored_ring_buffer: a ring buffer whose storage is doubled and
-   // every sample written twice, at _pos and _pos + size(). Any window of
-   // the history is then one contiguous stretch of memory regardless of
-   // the wrap point: span(age) points at the element `age` back, and the
-   // next k elements ascend in age, valid while age + k < size(). The
-   // price is one extra store per push and twice the memory; in exchange
-   // reads need no index arithmetic at all and vector kernels get plain
-   // pointers.
+   // mirrored_ring_buffer: a ring buffer whose first `mirror` elements are
+   // repeated after its end, each written twice. A window of up to
+   // mirror + 1 elements is then one contiguous stretch of memory
+   // regardless of the wrap point: span(age) points at the element `age`
+   // back, and the next k elements ascend in age, valid while k <= mirror
+   // and age + k < size(). The default mirror is size(): every sample
+   // written twice, twice the memory, and any window contiguous, for
+   // vector kernels. A short mirror costs only that many extra elements,
+   // for a reader that takes a few at a time, such as a 4-point
+   // interpolation (mirror 3).
    //
-   // No power-of-two rounding: the index mask existed to make modulo
-   // cheap, but here nothing takes a modulo. The one wrap left, in push,
-   // is an explicit compare taken once per revolution, so the capacity
-   // is exactly what was asked for. Reads only: writing through a
-   // reference would desync the mirror, so no mutable element access is
-   // offered.
+   // No power-of-two rounding: the capacity is exactly what was asked
+   // for, and the wraps are explicit compares, one per push and one per
+   // read. Reads only: writing through a reference would desync the
+   // mirror, so no mutable element access is offered.
    ////////////////////////////////////////////////////////////////////////////
    template <typename T, typename Storage = std::vector<T>>
    class mirrored_ring_buffer
@@ -193,12 +194,17 @@ namespace cycfi::q
       using interpolation_type = sample_interpolation::none;
 
       explicit mirrored_ring_buffer(std::size_t size)
+       : mirrored_ring_buffer(size, size)
+      {}
+
+      mirrored_ring_buffer(std::size_t size, std::size_t mirror)
        : _size(size)
+       , _mirror(std::min(mirror, size))
        , _pos(0)
       {
          static_assert(detail::resizable_container<Storage>::value,
             "Error: Can't be constructed with size. Storage has fixed size.");
-         _data.resize(2 * size, T{});
+         _data.resize(_size + _mirror, T{});
       }
 
       std::size_t size() const
@@ -212,23 +218,29 @@ namespace cycfi::q
             _pos = _size;
          --_pos;
          _data[_pos] = val;
-         _data[_pos + _size] = val;
+         if (_pos < _mirror)
+            _data[_pos + _size] = val;
       }
 
       T const& front() const          { return (*this)[0]; }
       T const& back() const           { return (*this)[size() - 1]; }
 
-      // The nth latest element; no mask: _pos + index stays inside the
-      // doubled storage, whose upper half repeats the lower.
+      // The nth latest element.
       T const& operator[](std::size_t index) const
       {
-         return _data[_pos + index];
+         return *span(index);
       }
 
       // The elements from `age` back, ascending in age, contiguous.
       T const* span(std::size_t age) const
       {
-         return _data.data() + _pos + age;
+         auto const i = _pos + age;
+         return _data.data() + (i < _size ? i : i - _size);
+      }
+
+      std::size_t mirror() const
+      {
+         return _mirror;
       }
 
       void clear()
@@ -242,6 +254,7 @@ namespace cycfi::q
    private:
 
       std::size_t    _size;
+      std::size_t    _mirror;
       std::size_t    _pos;
       Storage        _data;
    };
