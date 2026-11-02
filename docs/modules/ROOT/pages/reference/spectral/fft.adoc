@@ -67,28 +67,15 @@ WARNING: The transforms are *in place*: they overwrite the input array with the 
 
 == Backends
 
-With the CMake option `Q_USE_PFFFT` on (the default), the `float` transforms run on https://github.com/marton78/pffft[PFFFT], a SIMD FFT using NEON on ARM and SSE on x86: `fft` from 16 points up, `rfft` from 32. `double`, and the smaller sizes, use Q's own implementation. The API, the data layout and the scaling are the same either way. Results agree to within rounding, but are not bit-identical between the two.
+With the CMake option `Q_USE_PFFFT` on (the default), the `float` transforms run on https://github.com/marton78/pffft[PFFFT], a SIMD FFT using NEON on ARM and SSE on x86: `fft` from 16 points up, `rfft` from 32. `double`, and the smaller sizes, use the Q native implementation. The API, the data layout and the scaling are the same either way. Results agree to within rounding, but are not bit-identical between the two.
 
-The time for one frame (copy a frame in, forward transform, inverse transform), in µs, measured with `test/benchmark/fft_bench` on an Apple M2:
+Which is faster depends on the processor. On a computer, PFFFT's SIMD makes it about three times faster than Q native. On a microcontroller without SIMD, such as an Arm Cortex-M7, PFFFT runs in scalar form and Q native is as fast or faster: leave `Q_USE_PFFFT` undefined there. See <<_performance,Performance>>, and run `test/benchmark/fft_bench` on your own target.
 
-[cols="1,1,1,1,1"]
-|===
-| `n`  | `fft`, Q's own | `fft`, PFFFT | `rfft`, Q's own | `rfft`, PFFFT
-
-| 256  | 1.9   | 0.55 | 1.0  | 0.28
-| 512  | 4.4   | 1.2  | 2.3  | 0.55
-| 1024 | 9.6   | 2.4  | 5.1  | 1.1
-| 2048 | 20.7  | 5.6  | 10.9 | 2.6
-| 4096 | 44.2  | 11.4 | 23.5 | 5.3
-|===
-
-Treat these as ratios: other machines, compilers and sizes give other numbers. Run `fft_bench` on your own target.
-
-An object owns everything a transform uses: PFFFT's setup for its size and its work space, or the tables of Q's own implementation. Each object therefore makes one setup, for the one size it was built with. Because the work space is the object's, two threads transforming at the same time need two objects.
+An object owns everything a transform uses: PFFFT's setup for its size and its work space, or the tables of the Q native implementation. Each object therefore makes one setup, for the one size it was built with. Because the work space is the object's, two threads transforming at the same time need two objects.
 
 PFFFT on x86 needs its buffers 16-byte aligned. Any `float` pointer still works: a misaligned one goes through a buffer in the object, at the cost of a copy. Declaring the data `alignas(16)` avoids the copy. ARM has no such requirement.
 
-Q is header-only, and so is PFFFT as Q uses it: with the option on, Q's CMake fetches PFFFT and gives `libq` the `Q_USE_PFFFT` definition and PFFFT's include paths, and nothing is compiled. A build that does not use CMake gets Q's own implementation, unless it defines `Q_USE_PFFFT` and adds PFFFT's `include/pffft` and `src` directories to its include path. Turn PFFFT off with `-DQ_USE_PFFFT=OFF`.
+Q is header-only, and so is PFFFT as Q uses it: with the option on, Q's CMake fetches PFFFT and gives `libq` the `Q_USE_PFFFT` definition and PFFFT's include paths, and nothing is compiled. A build that does not use CMake gets the Q native implementation, unless it defines `Q_USE_PFFFT` and adds PFFFT's `include/pffft` and `src` directories to its include path. Turn PFFFT off with `-DQ_USE_PFFFT=OFF`.
 
 == Migrating from v1.5
 
@@ -277,6 +264,25 @@ auto freq = peak * sps / n;                                              <5>
 
 NOTE: Implementation details are subject to change without notice. Rely only on the expressions above.
 
-Q's own complex FFT is an iterative radix-2 Cooley-Tukey transform. Its twiddle factors are computed once, in double precision, and its bit-reversal order is a table; both are made by the constructor. Its own real FFT reads the `n` samples as `n/2` complex values, `z(m) = x(2m) + i x(2m+1)`, and transforms those with a complex FFT of half the size. Each pair of bins `k` and `n/2-k` of the result then separates into the transforms of the even and the odd samples, `E(k)` and `O(k)`, and `X(k) = E(k) + exp(-2πik/n) O(k)`. The inverse runs the same steps backwards.
+The Q native complex FFT is an iterative Cooley-Tukey transform, its radix-2 stages taken two at a time as radix-4 butterflies: three twiddle multiplies for four points. The first two stages, whose twiddles are 1 and -i, need no multiplies at all. The twiddle factors are computed once, in double precision, and the bit-reversal order is a list of the pairs to swap; both are made by the constructor. The Q native real FFT reads the `n` samples as `n/2` complex values, `z(m) = x(2m) + i x(2m+1)`, and transforms those with a complex FFT of half the size. Each pair of bins `k` and `n/2-k` of the result then separates into the transforms of the even and the odd samples, `E(k)` and `O(k)`, and `X(k) = E(k) + exp(-2πik/n) O(k)`. The inverse runs the same steps backwards, its `1/n` folded into the separation.
 
 PFFFT comes from Cycfi's fork, https://github.com/cycfi/pffft[cycfi/pffft], and is compiled into each translation unit that includes `fft.hpp`, inside a namespace of Q's, with internal linkage. With `Q_USE_PFFFT` and without it, the classes live in different inline namespaces, so translation units built with and without it still link together, each with its own implementation.
+
+=== Performance
+
+NOTE: {performance_note}
+
+An FFT runs a frame at a time, so its cost is given per transform: a forward real FFT of `n` samples. The inverse takes within a few percent of the forward.
+
+[cols="1,2,2,2,2", options="header"]
+|===
+| `n` | Apple M2, Q native | Apple M2, PFFFT | STM32H723, Q native | STM32H723, PFFFT (scalar)
+
+| 256  | 290 ns | 83 ns  | 15 µs   | 16 µs
+| 1024 | 1.7 µs | 460 ns | 69 µs   | 67 µs
+| 2048 | 3.9 µs | 1.2 µs | 144 µs  | 165 µs
+| 4096 | 8.1 µs | 2.4 µs | 324 µs  | 371 µs
+| 8192 | 18 µs  | 5.1 µs | 0.81 ms | 1.08 ms
+|===
+
+On the H723 the two are even up to 1024 points, and Q native is faster above: by 13% at 2048 and 25% at 8192. CMSIS-DSP's `arm_rfft_fast_f32` (version 1.6.0, built the same way) takes 172 µs at 2048, slower than both.

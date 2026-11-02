@@ -185,7 +185,7 @@ You can turn off parts of the build with CMake options:
 `-D Q_BUILD_EXAMPLES=OFF`, `-D Q_BUILD_TEST=OFF`, and `-D Q_BUILD_IO=OFF`
 (the last drops the audio/MIDI I/O layer and its RtAudio and libremidi
 dependencies, leaving the header-only `q_lib` core). `-D Q_USE_PFFFT=OFF`
-runs the FFTs on Q's own implementation and leaves PFFFT out. QPlug is off
+runs the FFTs on the Q native implementation and leaves PFFFT out. QPlug is off
 unless you turn it on with `-D Q_BUILD_PLUG=ON`.
 
 '''
