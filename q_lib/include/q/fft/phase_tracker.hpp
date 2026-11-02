@@ -39,6 +39,9 @@ namespace cycfi::q
                             , std::span<float> freq
                            );
 
+      float                step(std::size_t k, float phase);
+      void                 next_frame();
+
       std::size_t          size() const;
       std::size_t          hop() const;
       void                 reset();
@@ -47,6 +50,7 @@ namespace cycfi::q
 
       std::size_t          _n;
       std::size_t          _hop;
+      float                _to_bins;   // radians a hop to bins
       bool                 _primed = false;
       std::vector<float>   _prev;
       std::vector<float>   _advance;
@@ -58,6 +62,7 @@ namespace cycfi::q
    inline phase_tracker::phase_tracker(std::size_t n, std::size_t hop)
     : _n{n}
     , _hop{hop}
+    , _to_bins{float(n / (2 * pi * double(hop)))}
     , _prev(n/2 + 1)
     , _advance(n/2 + 1)
    {
@@ -76,14 +81,24 @@ namespace cycfi::q
    {
       assert(phase.size() >= _n/2 + 1 && freq.size() >= _n/2 + 1);
 
-      float const to_bins = float(_n / (2 * pi * double(_hop)));
       for (std::size_t k = 0; k <= _n/2; ++k)
-      {
-         float offset = _primed?
-            principal_arg(phase[k] - _prev[k] - _advance[k]) : 0.0f;
-         freq[k] = float(k) + offset * to_bins;
-         _prev[k] = phase[k];
-      }
+         freq[k] = step(k, phase[k]);
+      next_frame();
+   }
+
+   // One bin of a frame, for a caller that goes through the bins in a
+   // pass of its own: the bin's frequency, in bins, from its phase. Call
+   // next_frame() once the frame's bins are all in.
+   inline float phase_tracker::step(std::size_t k, float phase)
+   {
+      float const offset = _primed?
+         principal_arg(phase - _prev[k] - _advance[k]) : 0.0f;
+      _prev[k] = phase;
+      return float(k) + offset * _to_bins;
+   }
+
+   inline void phase_tracker::next_frame()
+   {
       _primed = true;
    }
 
