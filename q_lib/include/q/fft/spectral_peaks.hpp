@@ -7,7 +7,9 @@
 #define CYCFI_Q_SPECTRAL_PEAKS_OCTOBER_31_2026
 
 #include <cassert>
+#include <bit>
 #include <cstddef>
+#include <cstdint>
 #include <span>
 #include <vector>
 
@@ -72,18 +74,29 @@ namespace cycfi::q
       auto const last_bin = _n/2;
       assert(mag.size() >= last_bin + 1);
 
-      auto above = [&](std::size_t k, std::size_t j)
+      // Magnitudes are never negative, and non-negative floats order as
+      // their bits do: the comparisons run as integer ones, which a core
+      // without a fast float compare (a Cortex-M) does far more cheaply.
+      auto bits = [&](std::size_t k)
       {
-         return j > last_bin || mag[k] > mag[j];
+         return std::bit_cast<std::uint32_t>(mag[k]);
+      };
+      auto above = [&](std::uint32_t m, std::size_t j)
+      {
+         return j > last_bin || m > bits(j);
       };
 
+      // A negative threshold passes every bin, as mag > threshold does.
+      bool const any = _threshold < 0.0f;
+      auto const floor = any ? 0u : std::bit_cast<std::uint32_t>(_threshold);
       _count = 0;
       for (std::size_t k = 0; k <= last_bin; ++k)
       {
-         bool is_peak = mag[k] > _threshold
-            && (k < 1 || mag[k] > mag[k-1])
-            && (k < 2 || mag[k] > mag[k-2])
-            && above(k, k+1) && above(k, k+2);
+         auto const m = bits(k);
+         bool is_peak = (any || m > floor)
+            && (k < 1 || m > bits(k-1))
+            && (k < 2 || m > bits(k-2))
+            && above(m, k+1) && above(m, k+2);
          if (is_peak)
             _peaks[_count++] = {k, 0, last_bin};
       }
