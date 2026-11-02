@@ -11,7 +11,9 @@
 #include <span>
 #include <cstring>
 #include <algorithm>
+#include <bit>
 #include <cmath>
+#include <limits>
 #include <utility>
 #include <infra/support.hpp>
 #include <q/detail/fast_math.hpp>
@@ -101,74 +103,76 @@ namespace cycfi::q
       constexpr float two_pi_lo = float(2 * pi - 6.28125);
       constexpr float inv_two_pi = float(1 / (2 * pi));
 
-      // k can come out one off right at the edges; a turn puts r back.
+      // Rounding can leave r a hair past pi either way: the same angle,
+      // held to the range (fmin and fmax need no compare).
       float k = std::floor(x * inv_two_pi + 0.5f);
       float r = (x - k * two_pi_hi) - k * two_pi_lo;
-      if (r > float(pi))
-         r = (r - two_pi_hi) - two_pi_lo;
-      else if (r < -float(pi))
-         r = (r + two_pi_hi) + two_pi_lo;
-      return r;
+      return std::fmin(std::fmax(r, -float(pi)), float(pi));
    }
 
    ////////////////////////////////////////////////////////////////////////////
    // fast_sincos: the sine and cosine of any angle, as {sin, cos}, sharing
-   // one evaluation. The angle is wrapped to [-pi, pi], folded to [-pi/2,
-   // pi/2], and both come from Taylor polynomials to x^11 and x^12.
+   // one evaluation. The angle is reduced to the nearest quarter turn (Cody
+   // and Waite, as principal_arg), leaving at most pi/4, where Taylor
+   // polynomials to x^9 and x^8 are good to about 2e-9; the quarter's two
+   // low bits then swap and sign the pair, with no branch.
    ////////////////////////////////////////////////////////////////////////////
    inline std::pair<float, float> fast_sincos(float x)
    {
-      constexpr float half_pi = float(pi / 2);
+      constexpr float half_pi_hi = 1.5703125f;
+      constexpr float half_pi_lo = float(pi / 2 - 1.5703125);
+      constexpr float two_over_pi = float(2 / pi);
 
-      // sin(pi - x) = sin(x) and cos(pi - x) = -cos(x), on either side.
-      x = principal_arg(x);
-      float sign = 1.0f;
-      if (x > half_pi)
-      {
-         x = float(pi) - x;
-         sign = -1.0f;
-      }
-      else if (x < -half_pi)
-      {
-         x = -float(pi) - x;
-         sign = -1.0f;
-      }
+      float const q = std::floor(x * two_over_pi + 0.5f);
+      float const r = (x - q * half_pi_hi) - q * half_pi_lo;
+      float const r2 = r * r;
+      float const s = r * (1 + r2 * (-1.0f/6 + r2 * (1.0f/120
+         + r2 * (-1.0f/5040 + r2 * (1.0f/362880)))));
+      float const c = 1 + r2 * (-0.5f + r2 * (1.0f/24 + r2 * (-1.0f/720
+         + r2 * (1.0f/40320))));
 
-      float x2 = x * x;
-      float s = x * (1 + x2 * (-1.0f/6 + x2 * (1.0f/120 + x2 * (-1.0f/5040
-         + x2 * (1.0f/362880 + x2 * (-1.0f/39916800))))));
-      float c = 1 + x2 * (-0.5f + x2 * (1.0f/24 + x2 * (-1.0f/720
-         + x2 * (1.0f/40320 + x2 * (-1.0f/3628800
-         + x2 * (1.0f/479001600))))));
-      return {s, sign * c};
+      // Quarter n: sin, cos = s, c; c, -s; -s, -c; -c, s.
+      auto const n = std::uint32_t(std::int32_t(q));
+      auto const swap = std::uint32_t(0) - (n & 1);
+      auto const sb = std::bit_cast<std::uint32_t>(s);
+      auto const cb = std::bit_cast<std::uint32_t>(c);
+      auto const sin_b = ((sb & ~swap) | (cb & swap)) ^ ((n & 2) << 30);
+      auto const cos_b = ((cb & ~swap) | (sb & swap)) ^ (((n + 1) & 2) << 30);
+      return {std::bit_cast<float>(sin_b), std::bit_cast<float>(cos_b)};
    }
 
    ////////////////////////////////////////////////////////////////////////////
    // fast_atan2: atan2(y, x), in [-pi, pi]. The arctangent of the smaller
    // over the larger of |y| and |x| comes from Abramowitz and Stegun 4.4.47
-   // (error at most 1e-5 on [-1, 1]); the octant then sets the angle.
-   // fast_atan2(0, 0) is 0.
+   // (error at most 1e-5 on [-1, 1]); the octant then sets the angle,
+   // from sign bits, with no compare. fast_atan2(0, 0) is 0.
    ////////////////////////////////////////////////////////////////////////////
    inline float fast_atan2(float y, float x)
    {
       constexpr float half_pi = float(pi / 2);
 
-      float ax = std::abs(x);
-      float ay = std::abs(y);
-      if (ax == 0 && ay == 0)
-         return 0.0f;
-
-      bool steep = ay > ax;
-      float z = steep? ax / ay : ay / ax;
-      float z2 = z * z;
-      float a = z * (0.9998660f + z2 * (-0.3302995f + z2 * (0.1801410f
+      float const ax = std::abs(x);
+      float const ay = std::abs(y);
+      float const hi = std::fmax(ax, ay);
+      float const lo = std::fmin(ax, ay);
+      float const z = lo / std::fmax(hi, std::numeric_limits<float>::min());
+      float const z2 = z * z;
+      float const a = z * (0.9998660f + z2 * (-0.3302995f + z2 * (0.1801410f
          + z2 * (-0.0851330f + z2 * 0.0208351f))));
 
-      if (steep)
-         a = half_pi - a;
-      if (x < 0)
-         a = float(pi) - a;
-      return (y < 0)? -a : a;
+      // Masks of all ones where |y| > |x| and where x < 0.
+      auto mask = [](float v)
+      {
+         return std::uint32_t(std::bit_cast<std::int32_t>(v) >> 31);
+      };
+      auto pick = [](float a, float b, std::uint32_t m)
+      {
+         return std::bit_cast<float>((std::bit_cast<std::uint32_t>(a) & ~m)
+            | (std::bit_cast<std::uint32_t>(b) & m));
+      };
+      float const steep = pick(a, half_pi - a, mask(ax - ay));
+      float const side = pick(steep, float(pi) - steep, mask(x));
+      return std::copysign(side, y);
    }
 
    ////////////////////////////////////////////////////////////////////////////
