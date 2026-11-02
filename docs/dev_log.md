@@ -11,6 +11,20 @@ commits; the feature branches they first cited were squash-merged and no
 longer resolve. The full text before the trim: `git show
 308ddccb:docs/dev_log.md`.
 
+## 2026-11-02
+
+`eee24034`: the native FFT at half the cost on a Cortex-M7. Its radix-2
+stages run two to a pass as radix-4 butterflies (three twiddle multiplies
+for four points), the first pass (twiddles 1 and -i) with none; the bit
+reversal is a list of swaps; the real FFT's split takes w/2 from its table
+and the inverse folds its 1/n into the split. On the H723 a 2048-point real
+FFT went from 161k cycles to 79k, ahead of PFFFT's scalar code (91k) and
+CMSIS-DSP 1.6.0's arm_rfft_fast_f32 (94k); 8192 points from 832k to 444k.
+On the M2 the native path is faster too (2048: 6.3 to 3.9 us), and float
+stays on PFFFT there. `b5ebb0be`: the FFT page's Performance section (M2
+and H723, Q native against PFFFT) and the standard performance NOTE in
+common.adoc; Q native named as the microcontroller's choice.
+
 ## 2026-10-31 (later)
 
 `a0679ed9` breaking: the FFT is an object built with its size.
