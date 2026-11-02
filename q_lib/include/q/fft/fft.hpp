@@ -28,8 +28,11 @@ namespace cycfi::q::detail
 {
    ////////////////////////////////////////////////////////////////////////////
    // native_fft_plan: an iterative radix-2 FFT of n complex values,
-   // interleaved, in place. The twiddles are computed once, in double, and
-   // the bit-reversal order is a table, both made at construction.
+   // interleaved, in place, its stages fused in pairs so each pass over the
+   // data does two (a radix-4 pass in registers): the first pair, whose
+   // twiddles are 1 and -i, with no multiplies. The twiddles are computed
+   // once, in double, and the bit-reversal order is a table, both made at
+   // construction.
    ////////////////////////////////////////////////////////////////////////////
    template <std::floating_point T>
    class native_fft_plan
@@ -40,16 +43,18 @@ namespace cycfi::q::detail
 
       void                 forward(T* data) const;
       void                 inverse(T* data) const;
+      void                 inverse_unscaled(T* data) const;
 
    private:
 
-      void                 transform(T* data, T sign) const;
+      template <bool Inverse>
+      void                 transform(T* data) const;
 
       using twiddles = std::vector<std::complex<T>>;
 
       std::size_t                _n;
       twiddles                   _twiddles;
-      std::vector<std::uint32_t> _bitrev;
+      std::vector<std::uint32_t> _swaps;  // bit-reversal pairs, i < j
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -57,7 +62,8 @@ namespace cycfi::q::detail
    // The samples, read as n/2 complex values z[m] = x[2m] + i x[2m+1],
    // transform to Z. Bin pairs (k, n/2-k) of Z then split into the
    // transforms of the even and odd samples, E and O, and
-   // X[k] = E[k] + w[k] O[k], w[k] = exp(-2 pi i k / n).
+   // X[k] = E[k] + w[k] O[k], w[k] = exp(-2 pi i k / n). The table holds
+   // w[k] / 2, which takes the split's halving with it.
    ////////////////////////////////////////////////////////////////////////////
    template <std::floating_point T>
    class native_rfft_plan
@@ -328,7 +334,6 @@ namespace cycfi::q::detail
    inline native_fft_plan<T>::native_fft_plan(std::size_t n)
     : _n{n}
     , _twiddles(n / 2)
-    , _bitrev(n)
    {
       for (std::size_t k = 0; k != _twiddles.size(); ++k)
       {
@@ -344,41 +349,140 @@ namespace cycfi::q::detail
          std::uint32_t r = 0;
          for (std::size_t b = 0; b != bits; ++b)
             r |= std::uint32_t((i >> b) & 1) << (bits - 1 - b);
-         _bitrev[i] = r;
+         if (i < r)
+         {
+            _swaps.push_back(std::uint32_t(i));
+            _swaps.push_back(r);
+         }
       }
    }
 
    template <std::floating_point T>
    inline void native_fft_plan<T>::forward(T* data) const
    {
-      transform(data, T(1));
+      transform<false>(data);
+   }
+
+   // The inverse without its 1/n, for a caller that scales on its own.
+   template <std::floating_point T>
+   inline void native_fft_plan<T>::inverse_unscaled(T* data) const
+   {
+      transform<true>(data);
    }
 
    template <std::floating_point T>
    inline void native_fft_plan<T>::inverse(T* data) const
    {
-      transform(data, T(-1));
+      transform<true>(data);
       T const s = T(1) / _n;
       for (std::size_t i = 0; i != 2*_n; ++i)
          data[i] *= s;
    }
 
-   // The inverse is the forward transform with conjugate twiddles: `sign`
-   // is -1 for it, flipping the twiddles' imaginary parts.
+   // The inverse is the forward transform with conjugate twiddles. A
+   // radix-2 stage of length len pairs x[k] and x[k + len/2] in each block,
+   // the second times w_len^k; two stages, len L then 2L, fuse into one
+   // radix-4 pass over the four points a, b, c, d at k, k + L/2, k + L,
+   // k + 3L/2: with w = w_2L^k, b takes w^2, c takes w and d w^3, and the
+   // rest is sums and differences times -i (i for the inverse).
    template <std::floating_point T>
-   inline void native_fft_plan<T>::transform(T* data, T sign) const
+   template <bool Inverse>
+   inline void native_fft_plan<T>::transform(T* data) const
    {
-      for (std::size_t i = 0; i != _n; ++i)
+      auto const* sw = _swaps.data();
+      for (std::size_t p = 0; p != _swaps.size(); p += 2)
       {
-         std::size_t j = _bitrev[i];
-         if (i < j)
+         auto const i = sw[p], j = sw[p + 1];
+         std::swap(data[2*i], data[2*j]);
+         std::swap(data[2*i + 1], data[2*j + 1]);
+      }
+
+      // a * w, w from the table, conjugated for the inverse.
+      auto twiddle = [](T& r, T& i, std::complex<T> const& w)
+      {
+         T const wr = w.real();
+         T const wi = Inverse ? -w.imag() : w.imag();
+         T const tr = r * wr - i * wi;
+         i = r * wi + i * wr;
+         r = tr;
+      };
+
+      std::size_t len = 2;
+      if (_n >= 4)
+      {
+         // Lengths 2 and 4: twiddles 1, then 1 and -i (i for the inverse).
+         for (std::size_t i = 0; i != _n; i += 4)
          {
-            std::swap(data[2*i], data[2*j]);
-            std::swap(data[2*i + 1], data[2*j + 1]);
+            T* x = data + 2*i;
+            T const ar = x[0] + x[2], ai = x[1] + x[3];
+            T const br = x[0] - x[2], bi = x[1] - x[3];
+            T const cr = x[4] + x[6], ci = x[5] + x[7];
+            T const dr = x[4] - x[6], di = x[5] - x[7];
+            T const vr = Inverse ? -di : di;
+            T const vi = Inverse ? dr : -dr;
+            x[0] = ar + cr;
+            x[1] = ai + ci;
+            x[4] = ar - cr;
+            x[5] = ai - ci;
+            x[2] = br + vr;
+            x[3] = bi + vi;
+            x[6] = br - vr;
+            x[7] = bi - vi;
+         }
+         len = 8;
+      }
+
+      for (; 2*len <= _n; len *= 4)
+      {
+         auto const q = len / 2;
+         auto const s1 = _n / len;
+         auto const s2 = s1 / 2;
+
+         // Each k's three twiddles serve every block: load them once, and
+         // sweep the blocks. w^3 = w_2L^3k is past the table's half
+         // circle once 3k >= L: there it is -w_2L^(3k - L).
+         for (std::size_t k = 0; k != q; ++k)
+         {
+            auto const w1 = _twiddles[k * s2];
+            auto const w2 = _twiddles[k * s1];
+            auto const k3 = 3 * k;
+            auto w3 = k3 < len
+               ? _twiddles[k3 * s2] : -_twiddles[(k3 - len) * s2];
+            for (std::size_t i = k; i < _n; i += 2*len)
+            {
+               T* a = data + 2*i;
+               T* b = a + 2*q;
+               T* c = a + 2*len;
+               T* d = c + 2*q;
+
+               T br = b[0], bi = b[1];
+               T cr = c[0], ci = c[1];
+               T dr = d[0], di = d[1];
+               twiddle(br, bi, w2);
+               twiddle(cr, ci, w1);
+               twiddle(dr, di, w3);
+               T const s0r = a[0] + br, s0i = a[1] + bi;
+               T const s1r = a[0] - br, s1i = a[1] - bi;
+               T const s2r = cr + dr, s2i = ci + di;
+               T const s3r = cr - dr, s3i = ci - di;
+
+               // b and d: s1 -+ i s3 going forward, s1 +- i s3 back.
+               T const jr = Inverse ? -s3i : s3i;
+               T const ji = Inverse ? s3r : -s3r;
+               a[0] = s0r + s2r;
+               a[1] = s0i + s2i;
+               c[0] = s0r - s2r;
+               c[1] = s0i - s2i;
+               b[0] = s1r + jr;
+               b[1] = s1i + ji;
+               d[0] = s1r - jr;
+               d[1] = s1i - ji;
+            }
          }
       }
 
-      for (std::size_t len = 2; len <= _n; len *= 2)
+      // An odd stage left over.
+      if (len <= _n)
       {
          auto const half = len / 2;
          auto const step = _n / len;
@@ -386,15 +490,10 @@ namespace cycfi::q::detail
          {
             for (std::size_t k = 0; k != half; ++k)
             {
-               auto const& w = _twiddles[k * step];
-               T wr = w.real();
-               T wi = sign * w.imag();
-
                T* u = data + 2*(i + k);
                T* v = data + 2*(i + k + half);
-               T vr = v[0] * wr - v[1] * wi;
-               T vi = v[0] * wi + v[1] * wr;
-
+               T vr = v[0], vi = v[1];
+               twiddle(vr, vi, _twiddles[k * step]);
                v[0] = u[0] - vr;
                v[1] = u[1] - vi;
                u[0] += vr;
@@ -416,7 +515,7 @@ namespace cycfi::q::detail
       for (std::size_t k = 0; k != _w.size(); ++k)
       {
          double a = -2 * std::numbers::pi * k / n;
-         _w[k] = {T(std::cos(a)), T(std::sin(a))};
+         _w[k] = {T(0.5 * std::cos(a)), T(0.5 * std::sin(a))};
       }
    }
 
@@ -435,22 +534,25 @@ namespace cycfi::q::detail
       data[n] = r0 - i0;
       data[n + 1] = 0;
 
+      // 2E and 2O from the pair, then X = E + w O with w / 2 from the
+      // table, the remaining halving taken in the sums.
       for (std::size_t k = 1; 2*k < m; ++k)
       {
          T* xk = data + 2*k;
          T* xj = data + 2*(m - k);
 
-         T er = (xk[0] + xj[0]) / 2;
-         T ei = (xk[1] - xj[1]) / 2;
-         T or_ = (xk[1] + xj[1]) / 2;
-         T oi = (xj[0] - xk[0]) / 2;
-         T tr = _w[k].real() * or_ - _w[k].imag() * oi;
-         T ti = _w[k].real() * oi + _w[k].imag() * or_;
+         T const er = xk[0] + xj[0];
+         T const ei = xk[1] - xj[1];
+         T const or_ = xk[1] + xj[1];
+         T const oi = xj[0] - xk[0];
+         T const hr = _w[k].real(), hi = _w[k].imag();
+         T const tr = hr * or_ - hi * oi;
+         T const ti = hr * oi + hi * or_;
 
-         xk[0] = er + tr;
-         xk[1] = ei + ti;
-         xj[0] = er - tr;
-         xj[1] = ti - ei;
+         xk[0] = T(0.5) * er + tr;
+         xk[1] = T(0.5) * ei + ti;
+         xj[0] = T(0.5) * er - tr;
+         xj[1] = ti - T(0.5) * ei;
       }
 
       // The middle bin pairs with itself: X[n/4] = conj(Z[n/4]).
@@ -464,22 +566,27 @@ namespace cycfi::q::detail
       auto const n = _n;
       auto const m = n / 2;
 
-      T e0 = (data[0] + data[n]) / 2;
-      T o0 = (data[0] - data[n]) / 2;
+      // The half transform's 1/m and this step's 1/2, together: 1/n.
+      T const s = T(1) / T(n);
+      T e0 = (data[0] + data[n]) * s;
+      T o0 = (data[0] - data[n]) * s;
       data[0] = e0;
       data[1] = o0;
 
+      // The table's w / 2 makes the twiddled terms want 2 s.
+      T const s2 = 2 * s;
       for (std::size_t k = 1; 2*k < m; ++k)
       {
          T* xk = data + 2*k;
          T* xj = data + 2*(m - k);
 
-         T er = (xk[0] + xj[0]) / 2;
-         T ei = (xk[1] - xj[1]) / 2;
-         T tr = (xk[0] - xj[0]) / 2;
-         T ti = (xk[1] + xj[1]) / 2;
-         T or_ = _w[k].real() * tr + _w[k].imag() * ti;
-         T oi = _w[k].real() * ti - _w[k].imag() * tr;
+         T const er = (xk[0] + xj[0]) * s;
+         T const ei = (xk[1] - xj[1]) * s;
+         T const tr = xk[0] - xj[0];
+         T const ti = xk[1] + xj[1];
+         T const hr = _w[k].real(), hi = _w[k].imag();
+         T const or_ = (hr * tr + hi * ti) * s2;
+         T const oi = (hr * ti - hi * tr) * s2;
 
          xk[0] = er - oi;
          xk[1] = ei + or_;
@@ -487,10 +594,14 @@ namespace cycfi::q::detail
          xj[1] = or_ - ei;
       }
 
+      // The middle bin, X[n/4], pairs with itself: conjugated, at 1/m.
       if (m >= 2)
-         data[m + 1] = -data[m + 1];
+      {
+         data[m] *= 2 * s;
+         data[m + 1] = -data[m + 1] * (2 * s);
+      }
 
-      _half.inverse(data);
+      _half.inverse_unscaled(data);
    }
 
 #if defined(Q_USE_PFFFT)
