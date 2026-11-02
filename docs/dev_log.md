@@ -11,6 +11,17 @@ commits; the feature branches they first cited were squash-merged and no
 longer resolve. The full text before the trim: `git show
 308ddccb:docs/dev_log.md`.
 
+## 2026-11-03
+
+`1f60b3b2`: `bitstream_acf` counts its mismatches with Harley-Seal where
+the target has no hardware popcount (a Cortex-M, baseline x86-64):
+carry-save adders sum eight XORed words bitwise and one count serves the
+eight; the shifted word is loaded once and carried. On the H723 a 16-word
+window went from 22 to 14.5 cycles a word; `bacf_period_detector`'s
+cueing runs 1.5x faster at a 45 ms window (G's worst detection 3.1 to
+2.0 ms), 1.1 to 1.2x at a guitar pitch window. NEON, POPCNT and MSVC keep
+the one-a-word count. The counts are unchanged.
+
 ## 2026-11-02
 
 `aca757e1`, `63c12d05`, `83e2ceae`: the phase vocoder's per-bin math for
