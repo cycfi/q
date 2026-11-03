@@ -13,6 +13,22 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-11-03
 
+`73a1b86f` to `a6f8aea3`: every class that keeps double state or
+arithmetic per sample is a `basic_` template on T, its old name the
+double form, so a single-precision FPU instantiates it in float:
+`basic_decibel<T>` (`dB<T>`, `lin_to_db<T>`, `approx_db<T>`; the two
+forms mix and convert) and on it the compressor, soft knee compressor,
+expander, agc, level crossfade and the signal conditioner's second
+parameter; the Hamming, Blackman and exponential generators; the RMS
+followers (T is the accumulator and the `_db` decibel) and
+`moving_average_ref`'s accumulator; `basic_dx_envelope_gen` and
+`basic_fm_operator`'s ratio type. Stray double literals in `saw_osc`,
+`poly_blamp` (it returned double) and `zero_crossing_collector` are float.
+On a Cortex-M4F every per-sample path in float has no software double;
+the suites pass as they were, 124 of 124 on ARM and x86. The anna examples read the now double
+`sin_cos_gen` as float. Docs: the template forms, `sin_cos_gen`'s
+precision, and the mirror length.
+
 `84780898`: `basic_sin_cos_gen<T>`, `basic_hann_gen<T>` and the basic Hann
 ramps, with the old names as their double forms. The oscillator's state
 is now T as well (it was float under a double coefficient, which bought
