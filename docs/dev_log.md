@@ -13,6 +13,13 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-11-03
 
+`84780898`: `basic_sin_cos_gen<T>`, `basic_hann_gen<T>` and the basic Hann
+ramps, with the old names as their double forms. The oscillator's state
+is now T as well (it was float under a double coefficient, which bought
+nothing: float and the old mix both hold the peak within 1e-6 however
+long they run, double within 1e-8). Float is for a single-precision FPU
+where the run is short, such as a crossfade.
+
 `1a8c4639`: `mirrored_ring_buffer(size, mirror)` repeats only the first
 `mirror` elements after the end, so windows of up to mirror + 1 elements
 stay contiguous at that many extra elements instead of a doubled store.
