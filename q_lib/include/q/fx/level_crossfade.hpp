@@ -20,30 +20,37 @@ namespace cycfi::q
    // For example, if `pivot` is -10dB, and `ctrl` is -13dB, the gain of `a`
    // is 0.708 (-3dB == -10dB - -13dB) and the gain of `b` is 0.3 (1.0 -
    // 0.708).
+   //
+   // T is the decibel's type (see basic_decibel). level_crossfade is double.
    ////////////////////////////////////////////////////////////////////////////
-   struct level_crossfade
+   template <typename T>
+   struct basic_level_crossfade
    {
-      constexpr level_crossfade(decibel pivot)
+      using decibel_type = basic_decibel<T>;
+
+      constexpr basic_level_crossfade(decibel_type pivot)
        : _pivot(pivot)
       {}
 
-      float operator()(float a, float b, decibel ctrl)
+      float operator()(float a, float b, decibel_type ctrl)
       {
          if (ctrl < _pivot)
          {
             auto xfade = lin_float(ctrl - _pivot);
-            return xfade * a + (1.0 - xfade) * b;
+            return xfade * a + (1.0f - xfade) * b;
          }
          return a;
       }
 
-      void pivot(decibel pivot_)
+      void pivot(decibel_type pivot_)
       {
          _pivot = pivot_;
       }
 
-      decibel  _pivot;
+      decibel_type _pivot;
    };
+
+   using level_crossfade = basic_level_crossfade<double>;
 }
 
 #endif
