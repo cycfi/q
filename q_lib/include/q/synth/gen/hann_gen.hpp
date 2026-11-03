@@ -23,10 +23,12 @@ namespace cycfi::q
    // The formula for the Hann window is:
    //    w(n) = 0.5*(1 - cos(2pin/(N-1)))
    //
+   // T is the type of the basic_sin_cos_gen that makes the cosine.
    ////////////////////////////////////////////////////////////////////////////
-   struct hann_gen
+   template <typename T>
+   struct basic_hann_gen
    {
-      hann_gen(duration width, float sps)
+      basic_hann_gen(duration width, float sps)
        : cos{frequency(1.0f / as_float(width)), sps}
       {
       }
@@ -55,52 +57,64 @@ namespace cycfi::q
 
    private:
 
-      sin_cos_gen cos;
+      basic_sin_cos_gen<T> cos;
    };
+
+   using hann_gen = basic_hann_gen<double>;
 
    ////////////////////////////////////////////////////////////////////////////
    // The Hann upward ramp generator generates a rising curve with the shape
    // of the first half of a Hann window taper.
    ////////////////////////////////////////////////////////////////////////////
-   struct hann_upward_ramp_gen : hann_gen
+   template <typename T>
+   struct basic_hann_upward_ramp_gen : basic_hann_gen<T>
    {
-      hann_upward_ramp_gen(duration width, float sps)
-       : hann_gen{width*2, sps}
+      using base_type = basic_hann_gen<T>;
+
+      basic_hann_upward_ramp_gen(duration width, float sps)
+       : base_type{width*2, sps}
       {
       }
 
       void config(duration width, float sps, bool reset_ = false)
       {
-         hann_gen::config(width*2, sps);
+         base_type::config(width*2, sps);
          if (reset_)
-            reset();
+            base_type::reset();
       }
    };
+
+   using hann_upward_ramp_gen = basic_hann_upward_ramp_gen<double>;
 
    ////////////////////////////////////////////////////////////////////////////
    // The Hann downward ramp generator generates a falling curve with the
    // shape of the second half of a Hann window taper.
    ////////////////////////////////////////////////////////////////////////////
-   struct hann_downward_ramp_gen : hann_gen
+   template <typename T>
+   struct basic_hann_downward_ramp_gen : basic_hann_gen<T>
    {
-      hann_downward_ramp_gen(duration width, float sps)
-       : hann_gen{width*2, sps}
+      using base_type = basic_hann_gen<T>;
+
+      basic_hann_downward_ramp_gen(duration width, float sps)
+       : base_type{width*2, sps}
       {
-         midpoint();
+         base_type::midpoint();
       }
 
       void reset()
       {
-         hann_gen::midpoint();
+         base_type::midpoint();
       }
 
       void config(duration width, float sps, bool reset_ = false)
       {
-         hann_gen::config(width*2, sps);
+         base_type::config(width*2, sps);
          if (reset_)
             reset();    // this reset: the window midpoint
       }
    };
+
+   using hann_downward_ramp_gen = basic_hann_downward_ramp_gen<double>;
 }
 
 #endif
