@@ -74,12 +74,9 @@ namespace cycfi::q
    // POSITION, not by which stages ran: pre_env() is the envelope before the
    // compressor, signal_env() the envelope of the output.
    //
-   // T is the compressor's decibel type (see basic_decibel), double by
-   // default; float keeps the chain in float for a single-precision FPU.
-   //
    // signal_conditioner is the full chain.
    ////////////////////////////////////////////////////////////////////////////
-   template <unsigned Bypass = sc_bypass::none, typename T = double>
+   template <unsigned Bypass = sc_bypass::none>
    class basic_signal_conditioner
    {
    public:
@@ -120,7 +117,7 @@ namespace cycfi::q
       using hp_stage   = bypassable<bypass_highpass, highpass>;
       using sm_stage   = bypassable<bypass_smoother, dynamic_smoother>;
       using clip_stage = bypassable<bypass_clip, tanh_clip>;
-      using comp_stage = bypassable<bypass_compressor, basic_compressor<T>>;
+      using comp_stage = bypassable<bypass_compressor, compressor>;
 
       clip_stage              _clip;
       hp_stage                _hp;
@@ -143,9 +140,9 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // Implementation
    ////////////////////////////////////////////////////////////////////////////
-   template <unsigned Bypass, typename T>
+   template <unsigned Bypass>
    template <typename Config>
-   inline basic_signal_conditioner<Bypass, T>
+   inline basic_signal_conditioner<Bypass>
       ::basic_signal_conditioner(
       Config const& conf
     , frequency lowest_freq
@@ -159,7 +156,7 @@ namespace cycfi::q
     , _env{lowest_freq.period()*0.6, sps}
     , _env_lp{lowest_freq.period(), sps}
     , _post_env{0.0f}
-    , _comp{make_bypassable<bypass_compressor, basic_compressor<T>>(
+    , _comp{make_bypassable<bypass_compressor, compressor>(
          conf.comp_threshold, conf.comp_slope)}
     , _makeup_gain{conf.comp_gain}
     , _gate{
@@ -172,9 +169,9 @@ namespace cycfi::q
     , _gate_env{conf.attack_width, conf.gate_release, sps}
    {}
 
-   template <unsigned Bypass, typename T>
+   template <unsigned Bypass>
    inline float
-   basic_signal_conditioner<Bypass, T>
+   basic_signal_conditioner<Bypass>
       ::operator()(float s)
    {
       // High pass
@@ -199,7 +196,7 @@ namespace cycfi::q
       // Compressor + makeup-gain
       if constexpr (!bypass_compressor)
       {
-         auto env_db = lin_to_db<T>(env);
+         auto env_db = lin_to_db(env);
          auto gain = lin_float(_comp(env_db)) * _makeup_gain;
          s = s * gain;
          _post_env = env * gain;
@@ -212,8 +209,8 @@ namespace cycfi::q
       return s;
    }
 
-   template <unsigned Bypass, typename T>
-   inline float basic_signal_conditioner<Bypass, T>
+   template <unsigned Bypass>
+   inline float basic_signal_conditioner<Bypass>
       ::smoothed() const
    {
       static_assert(!bypass_smoother,
@@ -221,57 +218,57 @@ namespace cycfi::q
       return _sm();
    }
 
-   template <unsigned Bypass, typename T>
-   inline bool basic_signal_conditioner<Bypass, T>
+   template <unsigned Bypass>
+   inline bool basic_signal_conditioner<Bypass>
       ::gate() const
    {
       return _gate();
    }
 
-   template <unsigned Bypass, typename T>
-   inline float basic_signal_conditioner<Bypass, T>
+   template <unsigned Bypass>
+   inline float basic_signal_conditioner<Bypass>
       ::gate_env() const
    {
       return _gate_env();
    }
 
-   template <unsigned Bypass, typename T>
-   inline float basic_signal_conditioner<Bypass, T>
+   template <unsigned Bypass>
+   inline float basic_signal_conditioner<Bypass>
       ::pre_env() const
    {
       return _env_lp();
    }
 
-   template <unsigned Bypass, typename T>
-   inline float basic_signal_conditioner<Bypass, T>
+   template <unsigned Bypass>
+   inline float basic_signal_conditioner<Bypass>
       ::signal_env() const
    {
       return _post_env;
    }
 
-   template <unsigned Bypass, typename T>
-   inline void basic_signal_conditioner<Bypass, T>
+   template <unsigned Bypass>
+   inline void basic_signal_conditioner<Bypass>
       ::onset_threshold(decibel onset_threshold)
    {
       _gate.onset_threshold(onset_threshold);
    }
 
-   template <unsigned Bypass, typename T>
-   inline void basic_signal_conditioner<Bypass, T>
+   template <unsigned Bypass>
+   inline void basic_signal_conditioner<Bypass>
       ::release_threshold(decibel release_threshold)
    {
       _gate.release_threshold(release_threshold);
    }
 
-   template <unsigned Bypass, typename T>
-   inline void basic_signal_conditioner<Bypass, T>
+   template <unsigned Bypass>
+   inline void basic_signal_conditioner<Bypass>
       ::onset_threshold(float onset_threshold)
    {
       _gate.onset_threshold(onset_threshold);
    }
 
-   template <unsigned Bypass, typename T>
-   inline void basic_signal_conditioner<Bypass, T>
+   template <unsigned Bypass>
+   inline void basic_signal_conditioner<Bypass>
       ::release_threshold(float release_threshold)
    {
       _gate.release_threshold(release_threshold);

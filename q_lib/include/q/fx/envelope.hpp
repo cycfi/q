@@ -157,8 +157,8 @@ namespace cycfi::q
    // true_rms_envelope_follower's mean_square(). Consumers comparing
    // against a squared threshold can skip the square root entirely.
    //
-   // T is the averaging's accumulator and the _db variant's decibel type,
-   // double by default; float suits a single-precision FPU.
+   // T is the averaging's accumulator, double by default; float suits a
+   // single-precision FPU.
    //
    // Designed by Joel de Guzman (June 2020)
    ////////////////////////////////////////////////////////////////////////////
@@ -186,8 +186,8 @@ namespace cycfi::q
       using base_type::threshold;
       using base_type::_fenv;
 
-      basic_decibel<T>  operator()(float s);
-      basic_decibel<T>  operator()() const;
+      decibel           operator()(float s);
+      decibel           operator()() const;
    };
 
    using fast_rms_envelope_follower_db =
@@ -223,8 +223,8 @@ namespace cycfi::q
    // same floor convention as the fast_rms_envelope_follower) return 0;
    // the _db variant returns -120 dB.
    //
-   // T is the moving average's accumulator and the _db variant's decibel
-   // type, double by default, here and in the _ref and _db variants below.
+   // T is the moving average's accumulator, double by default, here and in
+   // the _ref and _db variants below.
    ////////////////////////////////////////////////////////////////////////////
    template <typename T>
    struct basic_true_rms_envelope_follower
@@ -314,8 +314,8 @@ namespace cycfi::q
       using base_type::threshold;
       using base_type::_ma;
 
-      basic_decibel<T>  operator()(float s);
-      basic_decibel<T>  operator()() const;
+      decibel           operator()(float s);
+      decibel           operator()() const;
    };
 
    using true_rms_envelope_follower_db =
@@ -505,24 +505,24 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // fast_rms_envelope_follower
    template <typename T>
-   inline basic_decibel<T>
+   inline decibel
    basic_fast_rms_envelope_follower_db<T>::operator()(float s)
    {
       // Floor at the threshold: the output floor is -240 dB / 2 = -120 dB.
       auto e = std::max(_fenv(s * s), threshold);
 
       // Perform square-root in the dB domain:
-      return lin_to_db<T>(e) / 2.0f;
+      return lin_to_db(e) / 2.0f;
    }
 
    template <typename T>
-   inline basic_decibel<T>
+   inline decibel
    basic_fast_rms_envelope_follower_db<T>::operator()() const
    {
       auto e = std::max(_fenv(), threshold);
 
       // Perform square-root in the dB domain:
-      return lin_to_db<T>(e) / 2.0f;
+      return lin_to_db(e) / 2.0f;
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -564,7 +564,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // true_rms_envelope_follower_db
    template <typename T>
-   inline basic_decibel<T>
+   inline decibel
    basic_true_rms_envelope_follower_db<T>::operator()(float s)
    {
       _ma(s * s);
@@ -572,14 +572,14 @@ namespace cycfi::q
    }
 
    template <typename T>
-   inline basic_decibel<T>
+   inline decibel
    basic_true_rms_envelope_follower_db<T>::operator()() const
    {
       // Floor at the threshold: the output floor is -240 dB / 2 = -120 dB.
       auto ms = std::max(_ma(), threshold);
 
       // Perform square-root in the dB domain:
-      return lin_to_db<T>(ms) / 2.0f;
+      return lin_to_db(ms) / 2.0f;
    }
 }
 

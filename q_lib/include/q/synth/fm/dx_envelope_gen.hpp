@@ -201,7 +201,7 @@ namespace cycfi::q
       }
       if (_i == idle || _db <= T(floor.rep))
          return 0.0f;
-      return lin_float(dB<T>(float(_db))) * _gain;
+      return lin_float(dB(float(_db))) * _gain;
    }
 }
 
