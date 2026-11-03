@@ -24,10 +24,12 @@ namespace cycfi::q
    // The formula for the Blackman window is:
    //    w(n) = 0.42 - 0.5 * cos(2pi*n/(N-1)) + 0.08 * cos(4pi*n/(N-1))
    //
+   // T is the type of the basic_sin_cos_gens that make the cosines.
    ////////////////////////////////////////////////////////////////////////////
-   struct blackman_gen
+   template <typename T>
+   struct basic_blackman_gen
    {
-      blackman_gen(duration width, float sps)
+      basic_blackman_gen(duration width, float sps)
        : cos1{frequency(1.0f / as_float(width)), sps}
        , cos2{frequency(1.0f / as_float(width/2)), sps}
       {
@@ -62,52 +64,64 @@ namespace cycfi::q
 
    private:
 
-      sin_cos_gen cos1, cos2;
+      basic_sin_cos_gen<T> cos1, cos2;
    };
+
+   using blackman_gen = basic_blackman_gen<double>;
 
    ////////////////////////////////////////////////////////////////////////////
    // The Blackman upward ramp generator generates a rising curve with the
    // shape of the first half of a Blackman window taper.
    ////////////////////////////////////////////////////////////////////////////
-   struct blackman_upward_ramp_gen : blackman_gen
+   template <typename T>
+   struct basic_blackman_upward_ramp_gen : basic_blackman_gen<T>
    {
-      blackman_upward_ramp_gen(duration width, float sps)
-       : blackman_gen{width*2, sps}
+      using base_type = basic_blackman_gen<T>;
+
+      basic_blackman_upward_ramp_gen(duration width, float sps)
+       : base_type{width*2, sps}
       {
       }
 
       void config(duration width, float sps, bool reset_ = false)
       {
-         blackman_gen::config(width*2, sps);
+         base_type::config(width*2, sps);
          if (reset_)
-            reset();
+            base_type::reset();
       }
    };
+
+   using blackman_upward_ramp_gen = basic_blackman_upward_ramp_gen<double>;
 
    ////////////////////////////////////////////////////////////////////////////
    // The Blackman downward ramp generator generates a falling curve with the
    // shape of the second half of a Blackman window taper.
    ////////////////////////////////////////////////////////////////////////////
-   struct blackman_downward_ramp_gen : blackman_gen
+   template <typename T>
+   struct basic_blackman_downward_ramp_gen : basic_blackman_gen<T>
    {
-      blackman_downward_ramp_gen(duration width, float sps)
-       : blackman_gen{width*2, sps}
+      using base_type = basic_blackman_gen<T>;
+
+      basic_blackman_downward_ramp_gen(duration width, float sps)
+       : base_type{width*2, sps}
       {
-         midpoint();
+         base_type::midpoint();
       }
 
       void reset()
       {
-         blackman_gen::midpoint();
+         base_type::midpoint();
       }
 
       void config(duration width, float sps, bool reset_ = false)
       {
-         blackman_gen::config(width*2, sps);
+         base_type::config(width*2, sps);
          if (reset_)
             reset();    // this reset: the window midpoint
       }
    };
+
+   using blackman_downward_ramp_gen = basic_blackman_downward_ramp_gen<double>;
 }
 
 #endif

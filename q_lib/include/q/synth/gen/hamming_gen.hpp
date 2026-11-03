@@ -22,10 +22,12 @@ namespace cycfi::q
    // The formula for the Hamming window is:
    //    w(n) = 0.54 - 0.46 * cos(2pi*n/(N-1))
    //
+   // T is the type of the basic_sin_cos_gen that makes the cosine.
    ////////////////////////////////////////////////////////////////////////////
-   struct hamming_gen
+   template <typename T>
+   struct basic_hamming_gen
    {
-      hamming_gen(duration width, float sps)
+      basic_hamming_gen(duration width, float sps)
        : cos{frequency(1.0f / as_float(width)), sps}
       {
       }
@@ -54,8 +56,10 @@ namespace cycfi::q
 
    private:
 
-      sin_cos_gen cos;
+      basic_sin_cos_gen<T> cos;
    };
+
+   using hamming_gen = basic_hamming_gen<double>;
 }
 
 #endif

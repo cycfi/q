@@ -25,13 +25,17 @@ namespace cycfi::q
    // will be considered as the peak value that will be scaled up to 1.0.
    // Increasing the `cv` value leads to more pronounced curves. Lower `cv`
    // values produce flatter, more linear ramps. The default is 0.95.
+   //
+   // T is the type of the rate and the running value. exp_upward_ramp_gen
+   // is double; float suits a single-precision FPU.
    ////////////////////////////////////////////////////////////////////////////
-   struct exp_upward_ramp_gen
+   template <typename T>
+   struct basic_exp_upward_ramp_gen
    {
-      exp_upward_ramp_gen(duration width, float sps, float cv = 0.95)
+      basic_exp_upward_ramp_gen(duration width, float sps, float cv = 0.95)
        : _tau{-std::log(1.0f - cv)}
        , _full{1.0f / cv}
-       , _rate{std::exp(-_tau / (sps * as_double(width)))}
+       , _rate{rate(width, sps)}
       {
       }
 
@@ -43,14 +47,14 @@ namespace cycfi::q
 
       void config(duration width, float sps)
       {
-         _rate = std::exp(-_tau / (sps * as_double(width)));
+         _rate = rate(width, sps);
       }
 
       void config(duration width, float sps, float cv)
       {
          _tau = -std::log(1.0f - cv);
          _full = 1.0f / cv;
-         _rate = std::exp(-_tau / (sps * as_double(width)));
+         _rate = rate(width, sps);
       }
 
       void reset()
@@ -60,11 +64,18 @@ namespace cycfi::q
 
    private:
 
+      T rate(duration width, float sps) const
+      {
+         return std::exp(T(-_tau) / (T(sps) * T(as_double(width))));
+      }
+
       float    _tau;
       float    _full;
-      double   _rate;
-      double   _y = 0;
+      T        _rate;
+      T        _y = 0;
    };
+
+   using exp_upward_ramp_gen = basic_exp_upward_ramp_gen<double>;
 
    ////////////////////////////////////////////////////////////////////////////
    // Exponential downward ramp generator.
@@ -72,15 +83,19 @@ namespace cycfi::q
    // The inverse of the exponential upward ramp generator. This is similar
    // to a capacitor discherged through a resistor.
    ////////////////////////////////////////////////////////////////////////////
-   struct exp_downward_ramp_gen : exp_upward_ramp_gen
+   template <typename T>
+   struct basic_exp_downward_ramp_gen : basic_exp_upward_ramp_gen<T>
    {
-      using exp_upward_ramp_gen::exp_upward_ramp_gen;
+      using base_type = basic_exp_upward_ramp_gen<T>;
+      using base_type::base_type;
 
       float operator()()
       {
-         return 1.0f - exp_upward_ramp_gen::operator()();
+         return 1.0f - base_type::operator()();
       }
    };
+
+   using exp_downward_ramp_gen = basic_exp_downward_ramp_gen<double>;
 }
 
 #endif
