@@ -109,8 +109,10 @@ namespace cycfi::q
    // This is a fast_envelope_follower followed by a moving average filter to
    // smooth out the staircase ripples as mentioned in the
    // fast_envelope_follower notes.
+   //
+   // T is the moving average's accumulator, double by default.
    ////////////////////////////////////////////////////////////////////////////
-   template <std::size_t div>
+   template <std::size_t div, typename T = double>
    struct basic_fast_ave_envelope_follower
    {
                basic_fast_ave_envelope_follower(duration hold, float sps);
@@ -119,8 +121,8 @@ namespace cycfi::q
       float    operator()(float s);
       float    operator()() const;
 
-      basic_fast_envelope_follower<div> _fenv;
-      moving_average _ma;
+      basic_fast_envelope_follower<div>   _fenv;
+      basic_moving_average<float, T>      _ma;
    };
 
    using fast_ave_envelope_follower = basic_fast_ave_envelope_follower<2>;
@@ -155,27 +157,41 @@ namespace cycfi::q
    // true_rms_envelope_follower's mean_square(). Consumers comparing
    // against a squared threshold can skip the square root entirely.
    //
+   // T is the averaging's accumulator and the _db variant's decibel type,
+   // double by default; float suits a single-precision FPU.
+   //
    // Designed by Joel de Guzman (June 2020)
    ////////////////////////////////////////////////////////////////////////////
-   struct fast_rms_envelope_follower
+   template <typename T>
+   struct basic_fast_rms_envelope_follower
    {
       constexpr static auto threshold = lin_float(-240_dB);
 
-               fast_rms_envelope_follower(duration hold, float sps);
+               basic_fast_rms_envelope_follower(duration hold, float sps);
       float    operator()(float s);
       float    operator()() const;
       float    peak_square() const;
 
-      fast_ave_envelope_follower  _fenv;
+      basic_fast_ave_envelope_follower<2, T> _fenv;
    };
 
-   struct fast_rms_envelope_follower_db : fast_rms_envelope_follower
+   using fast_rms_envelope_follower = basic_fast_rms_envelope_follower<double>;
+
+   template <typename T>
+   struct basic_fast_rms_envelope_follower_db
+    : basic_fast_rms_envelope_follower<T>
    {
-      using fast_rms_envelope_follower::fast_rms_envelope_follower;
+      using base_type = basic_fast_rms_envelope_follower<T>;
+      using base_type::base_type;
+      using base_type::threshold;
+      using base_type::_fenv;
 
-      decibel  operator()(float s);
-      decibel  operator()() const;
+      basic_decibel<T>  operator()(float s);
+      basic_decibel<T>  operator()() const;
    };
+
+   using fast_rms_envelope_follower_db =
+      basic_fast_rms_envelope_follower_db<double>;
 
    ////////////////////////////////////////////////////////////////////////////
    // The true RMS envelope follower computes the actual root-mean-square
@@ -206,20 +222,26 @@ namespace cycfi::q
    // Readings below the -240 dB mean-square threshold (-120 dB RMS, the
    // same floor convention as the fast_rms_envelope_follower) return 0;
    // the _db variant returns -120 dB.
+   //
+   // T is the moving average's accumulator and the _db variant's decibel
+   // type, double by default, here and in the _ref and _db variants below.
    ////////////////////////////////////////////////////////////////////////////
-   struct true_rms_envelope_follower
+   template <typename T>
+   struct basic_true_rms_envelope_follower
    {
       constexpr static auto threshold = lin_float(-240_dB);
 
-               true_rms_envelope_follower(duration window, float sps);
-               true_rms_envelope_follower(std::size_t window_samples);
+               basic_true_rms_envelope_follower(duration window, float sps);
+               basic_true_rms_envelope_follower(std::size_t window_samples);
 
       float    operator()(float s);
       float    operator()() const;
       float    mean_square() const;
 
-      moving_average _ma;
+      basic_moving_average<float, T> _ma;
    };
+
+   using true_rms_envelope_follower = basic_true_rms_envelope_follower<double>;
 
    ////////////////////////////////////////////////////////////////////////////
    // true_rms_envelope_follower_ref is the true RMS envelope follower over a
@@ -239,15 +261,16 @@ namespace cycfi::q
    // Readings below the -240 dB mean-square threshold return 0, the same
    // floor convention as true_rms_envelope_follower.
    ////////////////////////////////////////////////////////////////////////////
-   struct true_rms_envelope_follower_ref
+   template <typename T>
+   struct basic_true_rms_envelope_follower_ref
    {
       constexpr static auto threshold = lin_float(-240_dB);
 
-               true_rms_envelope_follower_ref(duration window, float sps)
+               basic_true_rms_envelope_follower_ref(duration window, float sps)
                 : _ms{window, sps}
                {}
 
-               true_rms_envelope_follower_ref(std::size_t window_samples)
+               basic_true_rms_envelope_follower_ref(std::size_t window_samples)
                 : _ms{window_samples}
                {}
 
@@ -270,8 +293,11 @@ namespace cycfi::q
          return _ms();
       }
 
-      moving_average_ref _ms;
+      basic_moving_average_ref<float, T> _ms;
    };
+
+   using true_rms_envelope_follower_ref =
+      basic_true_rms_envelope_follower_ref<double>;
 
    ////////////////////////////////////////////////////////////////////////////
    // true_rms_envelope_follower_db works in the dB domain: the square root
@@ -279,13 +305,21 @@ namespace cycfi::q
    // fast_rms_envelope_follower_db). Use it when the consumer already
    // works in dB (compressor, expander, agc).
    ////////////////////////////////////////////////////////////////////////////
-   struct true_rms_envelope_follower_db : true_rms_envelope_follower
+   template <typename T>
+   struct basic_true_rms_envelope_follower_db
+    : basic_true_rms_envelope_follower<T>
    {
-      using true_rms_envelope_follower::true_rms_envelope_follower;
+      using base_type = basic_true_rms_envelope_follower<T>;
+      using base_type::base_type;
+      using base_type::threshold;
+      using base_type::_ma;
 
-      decibel  operator()(float s);
-      decibel  operator()() const;
+      basic_decibel<T>  operator()(float s);
+      basic_decibel<T>  operator()() const;
    };
+
+   using true_rms_envelope_follower_db =
+      basic_true_rms_envelope_follower_db<double>;
 
    ////////////////////////////////////////////////////////////////////////////
    // Implementation
@@ -406,41 +440,46 @@ namespace cycfi::q
 
    ////////////////////////////////////////////////////////////////////////////
    // basic_fast_ave_envelope_follower<div>
-   template <std::size_t div>
-   inline basic_fast_ave_envelope_follower<div>::
+   template <std::size_t div, typename T>
+   inline basic_fast_ave_envelope_follower<div, T>::
       basic_fast_ave_envelope_follower(duration hold, float sps)
       : _fenv(hold, sps)
       , _ma(hold, sps)
    {}
 
-   template <std::size_t div>
-   inline basic_fast_ave_envelope_follower<div>::
+   template <std::size_t div, typename T>
+   inline basic_fast_ave_envelope_follower<div, T>::
       basic_fast_ave_envelope_follower(std::size_t hold_samples)
       : _fenv(hold_samples)
       , _ma(hold_samples)
    {}
 
-   template <std::size_t div>
-   inline float basic_fast_ave_envelope_follower<div>::operator()(float s)
+   template <std::size_t div, typename T>
+   inline float
+   basic_fast_ave_envelope_follower<div, T>::operator()(float s)
    {
       return _ma(_fenv(s));
    }
 
-   template <std::size_t div>
-   inline float basic_fast_ave_envelope_follower<div>::operator()() const
+   template <std::size_t div, typename T>
+   inline float
+   basic_fast_ave_envelope_follower<div, T>::operator()() const
    {
       return _ma();
    }
 
    ////////////////////////////////////////////////////////////////////////////
    // fast_rms_envelope_follower
-   inline fast_rms_envelope_follower::fast_rms_envelope_follower(
+   template <typename T>
+   inline basic_fast_rms_envelope_follower<T>
+      ::basic_fast_rms_envelope_follower(
       duration hold, float sps)
     : _fenv(hold, sps)
    {
    }
 
-   inline float fast_rms_envelope_follower::operator()(float s)
+   template <typename T>
+   inline float basic_fast_rms_envelope_follower<T>::operator()(float s)
    {
       auto e = _fenv(s*s);
       if (e < threshold)
@@ -448,7 +487,8 @@ namespace cycfi::q
       return fast_sqrt(e);
    }
 
-   inline float fast_rms_envelope_follower::operator()() const
+   template <typename T>
+   inline float basic_fast_rms_envelope_follower<T>::operator()() const
    {
       auto e = _fenv();
       if (e < threshold)
@@ -456,74 +496,90 @@ namespace cycfi::q
       return fast_sqrt(e);
    }
 
-   inline float fast_rms_envelope_follower::peak_square() const
+   template <typename T>
+   inline float basic_fast_rms_envelope_follower<T>::peak_square() const
    {
       return _fenv();
    }
 
    ////////////////////////////////////////////////////////////////////////////
    // fast_rms_envelope_follower
-   inline decibel fast_rms_envelope_follower_db::operator()(float s)
+   template <typename T>
+   inline basic_decibel<T>
+   basic_fast_rms_envelope_follower_db<T>::operator()(float s)
    {
       // Floor at the threshold: the output floor is -240 dB / 2 = -120 dB.
       auto e = std::max(_fenv(s * s), threshold);
 
       // Perform square-root in the dB domain:
-      return lin_to_db(e) / 2.0f;
+      return lin_to_db<T>(e) / 2.0f;
    }
 
-   inline decibel fast_rms_envelope_follower_db::operator()() const
+   template <typename T>
+   inline basic_decibel<T>
+   basic_fast_rms_envelope_follower_db<T>::operator()() const
    {
       auto e = std::max(_fenv(), threshold);
 
       // Perform square-root in the dB domain:
-      return lin_to_db(e) / 2.0f;
+      return lin_to_db<T>(e) / 2.0f;
    }
 
    ////////////////////////////////////////////////////////////////////////////
    // true_rms_envelope_follower
-   inline true_rms_envelope_follower::true_rms_envelope_follower(
+   template <typename T>
+   inline basic_true_rms_envelope_follower<T>
+      ::basic_true_rms_envelope_follower(
       duration window, float sps)
     : _ma(window, sps)
    {}
 
-   inline true_rms_envelope_follower::true_rms_envelope_follower(
+   template <typename T>
+   inline basic_true_rms_envelope_follower<T>
+      ::basic_true_rms_envelope_follower(
       std::size_t window_samples)
     : _ma(window_samples)
    {}
 
-   inline float true_rms_envelope_follower::operator()(float s)
+   template <typename T>
+   inline float basic_true_rms_envelope_follower<T>::operator()(float s)
    {
       _ma(s * s);
       return (*this)();
    }
 
-   inline float true_rms_envelope_follower::operator()() const
+   template <typename T>
+   inline float basic_true_rms_envelope_follower<T>::operator()() const
    {
       auto ms = _ma();
       return ms < threshold ? 0.0f : fast_sqrt(ms);
    }
 
-   inline float true_rms_envelope_follower::mean_square() const
+   template <typename T>
+   inline float basic_true_rms_envelope_follower<T>::mean_square() const
    {
       return _ma();
    }
 
    ////////////////////////////////////////////////////////////////////////////
    // true_rms_envelope_follower_db
-   inline decibel true_rms_envelope_follower_db::operator()(float s)
+   template <typename T>
+   inline basic_decibel<T>
+   basic_true_rms_envelope_follower_db<T>::operator()(float s)
    {
       _ma(s * s);
       return (*this)();
    }
 
-   inline decibel true_rms_envelope_follower_db::operator()() const
+   template <typename T>
+   inline basic_decibel<T>
+   basic_true_rms_envelope_follower_db<T>::operator()() const
    {
       // Floor at the threshold: the output floor is -240 dB / 2 = -120 dB.
       auto ms = std::max(_ma(), threshold);
 
       // Perform square-root in the dB domain:
-      return lin_to_db(ms) / 2.0f;
+      return lin_to_db<T>(ms) / 2.0f;
    }
 }
 

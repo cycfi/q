@@ -63,22 +63,23 @@ namespace cycfi::q
    //
    // basic_moving_average_ref is a subclass of the basic_moving_sum_ref.
    ////////////////////////////////////////////////////////////////////////////
-   template <typename T>
-   struct basic_moving_average_ref : basic_moving_sum_ref<T>
+   template <typename T, typename Accumulator = decltype(promote(T()))>
+   struct basic_moving_average_ref : basic_moving_sum_ref<T, Accumulator>
    {
-      using basic_moving_sum_ref<T>::basic_moving_sum_ref;
+      using base_type = basic_moving_sum_ref<T, Accumulator>;
+      using base_type::base_type;
       using value_type = T;
 
       T operator()(value_type s, value_type departing)
       {
-         basic_moving_sum_ref<T>::operator()(s, departing);
+         base_type::operator()(s, departing);
          return (*this)();
       }
 
       template <concepts::IndexableContainer History>
       T operator()(value_type s, History const& hist)
       {
-         basic_moving_sum_ref<T>::operator()(s, hist);
+         base_type::operator()(s, hist);
          return (*this)();
       }
 
