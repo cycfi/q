@@ -171,7 +171,7 @@ void anna_processor::process(in_channels const& /*in*/
    {
       // Bend and vibrato, in semitones, become one ratio every voice
       // multiplies its pitch by. Twelve semitones is a doubling.
-      auto const vibrato = _lfo().first * _wheel * vibrato_depth;
+      auto const vibrato = float(_lfo().first) * _wheel * vibrato_depth;
       auto const pitch_factor = std::exp2((_bend + vibrato) / 12.0f);
 
       auto mix = 0.0f;

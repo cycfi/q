@@ -102,7 +102,7 @@ inline float chorus::operator()(float s)
    auto const depth = _depth_slew(_depth);
    auto const mix = _mix_slew(_mix);
    auto const d = std::clamp(
-      _base + (depth * _lfo().first), 1.0f, _longest);
+      _base + (depth * float(_lfo().first)), 1.0f, _longest);
    auto const wet = _delay(s, d - 1.0f);
    return (s * (1.0f - mix)) + (wet * mix);
 }
