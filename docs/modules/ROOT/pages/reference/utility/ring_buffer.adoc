@@ -194,6 +194,8 @@ image::mirrored_ring_buffer.svg[alt="The storage of ring_buffer and mirrored_rin
 
 The cost is twice the memory and a second store on every push. The capacity is exactly the size given to the constructor, with no rounding to a power of two, and the storage must be resizable. Elements are read only: writing one through a reference would put its two copies out of step.
 
+A shorter mirror trades the reach of a window for memory. Given a mirror length, `m`, only the first `m` elements are repeated after the end, so a window of up to `m + 1` elements is contiguous, at the cost of `m` extra elements instead of `size()`. A reader that takes a few elements at a time needs only a few: a 4-point interpolated read wants a mirror of 3. The default mirror is `size()`, every window contiguous.
+
 === Include
 
 ```c++
@@ -214,8 +216,10 @@ public:
    using interpolation_type = sample_interpolation::none;
 
    explicit          mirrored_ring_buffer(std::size_t size);
+                     mirrored_ring_buffer(std::size_t size, std::size_t mirror);
 
    std::size_t       size() const;
+   std::size_t       mirror() const;
    void              push(T val);
    T const&          front() const;
    T const&          back() const;
@@ -235,7 +239,7 @@ public:
 `S`               :: Resizable storage type, e.g. `std::vector<T>`.
 `mrb_type`        :: A `mirrored_ring_buffer<T, S>` type.
 `mrb`, `a`, `b`   :: Objects of type `mrb_type`.
-`s`, `i`, `age`   :: Objects of type `std::size_t`.
+`s`, `m`, `i`, `age` :: Objects of type `std::size_t`.
 `val`             :: Object of type `T`.
 
 ==== Type Construction
@@ -272,7 +276,10 @@ a| Instantiate a `mirrored_ring_buffer` type
 | Expression         | Semantics
 
 | `mrb_type(s)`      | Construct a `mirrored_ring_buffer` with a capacity of
-                       exactly `s` elements, all zero.
+                       exactly `s` elements, all zero, every one mirrored.
+| `mrb_type(s, m)`   | Construct a `mirrored_ring_buffer` with a capacity of
+                       exactly `s` elements, all zero, the first `m` of
+                       them mirrored (at most `s`).
 | `mrb_type(mrb)`    | Copy construct from `mrb`.
 | `a = b`            | Assign `b` to `a`.
 |===
@@ -302,9 +309,10 @@ NOTE: C++ brace initialization may also be used.
                        `age` back. `p[k]` is the element
                        `age + k` back.                   | `T const*`
 | `mrb.size()`       | Get the capacity.                 | `std::size_t`
+| `mrb.mirror()`     | Get the mirror length.            | `std::size_t`
 |===
 
-WARNING: `mrb[i]` requires `i < mrb.size()`, and `mrb.span(age)[k]` requires `age + k < mrb.size()`. Anything past that is undefined behavior.
+WARNING: `mrb[i]` requires `i < mrb.size()`, and `mrb.span(age)[k]` requires `age + k < mrb.size()` and `k \<= mrb.mirror()`. Anything past that is undefined behavior.
 
 ==== Accessors
 
@@ -314,7 +322,7 @@ WARNING: `mrb[i]` requires `i < mrb.size()`, and `mrb.span(age)[k]` requires `ag
 
 | `mrb.front()`      | Get the latest element.           | `T const&`
 | `mrb.back()`       | Get the oldest element.           | `T const&`
-| `mrb.store()`      | Get the storage, `2 * size()`
+| `mrb.store()`      | Get the storage, `size() + mirror()`
                        elements.                         | `S const&`
 |===
 

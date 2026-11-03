@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-image:soft-knee-compressor.svg[alt="Soft Knee Compressor", width=400, role=right]The compressor dynamically modulates the gain when the signal envelope rises above a specified threshold. The compressor reduces the level of high-level signals (signals above the threshold) while leaving low-level signals unchanged. A type of compressor known as the soft knee compressor is implemented by a class named `soft_knee_compressor`.
+image:soft-knee-compressor.svg[alt="Soft Knee Compressor", width=400, role=right]The compressor dynamically modulates the gain when the signal envelope rises above a specified threshold. The compressor reduces the level of high-level signals (signals above the threshold) while leaving low-level signals unchanged. A type of compressor known as the soft knee compressor is implemented by a class named `soft_knee_compressor`. It is the `double` instantiation of a class template, `basic_soft_knee_compressor<T>`, where `T` is the type of its `{decibel}`; `basic_soft_knee_compressor<float>` keeps the dynamics in `float` for a single-precision FPU.
 
 Envelope tracking is done externally using an external envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.
 
@@ -23,29 +23,55 @@ NOTE: See xref:reference/dynamic.adoc[Dynamic] for further details.
 == Declaration
 
 ```c++
-struct soft_knee_compressor
+template <typename T>
+struct basic_soft_knee_compressor
 {
-            soft_knee_compressor(decibel threshold, decibel width, float ratio);
+   using decibel_type = basic_decibel<T>;
 
-   decibel  operator()(decibel env) const;
+                  basic_soft_knee_compressor(
+                     decibel_type threshold
+                   , decibel_type width
+                   , float ratio
+                  );
 
-   void     threshold(decibel val);
-   void     width(decibel val);
-   void     ratio(float ratio);
+   decibel_type   operator()(decibel_type env) const;
 
-   decibel  threshold() const;
-   decibel  width() const;
-   float    ratio() const;
+   void           threshold(decibel_type val);
+   void           width(decibel_type val);
+   void           ratio(float ratio);
+   decibel_type   threshold() const;
+   decibel_type   width() const;
+   float          ratio() const;
 };
+
+using soft_knee_compressor = basic_soft_knee_compressor<double>;
+```
+
+== Template Instantiations
+
+`soft_knee_compressor`:: A `soft_knee_compressor` on `decibel`, in `double`.
+
+```c++
+using soft_knee_compressor = basic_soft_knee_compressor<double>;
 ```
 
 == Expressions
 
 === Notation
 
-`comp`, `a`, `b`     :: Objects of type `soft_knee_compressor`
-`t`, `w`, `env`      :: Objects of type `decibel`
+`C`                  :: A `basic_soft_knee_compressor<T>` type.
+`comp`, `a`, `b`     :: Objects of type `C`
+`t`, `w`, `env`      :: Objects of type `basic_decibel<T>`
 `r`                  :: Floating point value for compression ratio.
+
+=== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression           | Semantics                    | Type
+
+| `C::decibel_type`    | Get the decibel type.        | `basic_decibel<T>`
+|===
 
 === Constructors and Assignment
 
@@ -53,8 +79,8 @@ struct soft_knee_compressor
 |===
 | Expression                     | Semantics
 
-| `soft_knee_compressor(t, w, r)`| Construct a `soft_knee_compressor` from `t` (threshold), `w` (width), and `r` (ratio).
-| `soft_knee_compressor(comp)`   | Copy construct from `soft_knee_compressor comp`.
+| `C(t, w, r)`                   | Construct a `soft_knee_compressor` from `t` (threshold), `w` (width), and `r` (ratio).
+| `C(comp)`                      | Copy construct from `comp`.
 | `a = b`                        | Assign `b` to `a`.
 |===
 
@@ -69,7 +95,7 @@ The ratio parameter, `r`, specifies the amount of gain applied. With the typical
 | Expression      | Semantics                            | Return Type
 
 | `comp(env)`     |  Process the input envelope `env`
-                     and return the compressed result.   | `decibel`
+                     and return the compressed result.   | `basic_decibel<T>`
 |===
 
 The output is the compressed gain, also in decibels. Simply multiply the signal by the result converted to a linear `float` using `lin_float` (or `double` using `lin_double`). For example:
@@ -114,8 +140,8 @@ Typically, you add some makeup gain after compression to compensate for the gain
 |===
 | Expression         | Semantics                                     | Return Type
 
-| `comp.threshold()` | Get the `soft_knee_compressor` threshold.     | `decibel`
-| `comp.width()`     | Get the `soft_knee_compressor` width.         | `decibel`
+| `comp.threshold()` | Get the `soft_knee_compressor` threshold.     | `basic_decibel<T>`
+| `comp.width()`     | Get the `soft_knee_compressor` width.         | `basic_decibel<T>`
 | `comp.ratio()`     | Get the `soft_knee_compressor` ratio.         | `float`
 |===
 

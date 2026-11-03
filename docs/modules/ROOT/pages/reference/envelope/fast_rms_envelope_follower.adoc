@@ -20,6 +20,8 @@ IMPORTANT: The fast RMS envelope follower is a fast level _detector_ computed in
 
 The `fast_rms_envelope_follower_db` variant works in the dB domain, for the dynamic range processors (compressor, expander and agc) that already work in decibels. It saves a linear to decibel conversion, and takes the square root as a division by 2.
 
+Both are the `double` instantiations of class templates on `T`, the type of the averaging's accumulator and of the `_db` variant's `{decibel}`. `float` suits a single-precision FPU.
+
 == Response
 
 The plot in Figure 1 below shows the fast RMS envelope follower’s response (envelope: green, signal: blue, absolute value of the signal: dark blue). It looks much like the output of the {fast_ave_envelope_follower}. This detector holds and averages the squared signal, and squaring weights louder excursions more heavily.
@@ -35,34 +37,49 @@ image::fast-rms-envelope-follower-output.png[alt="Fast RMS envelope follower res
 == Declaration
 
 ```c++
-struct fast_rms_envelope_follower
+template <typename T>
+struct basic_fast_rms_envelope_follower
 {
     static constexpr auto threshold = lin_float(-240_dB);
 
-            fast_rms_envelope_follower(duration hold, float sps);
+                        basic_fast_rms_envelope_follower(duration hold, float sps);
 
-    float   operator()(float s);
-    float   operator()() const;
-    float   peak_square() const;
+    float               operator()(float s);
+    float               operator()() const;
+    float               peak_square() const;
 };
 
-struct fast_rms_envelope_follower_db : fast_rms_envelope_follower
+template <typename T>
+struct basic_fast_rms_envelope_follower_db
+ : basic_fast_rms_envelope_follower<T>
 {
-    using fast_rms_envelope_follower::fast_rms_envelope_follower;
+    using base_type = basic_fast_rms_envelope_follower<T>;
+    using base_type::base_type;
 
-    decibel operator()(float s);
-    decibel operator()() const;
+    basic_decibel<T>    operator()(float s);
+    basic_decibel<T>    operator()() const;
 };
 ```
 
-`fast_rms_envelope_follower` essentially follows the same API as {fast_envelope_follower}. The `fast_rms_envelope_follower_db` variant works in the dB domain and returns `decibel` instead of `float`.
+`fast_rms_envelope_follower` essentially follows the same API as {fast_envelope_follower}. The `_db` variant works in the dB domain and returns `basic_decibel<T>` instead of `float`.
+
+== Template Instantiations
+
+`fast_rms_envelope_follower`:: A fast RMS envelope follower in `double`.
+`fast_rms_envelope_follower_db`:: Its dB domain variant, returning `decibel`.
+
+```c++
+using fast_rms_envelope_follower = basic_fast_rms_envelope_follower<double>;
+using fast_rms_envelope_follower_db =
+   basic_fast_rms_envelope_follower_db<double>;
+```
 
 == Expressions
 
 === Notation
 
-`env_t`             :: A `fast_rms_envelope_follower` or `fast_rms_envelope_follower_db`.
-`env`, `a`, `b`     :: Objects of type `fast_rms_envelope_follower` or `fast_rms_envelope_follower_db`.
+`env_t`             :: A `basic_fast_rms_envelope_follower<T>` or `basic_fast_rms_envelope_follower_db<T>`.
+`env`, `a`, `b`     :: Objects of type `env_t`.
 `hold`              :: Object of type `duration`
 `sps`               :: Floating point value for samples per second.
 `s`                 :: Floating point value for the latest input sample.
@@ -80,7 +97,7 @@ struct fast_rms_envelope_follower_db : fast_rms_envelope_follower
 
 NOTE: C++ brace initialization may also be used.
 
-`env_t` is a shortcut notation for `fast_rms_envelope_follower` or `fast_rms_envelope_follower_db`.
+`env_t` is a shortcut notation for `basic_fast_rms_envelope_follower<T>` or `basic_fast_rms_envelope_follower_db<T>`.
 
 === Function Call
 
@@ -89,9 +106,9 @@ NOTE: C++ brace initialization may also be used.
 | Expression        | Semantics                             | Return Type
 
 | `env(s)`          | Process the input sample `s` and
-                      return the detected envelope.         | `float` (`decibel` for the `_db` variant)
+                      return the detected envelope.         | `float` (`basic_decibel<T>` for the `_db` variant)
 | `env()`           | Get the latest detected envelope
-                      without processing a sample.          | `float` (`decibel` for the `_db` variant)
+                      without processing a sample.          | `float` (`basic_decibel<T>` for the `_db` variant)
 | `env.peak_square()` | Get the raw smoothed peak of the
                       squared signal: the value under the
                       radical (no square root).             | `float`

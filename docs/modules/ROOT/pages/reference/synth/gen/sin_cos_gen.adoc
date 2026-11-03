@@ -10,7 +10,15 @@ image:sin_cos.svg[alt="Sine and Cosine Waves", width=300, role=right]
 
 Although `sin_cos_gen` is technically an oscillator that produces periodic waveforms, it is represented as a model of a `{generator}` because it does not adhere to the `{oscillator}` concept, which requires complete control over the `{phase}` for synchronicity. As a free-running oscillator, `sin_cos_gen` can exhibit phase drift over time due to accumulating floating-point errors.
 
+The generator is a class template, `basic_sin_cos_gen<T>`, where `T` is the type of its coefficient and state. `sin_cos_gen` is its `double` instantiation.
+
 Source: https://www.earlevel.com/main/2003/03/02/the-digital-state-variable-filter/[The digital state variable filter]
+
+== Precision
+
+The recurrence holds its amplitude in either precision: run free, the peak stays within about 1e-8 of its start in `double`, and within about 1e-6 in `float`, however long it runs. Rounding moves the frequency slightly in `float` at very low rates: at 0.1 Hz and 48 kHz it is off by about 7e-7 of itself, and exact in `double`.
+
+`sin_cos_gen` is `double`, the choice for a free-running oscillator such as an LFO. `basic_sin_cos_gen<float>` suits a single-precision FPU, such as a Cortex-M4F, where `double` is computed in software, and a short run from a reset, such as a crossfade ramp, where its rounding is far below hearing.
 
 == Include
 
@@ -21,27 +29,43 @@ Source: https://www.earlevel.com/main/2003/03/02/the-digital-state-variable-filt
 == Declaration
 
 ```c++
-struct sin_cos_gen
+template <typename T>
+struct basic_sin_cos_gen
 {
-                              sin_cos_gen(frequency f, float sps);
+                              basic_sin_cos_gen(frequency f, float sps);
 
-   std::pair<float, float>    operator()();
+   std::pair<T, T>            operator()();
    void                       config(frequency f, float sps);
-   void                       reset(float sin = 0.0f, float cos = 1.0f);
+   void                       reset(T sin = 0, T cos = 1);
    void                       midpoint();
 };
+
+using sin_cos_gen = basic_sin_cos_gen<double>;
+```
+
+`T` models `std::floating_point`.
+
+== Template Instantiations
+
+`sin_cos_gen` is the template instantiation of `basic_sin_cos_gen` that most code uses:
+
+`sin_cos_gen`:: A sine and cosine generator in `double`.
+
+```c++
+using sin_cos_gen = basic_sin_cos_gen<double>;
 ```
 
 == Expressions
 
-`sin_cos_gen` is a model of `{generator}`. In addition to valid expressions for `{generator}`, `sin_cos_gen` allows these expressions.
+`basic_sin_cos_gen<T>` is a model of `{generator}`. In addition to valid expressions for `{generator}`, `basic_sin_cos_gen<T>` allows these expressions.
 
 === Notation
 
-`g`               :: Object of type `sin_cos_gen`.
+`G`               :: A `basic_sin_cos_gen<T>` type.
+`g`               :: Object of type `G`.
 `f`               :: Object of type `frequency`.
 `sps`             :: Floating point value representing samples per second.
-`sval`, `cval`    :: Floating point values.
+`sval`, `cval`    :: Values of type `T`.
 
 === Constructor
 
@@ -49,7 +73,7 @@ struct sin_cos_gen
 |===
 | Expression               | Semantics
 
-| `sin_cos_gen(f, sps)`    | Construct `sin_cos_gen` given frequency, `f`,
+| `G(f, sps)`              | Construct a `G` given frequency, `f`,
                              and samples per second, `sps`.
 |===
 
@@ -63,12 +87,12 @@ NOTE: C++ brace initialization may also be used.
 
 | `g()`           | Generate a sin/cos signal and get
                     both `sin` and `cos` result. The return type
-                    is a `std::pair<float, float>` which stores
-                    the `sin` and `cos` results.                     | `std::pair<float, float>`
+                    is a `std::pair<T, T>` which stores
+                    the `sin` and `cos` results.                     | `std::pair<T, T>`
 | `g().first`     | Generate a sin/cos signal and get
-                    only the `sin` result.                           | `float`
+                    only the `sin` result.                           | `T`
 | `g().second`    | Generate a sin/cos signal and get only the `cos`
-                    result.                                          | `float`
+                    result.                                          | `T`
 |===
 
 === Operation
@@ -77,11 +101,11 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression            | Semantics                                         | Return Type
 
-| `g.reset()`           | Reset the current `sin` and `cos` to 0.0f and
-                          1.0f, respectively.                               | `void`
+| `g.reset()`           | Reset the current `sin` and `cos` to 0 and
+                          1, respectively.                                  | `void`
 | `g.reset(sval, cval)` | Reset the current `sin` and `cos` values,
                           respectively.                                     | `void`
-| `g.midpoint()`        | Equivalent to `g.reset(0.0f, -1.0f)`.             | `void`
+| `g.midpoint()`        | Equivalent to `g.reset(0, -1)`.                   | `void`
 |===
 
 === Mutators

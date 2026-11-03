@@ -71,6 +71,7 @@ velocity or key is one addition in decibels.
 template <
    concepts::Oscillator Osc = sin_osc
  , concepts::EnvelopeGenerator Env = dx_envelope_gen
+ , typename T = double
 >
 struct basic_fm_operator
 {
@@ -78,7 +79,7 @@ struct basic_fm_operator
 
                   basic_fm_operator();
 
-   void           ratio(double r);
+   void           ratio(T r);
    void           fixed(phase step);
    void           envelope(typename Env::config const& cfg, float sps);
 
@@ -106,10 +107,11 @@ using fm_operator = basic_fm_operator<sin_osc, dx_envelope_gen>;
 
 `Osc`          :: A type that conforms to `{Oscillator}`.
 `Env`          :: A type that conforms to `{EnvelopeGenerator}`.
-`op_type`      :: A `basic_fm_operator<Osc, Env>` type.
+`T`            :: The ratio's floating point type, `double` by default.
+`op_type`      :: A `basic_fm_operator<Osc, Env, T>` type.
 `op`, `a`, `b` :: Objects of type `op_type`.
 `master`       :: Object of type `{phase_iterator}`: the pitch the voice plays.
-`r`            :: `double` value for the frequency ratio to the master.
+`r`            :: `T` value for the frequency ratio to the master.
 `step`         :: Object of type `{phase}`: the per sample step of a fixed frequency.
 `cfg`          :: Object of type `Env::config`.
 `sps`          :: Floating point value for samples per second.
@@ -122,9 +124,13 @@ using fm_operator = basic_fm_operator<sin_osc, dx_envelope_gen>;
 |===
 | Expression                       | Semantics
 
+| `basic_fm_operator<Osc, Env, T>` | Instantiate a `basic_fm_operator` type
+                                     given the oscillator type `Osc`, the
+                                     envelope generator type `Env` and the
+                                     ratio type `T`.
 | `basic_fm_operator<Osc, Env>`    | Instantiate a `basic_fm_operator` type
-                                     given the oscillator type `Osc` and the
-                                     envelope generator type `Env`.
+                                     given `Osc` and `Env`, with a `double`
+                                     ratio.
 | `basic_fm_operator<Osc>`         | Instantiate a `basic_fm_operator` type
                                      given `Osc`, with a `dx_envelope_gen`.
 | `basic_fm_operator<>`            | Instantiate a `basic_fm_operator` type

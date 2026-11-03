@@ -15,6 +15,8 @@ w(n) = 0.42 - 0.5 * cos(2pi*n/(N-1)) + 0.08 * cos(4pi*n/(N-1))
 
 Aside from its common use as a window function, the Q DSP library also utilizes the Blackman window generator for modulating the audio signal and generating complex envelopes.
 
+The generators on this page are class templates on `T`, the type of the `{sin_cos_gen}` objects that make the cosines; the names without the `basic_` prefix are their `double` instantiations. `float` suits a single-precision FPU (see the `{sin_cos_gen}` Precision section).
+
 == Blackman Window Generator
 
 === Include
@@ -26,24 +28,36 @@ Aside from its common use as a window function, the Q DSP library also utilizes 
 === Declaration
 
 ```c++
-struct blackman_gen
+template <typename T>
+struct basic_blackman_gen
 {
-            blackman_gen(duration width, float sps);
+            basic_blackman_gen(duration width, float sps);
 
    float    operator()();
    void     config(duration width, float sps, bool reset_ = false);
    void     reset();
    void     midpoint();
 };
+
+using blackman_gen = basic_blackman_gen<double>;
+```
+
+=== Template Instantiations
+
+`blackman_gen`:: A Blackman window generator in `double`.
+
+```c++
+using blackman_gen = basic_blackman_gen<double>;
 ```
 
 === Expressions
 
-`blackman_gen` is a model of `{generator}`. In addition to valid expressions for `{generator}`, `blackman_gen` allows these expressions.
+`basic_blackman_gen<T>` is a model of `{generator}`. In addition to valid expressions for `{generator}`, `basic_blackman_gen<T>` allows these expressions.
 
 ==== Notation
 
-`g`               :: Object of type `blackman_gen`.
+`G`               :: A `basic_blackman_gen<T>` type.
+`g`               :: Object of type `G`.
 `w`               :: Object of type `duration`.
 `sps`             :: Floating point value representing samples per second.
 `r`               :: Boolean value: `true` to reset the phase (default: `false`).
@@ -54,7 +68,7 @@ struct blackman_gen
 |===
 | Expression               | Semantics
 
-| `blackman_gen(w, sps)`   | Construct a `blackman_gen` given window width, `w`,
+| `G(w, sps)`              | Construct a `G` given window width, `w`,
                              and samples per second, `sps`.
 |===
 
@@ -108,7 +122,7 @@ for (auto& s : grain)
 
 == Ramp Generators
 
-Two subclasses of `blackman_gen` are specialized for ramp generation:
+Two subclasses of `basic_blackman_gen` are specialized for ramp generation:
 
 1. The Blackman upward ramp generator generates a rising curve with the
 shape of the first half of a Blackman window taper.
@@ -125,32 +139,47 @@ shape of the second half of a Blackman window taper.
 === Declaration
 
 ```c++
-struct blackman_upward_ramp_gen : blackman_gen
+template <typename T>
+struct basic_blackman_upward_ramp_gen : basic_blackman_gen<T>
 {
-            blackman_upward_ramp_gen(duration width, float sps);
+            basic_blackman_upward_ramp_gen(duration width, float sps);
 
    void     config(duration width, float sps, bool reset_ = false);
 };
 
-struct blackman_downward_ramp_gen : blackman_gen
+template <typename T>
+struct basic_blackman_downward_ramp_gen : basic_blackman_gen<T>
 {
-            blackman_downward_ramp_gen(duration width, float sps);
+            basic_blackman_downward_ramp_gen(duration width, float sps);
 
    void     reset();
    void     config(duration width, float sps, bool reset_ = false);
 };
+
+using blackman_upward_ramp_gen = basic_blackman_upward_ramp_gen<double>;
+using blackman_downward_ramp_gen = basic_blackman_downward_ramp_gen<double>;
+```
+
+=== Template Instantiations
+
+`blackman_upward_ramp_gen`:: A Blackman upward ramp generator in `double`.
+`blackman_downward_ramp_gen`:: A Blackman downward ramp generator in `double`.
+
+```c++
+using blackman_upward_ramp_gen = basic_blackman_upward_ramp_gen<double>;
+using blackman_downward_ramp_gen = basic_blackman_downward_ramp_gen<double>;
 ```
 
 === Expressions
 
-`blackman_upward_ramp_gen` and `blackman_downward_ramp_gen` are models of
-`{ramp}` and implement all valid expressions of `{ramp}`. In addition to
-valid expressions for `{ramp}`, `blackman_upward_ramp_gen` and
-`blackman_downward_ramp_gen` allow these expressions.
+`basic_blackman_upward_ramp_gen<T>` and `basic_blackman_downward_ramp_gen<T>` are
+models of `{ramp}` and implement all valid expressions of `{ramp}`. In
+addition to valid expressions for `{ramp}`, `basic_blackman_upward_ramp_gen<T>`
+and `basic_blackman_downward_ramp_gen<T>` allow these expressions.
 
 ==== Notation
 
-`g`               :: Object of type `blackman_upward_ramp_gen` or `blackman_downward_ramp_gen`.
+`g`               :: Object of type `basic_blackman_upward_ramp_gen<T>` or `basic_blackman_downward_ramp_gen<T>`.
 `w`               :: Object of type `duration`.
 `sps`             :: Floating point value representing samples per second.
 `r`               :: Boolean value: `true` to reset the ramp.
@@ -166,7 +195,7 @@ valid expressions for `{ramp}`, `blackman_upward_ramp_gen` and
                              the ramp to its start.                            | `void`
 |===
 
-NOTE: `blackman_downward_ramp_gen` starts at the middle of the window: its
+NOTE: `basic_blackman_downward_ramp_gen` starts at the middle of the window: its
 `reset()` sets the current phase to the midpoint.
 
 NOTE: The ramp generators run freely. After one ramp width, the phase

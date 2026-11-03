@@ -24,6 +24,8 @@ The `true_rms_envelope_follower_db` variant works in the dB domain: the square r
 
 The `true_rms_envelope_follower_ref` variant reads a history the caller owns, with no buffer of its own.
 
+All three are the `double` instantiations of class templates on `T`, the type of the moving average's accumulator and of the `_db` variant's `{decibel}`. `float` suits a single-precision FPU; a `float` accumulator re-sums once per window to bound its drift (see {moving_average}).
+
 == Response
 
 The plot in Figure 1 below shows the true RMS envelope follower's response (envelope: green, signal: blue) over the same Low E pluck as the figure on the {fast_rms_envelope_follower} page, with a window of 4 periods. The fast follower's envelope follows the peaks of the signal. The true RMS reading follows its _power_ level, below the peaks by the crest factor, and stays smooth through the beating partials. At the attack, the reading rises gradually, since a moving average trails by half its window.
@@ -41,33 +43,48 @@ image::true-rms-envelope-follower-output.png[alt="True RMS envelope follower res
 === Declaration
 
 ```c++
-struct true_rms_envelope_follower
+template <typename T>
+struct basic_true_rms_envelope_follower
 {
     static constexpr auto threshold = lin_float(-240_dB);
 
-            true_rms_envelope_follower(duration window, float sps);
-            true_rms_envelope_follower(std::size_t window_samples);
+                        basic_true_rms_envelope_follower(duration window, float sps);
+                        basic_true_rms_envelope_follower(std::size_t window_samples);
 
-    float   operator()(float s);
-    float   operator()() const;
-    float   mean_square() const;
+    float               operator()(float s);
+    float               operator()() const;
+    float               mean_square() const;
 };
 
-struct true_rms_envelope_follower_db : true_rms_envelope_follower
+template <typename T>
+struct basic_true_rms_envelope_follower_db
+ : basic_true_rms_envelope_follower<T>
 {
-    using true_rms_envelope_follower::true_rms_envelope_follower;
+    using base_type = basic_true_rms_envelope_follower<T>;
+    using base_type::base_type;
 
-    decibel operator()(float s);
-    decibel operator()() const;
+    basic_decibel<T>    operator()(float s);
+    basic_decibel<T>    operator()() const;
 };
+```
+
+=== Template Instantiations
+
+`true_rms_envelope_follower`:: A true RMS envelope follower in `double`.
+`true_rms_envelope_follower_db`:: Its dB domain variant, returning `decibel`.
+
+```c++
+using true_rms_envelope_follower = basic_true_rms_envelope_follower<double>;
+using true_rms_envelope_follower_db =
+   basic_true_rms_envelope_follower_db<double>;
 ```
 
 === Expressions
 
 ==== Notation
 
-`env_t`             :: A `true_rms_envelope_follower` or `true_rms_envelope_follower_db`.
-`env`, `a`, `b`     :: Objects of type `true_rms_envelope_follower` or `true_rms_envelope_follower_db`.
+`env_t`             :: A `basic_true_rms_envelope_follower<T>` or `basic_true_rms_envelope_follower_db<T>`.
+`env`, `a`, `b`     :: Objects of type `env_t`.
 `window`            :: Object of type `duration`.
 `n`                 :: Object of type `std::size_t`: the window in samples.
 `sps`               :: Floating point value for samples per second.
@@ -94,9 +111,9 @@ NOTE: C++ brace initialization may also be used.
 | Expression        | Semantics                             | Return Type
 
 | `env(s)`          | Process the input sample `s` and
-                      return the RMS level.                 | `float` (`decibel` for the `_db` variant)
+                      return the RMS level.                 | `float` (`basic_decibel<T>` for the `_db` variant)
 | `env()`           | Get the latest RMS level without
-                      processing a sample.                  | `float` (`decibel` for the `_db` variant)
+                      processing a sample.                  | `float` (`basic_decibel<T>` for the `_db` variant)
 | `env.mean_square()` | Get the raw mean of the squared
                         samples (no square root).           | `float`
 |===
@@ -150,12 +167,13 @@ for (auto s : in)
 === Declaration
 
 ```c++
-struct true_rms_envelope_follower_ref
+template <typename T>
+struct basic_true_rms_envelope_follower_ref
 {
     static constexpr auto threshold = lin_float(-240_dB);
 
-             true_rms_envelope_follower_ref(duration window, float sps);
-             true_rms_envelope_follower_ref(std::size_t window_samples);
+             basic_true_rms_envelope_follower_ref(duration window, float sps);
+             basic_true_rms_envelope_follower_ref(std::size_t window_samples);
 
     template <concepts::IndexableContainer History>
     float    operator()(float s, History const& hist);
@@ -164,13 +182,23 @@ struct true_rms_envelope_follower_ref
 };
 ```
 
+=== Template Instantiations
+
+`true_rms_envelope_follower_ref`:: A true RMS envelope follower ref in `double`.
+
+```c++
+using true_rms_envelope_follower_ref =
+   basic_true_rms_envelope_follower_ref<double>;
+```
+
 :moving_sum_ref: xref:reference/misc/moving_sum.adoc#_moving_sum_ref[Moving Sum Ref]
 
 === Expressions
 
 ==== Notation
 
-`env`, `a`, `b`     :: Objects of type `true_rms_envelope_follower_ref`.
+`R`                 :: A `basic_true_rms_envelope_follower_ref<T>` type.
+`env`, `a`, `b`     :: Objects of type `R`.
 `window`            :: Object of type `duration`.
 `n`                 :: Object of type `std::size_t`: the window in samples.
 `sps`               :: Floating point value for samples per second.
@@ -183,11 +211,11 @@ struct true_rms_envelope_follower_ref
 |===
 | Expression                                    | Semantics
 
-| `true_rms_envelope_follower_ref(window, sps)` | Construct a `true_rms_envelope_follower_ref` given
+| `R(window, sps)`                              | Construct an `R` given
                                                   `window` (averaging window) and `sps` (samples per second).
-| `true_rms_envelope_follower_ref(n)`           | Construct a `true_rms_envelope_follower_ref` with an
+| `R(n)`                                        | Construct an `R` with an
                                                   averaging window of exactly `n` samples.
-| `true_rms_envelope_follower_ref(env)`         | Copy construct from `env`.
+| `R(env)`                                      | Copy construct from `env`.
 | `a = b`                                       | Assign `b` to `a`.
 |===
 
@@ -219,7 +247,7 @@ level of -60 dB) return 0, as in `true_rms_envelope_follower`.
 |===
 | Expression                                  | Semantics                       | Return Type
 
-| `true_rms_envelope_follower_ref::threshold` | Get the floor of the mean
+| `R::threshold`                              | Get the floor of the mean
                                                 square: -120 dB as a linear
                                                 value.                          | `float`
 |===

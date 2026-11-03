@@ -20,6 +20,8 @@ The decibel scale is expressed as the base 10 logarithm of the ratio between two
 
 Decibel is non-linear and operates on the logarithmic domain. The `decibel` class is perfectly suitable for dynamics processing (e.g. compressors and limiters and envelopes). Q provides fast `decibel` computations using lookup tables for converting to and from scalars, exact to about 1e-5 dB over the whole `float` range, and a coarser bit-trick approximation.
 
+`decibel` is the `double` instantiation of a class template, `basic_decibel<T>`, where `T` is the type of the value. `basic_decibel<float>` keeps a level in `float` for a single-precision FPU, such as a Cortex-M4F, where `double` is computed in software; the dynamics processors take the same `T` (see `{compressor}`). The two have the same unit, so they mix in arithmetic and comparisons, and either converts to the other.
+
 == Include
 
 ```c++
@@ -32,19 +34,34 @@ Decibel is non-linear and operates on the logarithmic domain. The `decibel` clas
 ```c++
 struct decibel_unit;
 
-struct decibel : _unspecified_base_type_
+template <typename T>
+struct basic_decibel : _unspecified_base_type_
 {
    using base_type = _unspecified_base_type_;
    using base_type::base_type;
    using unit_type = decibel_unit;
+
+   template <typename U>
+   constexpr basic_decibel(basic_decibel<U> db);
 };
 
+using decibel = basic_decibel<double>;
+
 // Free functions
-double               lin_double(decibel db);
-constexpr float      lin_float(decibel db);
-constexpr decibel    dB(double val);
-inline decibel       approx_db(float val);
-decibel              lin_to_db(double val);
+template <typename T>
+double               lin_double(basic_decibel<T> db);
+
+template <typename T>
+constexpr float      lin_float(basic_decibel<T> db);
+
+template <typename T = double>
+constexpr basic_decibel<T> dB(std::type_identity_t<T> val);
+
+template <typename T = double>
+basic_decibel<T>     approx_db(float val);
+
+template <typename T = double>
+basic_decibel<T>     lin_to_db(float val);
 
 // Literals
 inline namespace literals
@@ -54,17 +71,38 @@ inline namespace literals
 }
 ```
 
+== Template Instantiations
+
+`decibel`:: A level in decibels, held in `double`.
+
+```c++
+using decibel = basic_decibel<double>;
+```
+
 == Expressions
 
-`decibel` is a model of `{Unit}`. In addition to valid expressions for {Unit}, `decibel` allows these expressions.
+`basic_decibel<T>` is a model of `{Unit}`. In addition to valid expressions for {Unit}, `basic_decibel<T>` allows these expressions.
 
 === Notation
 
-`d`      :: Object of type `decibel`.
+`D`      :: A `basic_decibel<T>` type.
+`d`      :: Object of type `D`.
+`e`      :: Object of type `basic_decibel<U>`, for another value type `U`.
 `v`      :: Linear floating point value.
 `dbv`    :: Floating point value in decibels.
 `0.0`    :: A floating point literal number.
 `0`      :: An integer literal number.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression         | Semantics
+
+| `D(e)`             | Convert `e` to a `D`, the same level in `T`.
+|===
+
+The conversion is implicit, so a `decibel` passes where a `basic_decibel<float>` is expected, as a literal does.
 
 === Conversions
 
@@ -72,12 +110,18 @@ inline namespace literals
 |===
 | Expression         | Semantics                                  | Return Type
 
-| `lin_float(d)`     | Convert `decibel` to a linear value.       | `float`
-| `lin_double(d)`    | Convert `decibel` to a linear value.       | `double`
+| `lin_float(d)`     | Convert `d` to a linear value.             | `float`
+| `lin_double(d)`    | Convert `d` to a linear value.             | `double`
 | `dB(dbv)`          | Convert a dB value `dbv` to `decibel`.     | `decibel`
+| `dB<T>(dbv)`       | Convert a dB value `dbv` to
+                       `basic_decibel<T>`.                        | `basic_decibel<T>`
 | `lin_to_db(v)`     | Convert a linear value `v` to `decibel`.   | `decibel`
+| `lin_to_db<T>(v)`  | Convert a linear value `v` to
+                       `basic_decibel<T>`.                        | `basic_decibel<T>`
 | `approx_db(v)`     | Convert a linear value `v` to `decibel`
                        (faster, approximate).                     | `decibel`
+| `approx_db<T>(v)`  | Convert a linear value `v` to
+                       `basic_decibel<T>` (faster, approximate).  | `basic_decibel<T>`
 |===
 
 The free function `lin_to_db` can be used to indirectly construct and return a `decibel` object from a linear value. The `lin_to_db` function performs linear to `decibel` conversion. Example:

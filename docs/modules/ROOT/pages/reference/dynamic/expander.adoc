@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-image:expander.svg[alt="Expander", width=400, role=right]The expander is the inverse of the compressor. The expander dynamically modulates the gain when the signal falls below the threshold, attenuating the signal. The expander is used to increase the dynamic range of an audio signal by reducing the level of low-level signals (signals below the threshold) while leaving high-level signals unchanged, in contrast to a compressor, which reduces the level of high-level signals while leaving low-level signals unchanged. A certain type of expander, called the downward expander, is implemented by a class named `expander`.
+image:expander.svg[alt="Expander", width=400, role=right]The expander is the inverse of the compressor. The expander dynamically modulates the gain when the signal falls below the threshold, attenuating the signal. The expander is used to increase the dynamic range of an audio signal by reducing the level of low-level signals (signals below the threshold) while leaving high-level signals unchanged, in contrast to a compressor, which reduces the level of high-level signals while leaving low-level signals unchanged. A certain type of expander, called the downward expander, is implemented by a class named `expander`. It is the `double` instantiation of a class template, `basic_expander<T>`, where `T` is the type of its `{decibel}`; `basic_expander<float>` keeps the dynamics in `float` for a single-precision FPU.
 
 TIP: The expander can be utilized as a noise gate by setting the threshold to allow only audio signals above the noise floor to pass through. When the audio level falls below the threshold, the expander effectively gates out any low-level noise by reducing the audio signal level down to zero. The result can range from a hard and sudden cutoff to a soft and gradual reduction of signals below the threshold, depending on the desired ratio.
 
@@ -25,25 +25,48 @@ NOTE: See xref:reference/dynamic.adoc[Dynamic] for further details.
 == Declaration
 
 ```c++
-struct expander
+template <typename T>
+struct basic_expander
 {
-                expander(decibel threshold, float ratio);
+   using decibel_type = basic_decibel<T>;
 
-    decibel     operator()(decibel env) const;
-    void        threshold(decibel val);
-    void        ratio(float ratio);
-    decibel     threshold() const;
-    float       ratio() const;
+                  basic_expander(decibel_type threshold, float ratio);
+
+   decibel_type   operator()(decibel_type env) const;
+   void           threshold(decibel_type val);
+   void           ratio(float ratio);
+   decibel_type   threshold() const;
+   float          ratio() const;
 };
+
+using expander = basic_expander<double>;
+```
+
+== Template Instantiations
+
+`expander`:: An `expander` on `decibel`, in `double`.
+
+```c++
+using expander = basic_expander<double>;
 ```
 
 == Expressions
 
 === Notation
 
-`exp`, `a`, `b`     :: Objects of type `expander`
-`t`, `env`          :: Objects of type `decibel`
+`C`                 :: A `basic_expander<T>` type.
+`exp`, `a`, `b`     :: Objects of type `C`
+`t`, `env`          :: Objects of type `basic_decibel<T>`
 `r`                 :: Floating point value for expansion ratio.
+
+=== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression           | Semantics                    | Type
+
+| `C::decibel_type`    | Get the decibel type.        | `basic_decibel<T>`
+|===
 
 === Constructors and Assignment
 
@@ -51,8 +74,8 @@ struct expander
 |===
 | Expression        | Semantics
 
-| `expander(t, r)`  | Construct an `expander` from `t` (threshold) and `r` (ratio).
-| `expander(exp)`   | Copy construct from `expander exp`.
+| `C(t, r)`         | Construct an `expander` from `t` (threshold) and `r` (ratio).
+| `C(exp)`          | Copy construct from `exp`.
 | `a = b`           | Assign `b` to `a`.
 |===
 
@@ -67,7 +90,7 @@ The ratio parameter, `r`, specifies the amount of gain applied. With the typical
 | Expression      | Semantics                           | Return Type
 
 | `exp(env)`      |  Process the input envelope `env`
-                     and return the expanded result.     | `decibel`
+                     and return the expanded result.     | `basic_decibel<T>`
 |===
 
 The output is the expanded gain, also in decibels. Simply multiply the signal by the result converted to a linear `float` using `lin_float` (or `double` using `lin_double`). For example:
@@ -109,7 +132,7 @@ auto right_out = right_signal * gain;       <3>
 |===
 | Expression        | Semantics                         | Return Type
 
-| `exp.threshold()` | Get the `expander` threshold.     | `decibel`
+| `exp.threshold()` | Get the `expander` threshold.     | `basic_decibel<T>`
 | `exp.ratio()`     | Get the `expander` ratio.         | `float`
 |===
 

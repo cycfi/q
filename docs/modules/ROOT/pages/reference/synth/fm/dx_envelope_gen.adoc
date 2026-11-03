@@ -25,6 +25,12 @@ retrigger or an early key-off is click-free.
 Each call returns the linear gain of the current level, times a master
 volume, `gain`, which is 1 by default.
 
+`dx_envelope_gen` is the `double` instantiation of a class template,
+`basic_dx_envelope_gen<T>`, where `T` is the type of the level and its
+steps. A slow rate moves a small fraction of a dB per sample, which `float`
+rounds coarsely near the floor; `float` suits a single-precision FPU where
+the slowest rates are not needed.
+
 === The Attack Curve
 
 A decay falls at its rate. An attack climbs faster: its rate times 2 plus the
@@ -58,7 +64,8 @@ operator or a voice can take a different envelope in its place.
 == Declaration
 
 ```c++
-struct dx_envelope_gen
+template <typename T>
+struct basic_dx_envelope_gen
 {
    static constexpr decibel floor = dB(-89.93);
    static constexpr decibel attack_from = dB(-49.95);
@@ -76,8 +83,8 @@ struct dx_envelope_gen
       r1, r2, r3, sustain, release_phase, idle
    };
 
-                  dx_envelope_gen();
-                  dx_envelope_gen(config const& cfg, float sps);
+                  basic_dx_envelope_gen();
+                  basic_dx_envelope_gen(config const& cfg, float sps);
 
    void           set(config const& cfg, float sps);
 
@@ -94,18 +101,29 @@ struct dx_envelope_gen
    bool           in_idle_phase() const;
    bool           in_release_phase() const;
 };
+
+using dx_envelope_gen = basic_dx_envelope_gen<double>;
+```
+
+== Template Instantiations
+
+`dx_envelope_gen`:: The DX envelope in `double`.
+
+```c++
+using dx_envelope_gen = basic_dx_envelope_gen<double>;
 ```
 
 == Expressions
 
-`dx_envelope_gen` is a model of `{EnvelopeGenerator}`. In addition to valid
-expressions for {EnvelopeGenerator}, `dx_envelope_gen` allows these
-expressions.
+`basic_dx_envelope_gen<T>` is a model of `{EnvelopeGenerator}`. In addition
+to valid expressions for {EnvelopeGenerator}, `basic_dx_envelope_gen<T>`
+allows these expressions.
 
 === Notation
 
-`e`            :: Object of type `dx_envelope_gen`.
-`cfg`          :: Object of type `dx_envelope_gen::config`.
+`E`            :: A `basic_dx_envelope_gen<T>` type.
+`e`            :: Object of type `E`.
+`cfg`          :: Object of type `E::config`.
 `i`            :: `std::size_t` segment index, from 0 (R1 and L1) to 3 (R4
                   and L4).
 
@@ -115,7 +133,7 @@ expressions.
 |===
 | Expression                 | Semantics
 
-| `dx_envelope_gen()`        | Construct an idle, silent `dx_envelope_gen`
+| `E()`                      | Construct an idle, silent `E`
                                with the default configuration at 44.1 kHz.
 |===
 
@@ -136,15 +154,15 @@ expressions.
 |===
 | Expression                        | Semantics                     | Return Type
 
-| `dx_envelope_gen::floor`          | Get the level below which the
+| `E::floor`                        | Get the level below which the
                                       envelope is silent,
                                       -89.93 dB.                    | `{decibel}`
-| `dx_envelope_gen::attack_from`    | Get the level an attack from
+| `E::attack_from`                  | Get the level an attack from
                                       silence starts at, -49.95 dB. | `{decibel}`
-| `dx_envelope_gen::range`          | Get the range a rate's time
+| `E::range`                        | Get the range a rate's time
                                       covers, floor to full,
                                       89.93 dB.                     | `{decibel}`
-| `dx_envelope_gen::fastest`        | Get the DX7's fastest rate,
+| `E::fastest`                      | Get the DX7's fastest rate,
                                       5.56 ms.                      | `{duration}`
 | `cfg.rate[i]`                     | Get the rate of segment `i`:
                                       the time the whole range

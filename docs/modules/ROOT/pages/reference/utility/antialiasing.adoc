@@ -37,7 +37,7 @@ WARNING: These corrections assume `dt` is small relative to a cycle (the usual a
 
 ```c++
 constexpr float     poly_blep(phase p, phase dt);
-constexpr double    poly_blamp(phase p, phase dt, float scale);
+constexpr float     poly_blamp(phase p, phase dt, float scale);
 ```
 
 == Expressions
@@ -60,7 +60,7 @@ constexpr double    poly_blamp(phase p, phase dt, float scale);
 | `poly_blamp(p, dt, scale)`   | Get the corner residual at `p` for a slope
                                  change of `2 * scale`: nonzero only when
                                  `p` is within `dt` of the start or end of
-                                 the cycle.                                   | `double`
+                                 the cycle.                                   | `float`
 |===
 
 Add the residual to the plain value, or subtract it, by the direction of the discontinuity: subtract `poly_blep` at a downward step, and `poly_blamp` at a peak. Both functions are stateless, `constexpr`, and free of side effects.

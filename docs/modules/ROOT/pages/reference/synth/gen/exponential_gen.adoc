@@ -13,6 +13,8 @@ to a capacitor discharged through a resistor.
 
 The Q DSP library utilizes the exponential ramp generators for generating complex envelopes.
 
+Both are class templates on `T`, the type of the rate and the running value; the names without the `basic_` prefix are their `double` instantiations. `float` suits a single-precision FPU.
+
 == Include
 
 ```c++
@@ -22,9 +24,10 @@ The Q DSP library utilizes the exponential ramp generators for generating comple
 == Declaration
 
 ```c++
-struct exp_upward_ramp_gen
+template <typename T>
+struct basic_exp_upward_ramp_gen
 {
-            exp_upward_ramp_gen(duration width, float sps, float cv = 0.95);
+            basic_exp_upward_ramp_gen(duration width, float sps, float cv = 0.95);
 
    float    operator()();
    void     config(duration width, float sps);
@@ -32,21 +35,38 @@ struct exp_upward_ramp_gen
    void     reset();
 };
 
-struct exp_downward_ramp_gen : exp_upward_ramp_gen
+template <typename T>
+struct basic_exp_downward_ramp_gen : basic_exp_upward_ramp_gen<T>
 {
-   using exp_upward_ramp_gen::exp_upward_ramp_gen;
+   using base_type = basic_exp_upward_ramp_gen<T>;
+   using base_type::base_type;
 
    float    operator()();
 };
+
+using exp_upward_ramp_gen = basic_exp_upward_ramp_gen<double>;
+using exp_downward_ramp_gen = basic_exp_downward_ramp_gen<double>;
+```
+
+== Template Instantiations
+
+`exp_upward_ramp_gen`:: An exponential upward ramp generator in `double`.
+`exp_downward_ramp_gen`:: An exponential downward ramp generator in `double`.
+
+```c++
+using exp_upward_ramp_gen = basic_exp_upward_ramp_gen<double>;
+using exp_downward_ramp_gen = basic_exp_downward_ramp_gen<double>;
 ```
 
 == Expressions
 
-`exp_upward_ramp_gen` and `exp_downward_ramp_gen` are models of `{ramp}`. In addition to valid expressions for `{ramp}`, `exp_upward_ramp_gen` and `exp_downward_ramp_gen` allow these expressions.
+`basic_exp_upward_ramp_gen<T>` and `basic_exp_downward_ramp_gen<T>` are models of `{ramp}`. In addition to valid expressions for `{ramp}`, `basic_exp_upward_ramp_gen<T>` and `basic_exp_downward_ramp_gen<T>` allow these expressions.
 
 === Notation
 
-`g`               :: Object of type `exp_upward_ramp_gen` or `exp_downward_ramp_gen`.
+`U`               :: A `basic_exp_upward_ramp_gen<T>` type.
+`D`               :: A `basic_exp_downward_ramp_gen<T>` type.
+`g`               :: Object of type `U` or `D`.
 `w`               :: Object of type `duration`.
 `sps`             :: Floating point value representing samples per second.
 `cv`              :: Floating point value for the exponential curvature, greater than 0.0 and less than 1.0.
@@ -57,9 +77,9 @@ struct exp_downward_ramp_gen : exp_upward_ramp_gen
 |===
 | Expression                                | Semantics
 
-| `exp_upward_ramp_gen(w, sps [, cv])`      | Construct an `exp_upward_ramp_gen` given width, `w`,
+| `U(w, sps [, cv])`                        | Construct a `U` given width, `w`,
                                               samples per second, `sps`, and exponential curvature, `cv`.
-| `exp_downward_ramp_gen(w, sps [, cv])`    | Construct an `exp_downward_ramp_gen` given width, `w`,
+| `D(w, sps [, cv])`                        | Construct a `D` given width, `w`,
                                               samples per second, `sps`, and exponential curvature, `cv`.
 |===
 

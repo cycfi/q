@@ -15,6 +15,8 @@ w(n) = 0.5*(1 - cos(2pin/(N-1)))
 
 Aside from its common use as a window function, the Q DSP library also utilizes the Hann window generator for modulating the audio signal and generating complex envelopes.
 
+The generators on this page are class templates on `T`, the type of the `{sin_cos_gen}` that makes the cosine; the names without the `basic_` prefix are their `double` instantiations. `float` suits a single-precision FPU, and a ramp of a few hundred samples from a reset, such as a crossfade, is exact enough in it (see the `{sin_cos_gen}` Precision section).
+
 == Hann Window Generator
 
 === Include
@@ -26,24 +28,36 @@ Aside from its common use as a window function, the Q DSP library also utilizes 
 === Declaration
 
 ```c++
-struct hann_gen
+template <typename T>
+struct basic_hann_gen
 {
-            hann_gen(duration width, float sps);
+            basic_hann_gen(duration width, float sps);
 
    float    operator()();
    void     config(duration width, float sps, bool reset_ = false);
    void     reset();
    void     midpoint();
 };
+
+using hann_gen = basic_hann_gen<double>;
+```
+
+=== Template Instantiations
+
+`hann_gen`:: A Hann window generator in `double`.
+
+```c++
+using hann_gen = basic_hann_gen<double>;
 ```
 
 === Expressions
 
-`hann_gen` is a model of `{generator}`. In addition to valid expressions for `{generator}`, `hann_gen` allows these expressions.
+`basic_hann_gen<T>` is a model of `{generator}`. In addition to valid expressions for `{generator}`, `basic_hann_gen<T>` allows these expressions.
 
 ==== Notation
 
-`g`               :: Object of type `hann_gen`.
+`G`               :: A `basic_hann_gen<T>` type.
+`g`               :: Object of type `G`.
 `w`               :: Object of type `duration`.
 `sps`             :: Floating point value representing samples per second.
 `r`               :: Boolean value: `true` to reset the phase (default: `false`).
@@ -54,7 +68,7 @@ struct hann_gen
 |===
 | Expression               | Semantics
 
-| `hann_gen(w, sps)`       | Construct a `hann_gen` given window width, `w`,
+| `G(w, sps)`              | Construct a `G` given window width, `w`,
                              and samples per second, `sps`.
 |===
 
@@ -108,7 +122,7 @@ for (auto& s : grain)
 
 == Ramp Generators
 
-Two subclasses of `hann_gen` are specialized for ramp generation:
+Two subclasses of `basic_hann_gen` are specialized for ramp generation:
 
 1. The Hann upward ramp generator generates a rising curve with the
 shape of the first half of a Hann window taper.
@@ -125,32 +139,47 @@ shape of the second half of a Hann window taper.
 === Declaration
 
 ```c++
-struct hann_upward_ramp_gen : hann_gen
+template <typename T>
+struct basic_hann_upward_ramp_gen : basic_hann_gen<T>
 {
-            hann_upward_ramp_gen(duration width, float sps);
+            basic_hann_upward_ramp_gen(duration width, float sps);
 
    void     config(duration width, float sps, bool reset_ = false);
 };
 
-struct hann_downward_ramp_gen : hann_gen
+template <typename T>
+struct basic_hann_downward_ramp_gen : basic_hann_gen<T>
 {
-            hann_downward_ramp_gen(duration width, float sps);
+            basic_hann_downward_ramp_gen(duration width, float sps);
 
    void     reset();
    void     config(duration width, float sps, bool reset_ = false);
 };
+
+using hann_upward_ramp_gen = basic_hann_upward_ramp_gen<double>;
+using hann_downward_ramp_gen = basic_hann_downward_ramp_gen<double>;
+```
+
+=== Template Instantiations
+
+`hann_upward_ramp_gen`:: A Hann upward ramp generator in `double`.
+`hann_downward_ramp_gen`:: A Hann downward ramp generator in `double`.
+
+```c++
+using hann_upward_ramp_gen = basic_hann_upward_ramp_gen<double>;
+using hann_downward_ramp_gen = basic_hann_downward_ramp_gen<double>;
 ```
 
 === Expressions
 
-`hann_upward_ramp_gen` and `hann_downward_ramp_gen` are models of
-`{ramp}` and implement all valid expressions of `{ramp}`. In addition to
-valid expressions for `{ramp}`, `hann_upward_ramp_gen` and
-`hann_downward_ramp_gen` allow these expressions.
+`basic_hann_upward_ramp_gen<T>` and `basic_hann_downward_ramp_gen<T>` are
+models of `{ramp}` and implement all valid expressions of `{ramp}`. In
+addition to valid expressions for `{ramp}`, `basic_hann_upward_ramp_gen<T>`
+and `basic_hann_downward_ramp_gen<T>` allow these expressions.
 
 ==== Notation
 
-`g`               :: Object of type `hann_upward_ramp_gen` or `hann_downward_ramp_gen`.
+`g`               :: Object of type `basic_hann_upward_ramp_gen<T>` or `basic_hann_downward_ramp_gen<T>`.
 `w`               :: Object of type `duration`.
 `sps`             :: Floating point value representing samples per second.
 `r`               :: Boolean value: `true` to reset the ramp.
@@ -166,7 +195,7 @@ valid expressions for `{ramp}`, `hann_upward_ramp_gen` and
                              the ramp to its start.                            | `void`
 |===
 
-NOTE: `hann_downward_ramp_gen` starts at the middle of the window: its
+NOTE: `basic_hann_downward_ramp_gen` starts at the middle of the window: its
 `reset()` sets the current phase to the midpoint.
 
 NOTE: The ramp generators run freely. After one ramp width, the phase

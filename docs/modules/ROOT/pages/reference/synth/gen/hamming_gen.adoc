@@ -16,6 +16,8 @@ w(n) = 0.54 - 0.46 * cos(2pi*n/(N-1))
 
 Aside from its common use as a window function, the Q DSP library also utilizes the Hamming window generator for modulating the audio signal and generating complex envelopes.
 
+The generator is a class template, `basic_hamming_gen<T>`, where `T` is the type of the `{sin_cos_gen}` that makes the cosine; `hamming_gen` is its `double` instantiation. `float` suits a single-precision FPU (see the `{sin_cos_gen}` Precision section).
+
 == Include
 
 ```c++
@@ -25,24 +27,36 @@ Aside from its common use as a window function, the Q DSP library also utilizes 
 == Declaration
 
 ```c++
-struct hamming_gen
+template <typename T>
+struct basic_hamming_gen
 {
-            hamming_gen(duration width, float sps);
+            basic_hamming_gen(duration width, float sps);
 
    float    operator()();
    void     config(duration width, float sps, bool reset_ = false);
    void     reset();
    void     midpoint();
 };
+
+using hamming_gen = basic_hamming_gen<double>;
+```
+
+== Template Instantiations
+
+`hamming_gen`:: A Hamming window generator in `double`.
+
+```c++
+using hamming_gen = basic_hamming_gen<double>;
 ```
 
 == Expressions
 
-`hamming_gen` is a model of `{generator}`. In addition to valid expressions for `{generator}`, `hamming_gen` allows these expressions.
+`basic_hamming_gen<T>` is a model of `{generator}`. In addition to valid expressions for `{generator}`, `basic_hamming_gen<T>` allows these expressions.
 
 === Notation
 
-`g`               :: Object of type `hamming_gen`.
+`G`               :: A `basic_hamming_gen<T>` type.
+`g`               :: Object of type `G`.
 `w`               :: Object of type `duration`.
 `sps`             :: Floating point value representing samples per second.
 `r`               :: Boolean value: `true` to reset the phase (default: `false`).
@@ -53,7 +67,7 @@ struct hamming_gen
 |===
 | Expression               | Semantics
 
-| `hamming_gen(w, sps)`    | Construct a `hamming_gen` given window width, `w`,
+| `G(w, sps)`              | Construct a `G` given window width, `w`,
                              and samples per second, `sps`.
 |===
 
