@@ -30,7 +30,7 @@ namespace cycfi::q
       }
    }
 
-   constexpr double poly_blamp(phase p, phase dt, float scale)
+   constexpr float poly_blamp(phase p, phase dt, float scale)
    {
       constexpr auto end = phase::end();
 

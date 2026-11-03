@@ -145,7 +145,7 @@ namespace cycfi::q
    inline void zero_crossing_collector::info::update_peak(float s, std::size_t frame)
    {
       _peak = std::max(s, _peak);
-      if ((_width == 0.0f) && (s < (_peak * 0.3)))
+      if ((_width == 0.0f) && (s < (_peak * 0.3f)))
          _width = frame - _leading_edge;
    }
 
