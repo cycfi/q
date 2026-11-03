@@ -24,7 +24,7 @@ The `true_rms_envelope_follower_db` variant works in the dB domain: the square r
 
 The `true_rms_envelope_follower_ref` variant reads a history the caller owns, with no buffer of its own.
 
-All three are the `double` instantiations of class templates on `T`, the type of the moving average's accumulator and of the `_db` variant's `{decibel}`. `float` suits a single-precision FPU; a `float` accumulator re-sums once per window to bound its drift (see {moving_average}).
+All three are the `double` instantiations of class templates on `T`, the type of the moving average's accumulator. `float` suits a single-precision FPU; a `float` accumulator re-sums once per window to bound its drift (see {moving_average}).
 
 == Response
 
@@ -63,8 +63,8 @@ struct basic_true_rms_envelope_follower_db
     using base_type = basic_true_rms_envelope_follower<T>;
     using base_type::base_type;
 
-    basic_decibel<T>    operator()(float s);
-    basic_decibel<T>    operator()() const;
+    decibel             operator()(float s);
+    decibel             operator()() const;
 };
 ```
 
@@ -111,9 +111,9 @@ NOTE: C++ brace initialization may also be used.
 | Expression        | Semantics                             | Return Type
 
 | `env(s)`          | Process the input sample `s` and
-                      return the RMS level.                 | `float` (`basic_decibel<T>` for the `_db` variant)
+                      return the RMS level.                 | `float` (`decibel` for the `_db` variant)
 | `env()`           | Get the latest RMS level without
-                      processing a sample.                  | `float` (`basic_decibel<T>` for the `_db` variant)
+                      processing a sample.                  | `float` (`decibel` for the `_db` variant)
 | `env.mean_square()` | Get the raw mean of the squared
                         samples (no square root).           | `float`
 |===

@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-image:compressor.svg[alt="Compressor", width=400, role=right]The compressor dynamically modulates the gain when the signal envelope rises above a specified threshold. The compressor reduces the level of high-level signals (signals above the threshold) while leaving low-level signals unchanged. The compressor is implemented by a class named `compressor`. It is the `double` instantiation of a class template, `basic_compressor<T>`, where `T` is the type of its `{decibel}`; `basic_compressor<float>` keeps the dynamics in `float` for a single-precision FPU.
+image:compressor.svg[alt="Compressor", width=400, role=right]The compressor dynamically modulates the gain when the signal envelope rises above a specified threshold. The compressor reduces the level of high-level signals (signals above the threshold) while leaving low-level signals unchanged. The compressor is implemented by a class named `compressor`.
 
 Envelope tracking is done externally using an external envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.
 
@@ -25,49 +25,26 @@ NOTE: See xref:reference/dynamic.adoc[Dynamic] for further details.
 == Declaration
 
 ```c++
-template <typename T>
-struct basic_compressor
+struct compressor
 {
-   using decibel_type = basic_decibel<T>;
+               compressor(decibel threshold, float ratio);
 
-                  basic_compressor(decibel_type threshold, float ratio);
+   decibel     operator()(decibel env) const;
 
-   decibel_type   operator()(decibel_type env) const;
-
-   void           threshold(decibel_type val);
-   void           ratio(float ratio);
-   decibel_type   threshold() const;
-   float          ratio() const;
+   void        threshold(decibel val);
+   void        ratio(float ratio);
+   decibel     threshold() const;
+   float       ratio() const;
 };
-
-using compressor = basic_compressor<double>;
-```
-
-== Template Instantiations
-
-`compressor`:: A `compressor` on `decibel`, in `double`.
-
-```c++
-using compressor = basic_compressor<double>;
 ```
 
 == Expressions
 
 === Notation
 
-`C`                  :: A `basic_compressor<T>` type.
-`comp`, `a`, `b`     :: Objects of type `C`
-`t`, `env`           :: Objects of type `basic_decibel<T>`
+`comp`, `a`, `b`     :: Objects of type `compressor`
+`t`, `env`           :: Objects of type `decibel`
 `r`                  :: Floating point value for compression ratio.
-
-=== Type Definitions
-
-[cols="1,1,1"]
-|===
-| Expression           | Semantics                    | Type
-
-| `C::decibel_type`    | Get the decibel type.        | `basic_decibel<T>`
-|===
 
 === Constructors and Assignment
 
@@ -75,8 +52,8 @@ using compressor = basic_compressor<double>;
 |===
 | Expression            | Semantics
 
-| `C(t, r)`             | Construct a `compressor` from `t` (threshold) and `r` (ratio).
-| `C(comp)`             | Copy construct from `comp`.
+| `compressor(t, r)`    | Construct a `compressor` from `t` (threshold) and `r` (ratio).
+| `compressor(comp)`    | Copy construct from `compressor comp`.
 | `a = b`               | Assign `b` to `a`.
 |===
 
@@ -91,7 +68,7 @@ The ratio parameter, `r`, specifies the amount of gain applied. With the typical
 | Expression      | Semantics                            | Return Type
 
 | `comp(env)`     |  Process the input envelope `env`
-                     and return the compressed result.   | `basic_decibel<T>`
+                     and return the compressed result.   | `decibel`
 |===
 
 The output is the compressed gain, also in decibels. Simply multiply the signal by the result converted to a linear `float` using `lin_float` (or `double` using `lin_double`). For example:
@@ -135,7 +112,7 @@ Typically, you add some makeup gain after compression to compensate for the gain
 |===
 | Expression         | Semantics                         | Return Type
 
-| `comp.threshold()` | Get the `compressor` threshold.   | `basic_decibel<T>`
+| `comp.threshold()` | Get the `compressor` threshold.   | `decibel`
 | `comp.ratio()`     | Get the `compressor` ratio.       | `float`
 |===
 

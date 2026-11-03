@@ -26,7 +26,7 @@ The stages:
 . *Noise gate* ({onset_gate}, smoothed by an {ar_envelope_follower}) mutes the signal between notes, rejecting bleed and low-level noise while letting fast attacks through. The boolean gate is smoothed into a gain to avoid clicks.
 . *Compressor + makeup gain* (`{compressor}` driven by the envelope in `decibel`, plus a linear makeup gain) evens out the dynamics so the detector receives a consistent level.
 
-`signal_conditioner` is the full chain. It is an alias for `basic_signal_conditioner<>`, a class template whose first parameter is a mask of stages to leave out at compile time (see <<_bypassing_stages>>). Its second, `T`, is the type of the compressor's `{decibel}`, `double` by default; `float` keeps the chain in `float` for a single-precision FPU. A bypassed stage costs none of its per-sample work, and its member becomes an empty stand-in.
+`signal_conditioner` is the full chain. It is an alias for `basic_signal_conditioner<>`, a class template whose one parameter is a mask of stages to leave out at compile time (see <<_bypassing_stages>>). A bypassed stage costs none of its per-sample work, and its member becomes an empty stand-in.
 
 The gate thresholds can be adjusted at runtime, for a noise floor or playing dynamics that change. See <<_mutators>>.
 
@@ -123,7 +123,7 @@ struct sc_bypass
    static constexpr unsigned compressor = 1 << 3;
 };
 
-template <unsigned Bypass = sc_bypass::none, typename T = double>
+template <unsigned Bypass = sc_bypass::none>
 class basic_signal_conditioner
 {
 public:
@@ -160,8 +160,7 @@ using signal_conditioner = basic_signal_conditioner<>;
 === Notation
 
 `Bypass`                     :: A mask of `sc_bypass` flags: the stages to leave out.
-`T`                          :: The compressor's decibel value type: `double` (the default) or `float`.
-`SC`                         :: A `basic_signal_conditioner<Bypass, T>` type.
+`SC`                         :: A `basic_signal_conditioner<Bypass>` type.
 `sc`, `a`, `b`               :: Objects of type `SC`.
 `conf`                       :: Object of type `signal_conditioner_config`, or of any type with the same members.
 `lowest_freq`, `highest_freq`:: Objects of type `{frequency}`: the lowest and highest notes of interest.

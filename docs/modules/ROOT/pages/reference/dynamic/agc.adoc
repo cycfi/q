@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-image:agc.svg[alt="AGC", width=400, role=right]The AGC, or automatic gain control, compares the envelope, `env`, to an external reference, `ref`, and increases or decreases the gain to maintain a constant output level. A class named `agc` implements AGC. It is the `double` instantiation of a class template, `basic_agc<T>`, where `T` is the type of its `{decibel}`; `basic_agc<float>` keeps the dynamics in `float` for a single-precision FPU.
+image:agc.svg[alt="AGC", width=400, role=right]The AGC, or automatic gain control, compares the envelope, `env`, to an external reference, `ref`, and increases or decreases the gain to maintain a constant output level. A class named `agc` implements AGC.
 
 Envelope tracking is done externally using an external envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.
 
@@ -23,45 +23,22 @@ NOTE: See xref:reference/dynamic.adoc[Dynamic] for further details.
 == Declaration
 
 ```c++
-template <typename T>
-struct basic_agc
+struct agc
 {
-   using decibel_type = basic_decibel<T>;
+                agc(decibel max);
 
-                  basic_agc(decibel_type max);
-
-   decibel_type   operator()(decibel_type env, decibel_type ref) const;
-   void           max(decibel_type max_);
-   decibel_type   max() const;
+    decibel     operator()(decibel env, decibel ref) const;
+    void        max(decibel max_);
+    decibel     max() const;
 };
-
-using agc = basic_agc<double>;
-```
-
-== Template Instantiations
-
-`agc`:: An `agc` on `decibel`, in `double`.
-
-```c++
-using agc = basic_agc<double>;
 ```
 
 == Expressions
 
 === Notation
 
-`C`                 :: A `basic_agc<T>` type.
-`g`, `a`, `b`       :: Objects of type `C`
-`max`, `ref`, `env` :: Objects of type `basic_decibel<T>`
-
-=== Type Definitions
-
-[cols="1,1,1"]
-|===
-| Expression           | Semantics                    | Type
-
-| `C::decibel_type`    | Get the decibel type.        | `basic_decibel<T>`
-|===
+`g`, `a`, `b`       :: Objects of type `agc`
+`max`, `ref`, `env` :: Objects of type `decibel`
 
 === Constructors and Assignment
 
@@ -69,8 +46,8 @@ using agc = basic_agc<double>;
 |===
 | Expression    | Semantics
 
-| `C(max)`      | Construct an `agc` from `max` (maximum) gain.
-| `C(g)`        | Copy construct from `g`.
+| `agc(max)`    | Construct an `agc` from `max` (maximum) gain.
+| `agc(g)`      | Copy construct from `agc g`.
 | `a = b`       | Assign `b` to `a`.
 |===
 
@@ -88,7 +65,7 @@ As previously stated, the `agc` compares the envelope, `env`, to an external ref
                       by increasing or decreasing the gain
                       if `env` goes above or falls below
                       `ref`, to maintain a constant output
-                      level.                                | `basic_decibel<T>`
+                      level.                                | `decibel`
 |===
 
 The output is the adjusted gain, also in decibels. Simply multiply the signal by the result converted to a linear `float` using `lin_float` (or `double` using `lin_double`). For example:
@@ -128,6 +105,6 @@ auto out = signal * gain;               <2>
 |===
 | Expression        | Semantics                         | Return Type
 
-| `g.max()`         | Get the `agc` maximum gain.       | `basic_decibel<T>`
+| `g.max()`         | Get the `agc` maximum gain.       | `decibel`
 |===
 

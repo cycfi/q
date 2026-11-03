@@ -20,7 +20,7 @@ IMPORTANT: The fast RMS envelope follower is a fast level _detector_ computed in
 
 The `fast_rms_envelope_follower_db` variant works in the dB domain, for the dynamic range processors (compressor, expander and agc) that already work in decibels. It saves a linear to decibel conversion, and takes the square root as a division by 2.
 
-Both are the `double` instantiations of class templates on `T`, the type of the averaging's accumulator and of the `_db` variant's `{decibel}`. `float` suits a single-precision FPU.
+Both are the `double` instantiations of class templates on `T`, the type of the averaging's accumulator. `float` suits a single-precision FPU.
 
 == Response
 
@@ -56,12 +56,12 @@ struct basic_fast_rms_envelope_follower_db
     using base_type = basic_fast_rms_envelope_follower<T>;
     using base_type::base_type;
 
-    basic_decibel<T>    operator()(float s);
-    basic_decibel<T>    operator()() const;
+    decibel             operator()(float s);
+    decibel             operator()() const;
 };
 ```
 
-`fast_rms_envelope_follower` essentially follows the same API as {fast_envelope_follower}. The `_db` variant works in the dB domain and returns `basic_decibel<T>` instead of `float`.
+`fast_rms_envelope_follower` essentially follows the same API as {fast_envelope_follower}. The `_db` variant works in the dB domain and returns `decibel` instead of `float`.
 
 == Template Instantiations
 
@@ -106,9 +106,9 @@ NOTE: C++ brace initialization may also be used.
 | Expression        | Semantics                             | Return Type
 
 | `env(s)`          | Process the input sample `s` and
-                      return the detected envelope.         | `float` (`basic_decibel<T>` for the `_db` variant)
+                      return the detected envelope.         | `float` (`decibel` for the `_db` variant)
 | `env()`           | Get the latest detected envelope
-                      without processing a sample.          | `float` (`basic_decibel<T>` for the `_db` variant)
+                      without processing a sample.          | `float` (`decibel` for the `_db` variant)
 | `env.peak_square()` | Get the raw smoothed peak of the
                       squared signal: the value under the
                       radical (no square root).             | `float`
