@@ -13,6 +13,15 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-11-03
 
+`6bc20be6`, `7a76878e`: `decibel` is a float unit, and `basic_decibel<T>`
+with the dynamics templates of `92fa1e4d` is gone: nothing needed a
+double decibel (the conversions are float tables, a float holds a level
+to about 1e-5 dB, and nothing accumulates decibels), so the compressor,
+soft knee compressor, expander, agc, level crossfade and signal
+conditioner are plain classes again, in hardware float on a Cortex-M4F.
+The RMS followers' T is their accumulator only. Suites 124 of 124 on
+ARM and x86; hz compiles against it.
+
 `73a1b86f` to `a6f8aea3`: every class that keeps double state or
 arithmetic per sample is a `basic_` template on T, its old name the
 double form, so a single-precision FPU instantiates it in float:
