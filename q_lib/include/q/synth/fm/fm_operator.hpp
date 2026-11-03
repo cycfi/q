@@ -27,10 +27,13 @@ namespace cycfi::q
    // The operator follows the master's step, not its phase: with any
    // non-integer ratio, its phase runs on its own, restarted by sync().
    // Its output level is in its envelope's levels.
+   //
+   // T is the ratio's type, double by default.
    ////////////////////////////////////////////////////////////////////////////
    template <
       concepts::Oscillator Osc = sin_osc
     , concepts::EnvelopeGenerator Env = dx_envelope_gen
+    , typename T = double
    >
    struct basic_fm_operator
    {
@@ -38,7 +41,7 @@ namespace cycfi::q
 
                      basic_fm_operator();
 
-      void           ratio(double r);            // of the master's frequency
+      void           ratio(T r);                 // of the master's frequency
       void           fixed(phase step);          // a fixed frequency
       void           envelope(typename Env::config const& cfg, float sps);
 
@@ -60,7 +63,7 @@ namespace cycfi::q
 
       phase_iterator _pi;
       phase          _mod;
-      double         _ratio = 1.0;               // 0: fixed
+      T              _ratio = 1;                 // 0: fixed
       std::uint32_t  _master = 0;                // the master's step
       Env            _env;
    };
@@ -73,61 +76,70 @@ namespace cycfi::q
 
    // The envelope's default config, at a placeholder sample rate until
    // envelope() sets the real one
-   template <concepts::Oscillator Osc, concepts::EnvelopeGenerator Env>
-   inline basic_fm_operator<Osc, Env>::basic_fm_operator()
+   template <
+      concepts::Oscillator Osc, concepts::EnvelopeGenerator Env, typename T>
+   inline basic_fm_operator<Osc, Env, T>::basic_fm_operator()
     : _env{typename Env::config{}, 44100.0f}
    {}
 
-   template <concepts::Oscillator Osc, concepts::EnvelopeGenerator Env>
-   inline void basic_fm_operator<Osc, Env>::ratio(double r)
+   template <
+      concepts::Oscillator Osc, concepts::EnvelopeGenerator Env, typename T>
+   inline void basic_fm_operator<Osc, Env, T>::ratio(T r)
    {
       _ratio = r;
       _master = 0;                     // the next sample sets the step
    }
 
-   template <concepts::Oscillator Osc, concepts::EnvelopeGenerator Env>
-   inline void basic_fm_operator<Osc, Env>::fixed(phase step)
+   template <
+      concepts::Oscillator Osc, concepts::EnvelopeGenerator Env, typename T>
+   inline void basic_fm_operator<Osc, Env, T>::fixed(phase step)
    {
-      _ratio = 0.0;
+      _ratio = 0;
       _pi._step = step;
    }
 
-   template <concepts::Oscillator Osc, concepts::EnvelopeGenerator Env>
-   inline void basic_fm_operator<Osc, Env>::envelope(
+   template <
+      concepts::Oscillator Osc, concepts::EnvelopeGenerator Env, typename T>
+   inline void basic_fm_operator<Osc, Env, T>::envelope(
       typename Env::config const& cfg, float sps)
    {
       _env.set(cfg, sps);
    }
 
-   template <concepts::Oscillator Osc, concepts::EnvelopeGenerator Env>
-   inline void basic_fm_operator<Osc, Env>::attack()
+   template <
+      concepts::Oscillator Osc, concepts::EnvelopeGenerator Env, typename T>
+   inline void basic_fm_operator<Osc, Env, T>::attack()
    {
       _env.attack();
    }
 
-   template <concepts::Oscillator Osc, concepts::EnvelopeGenerator Env>
-   inline void basic_fm_operator<Osc, Env>::release()
+   template <
+      concepts::Oscillator Osc, concepts::EnvelopeGenerator Env, typename T>
+   inline void basic_fm_operator<Osc, Env, T>::release()
    {
       _env.release();
    }
 
-   template <concepts::Oscillator Osc, concepts::EnvelopeGenerator Env>
-   inline void basic_fm_operator<Osc, Env>::sync()
+   template <
+      concepts::Oscillator Osc, concepts::EnvelopeGenerator Env, typename T>
+   inline void basic_fm_operator<Osc, Env, T>::sync()
    {
       _pi._phase = phase{};
    }
 
-   template <concepts::Oscillator Osc, concepts::EnvelopeGenerator Env>
-   inline bool basic_fm_operator<Osc, Env>::active() const
+   template <
+      concepts::Oscillator Osc, concepts::EnvelopeGenerator Env, typename T>
+   inline bool basic_fm_operator<Osc, Env, T>::active() const
    {
       return !_env.in_idle_phase();
    }
 
-   template <concepts::Oscillator Osc, concepts::EnvelopeGenerator Env>
-   inline float basic_fm_operator<Osc, Env>::operator()(
+   template <
+      concepts::Oscillator Osc, concepts::EnvelopeGenerator Env, typename T>
+   inline float basic_fm_operator<Osc, Env, T>::operator()(
       phase_iterator master)
    {
-      if (_ratio != 0.0 && master._step.rep != _master)
+      if (_ratio != T(0) && master._step.rep != _master)
       {
          _master = master._step.rep;
          _pi._step = phase{std::uint32_t(_master * _ratio), direct_unit};

@@ -39,8 +39,13 @@ namespace cycfi::q
    // from silence it starts at attack_from rather than crawling up from
    // the floor. A plain constant-slope attack in the log domain sounds
    // sluggish; this is why. Levels below floor are silent.
+   //
+   // T is the type of the level and its steps. dx_envelope_gen is double: a
+   // slow rate moves a small fraction of a dB per sample, which float
+   // rounds coarsely near the floor.
    ////////////////////////////////////////////////////////////////////////////
-   struct dx_envelope_gen
+   template <typename T>
+   struct basic_dx_envelope_gen
    {
       // Silent below floor; an attack from silence starts at attack_from;
       // the range is what a rate's time covers; fastest is the DX7's
@@ -61,8 +66,8 @@ namespace cycfi::q
          r1, r2, r3, sustain, release_phase, idle
       };
 
-                     dx_envelope_gen();
-                     dx_envelope_gen(config const& cfg, float sps);
+                     basic_dx_envelope_gen();
+                     basic_dx_envelope_gen(config const& cfg, float sps);
 
       void           set(config const& cfg, float sps);
 
@@ -84,57 +89,65 @@ namespace cycfi::q
       void           start(std::size_t i);
       void           advance();
 
-      // Double: a slow rate moves a small fraction of a dB per sample
-      double         _target[4];                   // dB
-      double         _step[4];                     // dB per sample
-      double         _db = floor.rep;
+      T              _target[4];                   // dB
+      T              _step[4];                     // dB per sample
+      T              _db = T(floor.rep);
       float          _gain = 1.0f;
       bool           _rising = false;
       std::size_t    _i = idle;
    };
 
+   using dx_envelope_gen = basic_dx_envelope_gen<double>;
+
    ////////////////////////////////////////////////////////////////////////////
    // Implementation
    ////////////////////////////////////////////////////////////////////////////
-   inline dx_envelope_gen::dx_envelope_gen()
-    : dx_envelope_gen{config{}, 44100.0f}
+   template <typename T>
+   inline basic_dx_envelope_gen<T>::basic_dx_envelope_gen()
+    : basic_dx_envelope_gen{config{}, 44100.0f}
    {}
 
-   inline dx_envelope_gen::dx_envelope_gen(
+   template <typename T>
+   inline basic_dx_envelope_gen<T>::basic_dx_envelope_gen(
       config const& cfg, float sps)
    {
       set(cfg, sps);
    }
 
-   inline void dx_envelope_gen::set(config const& cfg, float sps)
+   template <typename T>
+   inline void basic_dx_envelope_gen<T>::set(config const& cfg, float sps)
    {
       for (std::size_t i = 0; i != 4; ++i)
       {
-         _step[i] = range.rep / (as_double(cfg.rate[i]) * sps);
-         _target[i] = std::max(cfg.level[i].rep, floor.rep);
+         _step[i] = T(range.rep / (as_double(cfg.rate[i]) * sps));
+         _target[i] = T(std::max(cfg.level[i].rep, floor.rep));
       }
    }
 
-   inline void dx_envelope_gen::attack()
+   template <typename T>
+   inline void basic_dx_envelope_gen<T>::attack()
    {
       start(r1);
    }
 
-   inline void dx_envelope_gen::release()
+   template <typename T>
+   inline void basic_dx_envelope_gen<T>::release()
    {
       if (!in_idle_phase())
          start(release_phase);
    }
 
-   inline void dx_envelope_gen::reset()
+   template <typename T>
+   inline void basic_dx_envelope_gen<T>::reset()
    {
       _i = idle;
-      _db = floor.rep;
+      _db = T(floor.rep);
    }
 
    // Enter segment i from the current level. A segment that is already at
    // its target is skipped, so the envelope moves on the next sample.
-   inline void dx_envelope_gen::start(std::size_t i)
+   template <typename T>
+   inline void basic_dx_envelope_gen<T>::start(std::size_t i)
    {
       _i = i;
       if (i == sustain || i == idle)
@@ -142,18 +155,19 @@ namespace cycfi::q
 
       auto target = _target[i == release_phase ? 3 : i];
       _rising = target > _db;
-      if (_rising && _db < attack_from.rep)
-         _db = std::min(attack_from.rep, target);
+      if (_rising && _db < T(attack_from.rep))
+         _db = std::min(T(attack_from.rep), target);
       if (_db == target)
          advance();
    }
 
    // After R3, hold at L3. After R4, idle once silent, else hold at L4.
-   inline void dx_envelope_gen::advance()
+   template <typename T>
+   inline void basic_dx_envelope_gen<T>::advance()
    {
       if (_i == release_phase)
       {
-         if (_db <= floor.rep)
+         if (_db <= T(floor.rep))
             _i = idle;
       }
       else
@@ -162,7 +176,8 @@ namespace cycfi::q
       }
    }
 
-   inline float dx_envelope_gen::operator()()
+   template <typename T>
+   inline float basic_dx_envelope_gen<T>::operator()()
    {
       if (_i == idle)
          return 0.0f;
@@ -173,8 +188,8 @@ namespace cycfi::q
          auto target = _target[k];
          if (_rising)
          {
-            auto below = std::floor(-_db / 6.0206);      // doublings
-            auto factor = std::max(1.0, 2.0 + below);
+            auto below = std::floor(-_db / T(6.0206));      // doublings
+            auto factor = std::max(T(1), T(2) + below);
             _db = std::min(_db + _step[k] * factor, target);
          }
          else
@@ -184,9 +199,9 @@ namespace cycfi::q
          if (_db == target)
             advance();
       }
-      if (_i == idle || _db <= floor.rep)
+      if (_i == idle || _db <= T(floor.rep))
          return 0.0f;
-      return lin_float(dB(float(_db))) * _gain;
+      return lin_float(dB<T>(float(_db))) * _gain;
    }
 }
 
