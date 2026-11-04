@@ -6,37 +6,20 @@
 #if !defined(CYCFI_Q_COUNT_BITS_HPP_MARCH_12_2018)
 #define CYCFI_Q_COUNT_BITS_HPP_MARCH_12_2018
 
-#ifdef _MSC_VER
-# include <intrin.h>
-# include <nmmintrin.h>
-#endif
+#include <bit>
+#include <cstdint>
 
 namespace cycfi::q::detail
 {
    inline std::uint32_t count_bits(std::uint32_t i)
    {
-#if defined(_MSC_VER)
-      return __popcnt(i);
-#elif defined(__GNUC__)
-      return __builtin_popcount(i);
-#else
-# error Unsupported compiler
-#endif
+      return std::popcount(i);
    }
 
-#if (!defined(_MSC_VER) || defined(_WIN64))
    inline std::uint64_t count_bits(std::uint64_t i)
    {
-#if defined(_MSC_VER)
-      return _mm_popcnt_u64(i);
-#elif defined(__GNUC__)
-      return __builtin_popcountll(i);
-#else
-# error Unsupported compiler
-#endif
+      return std::popcount(i);
    }
-#endif // (!defined(_MSC_VER) || defined(_WIN64))
 }
 
 #endif
-
