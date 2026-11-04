@@ -10,10 +10,11 @@
 # them too, the scripts through Git for Windows' bash; Linux draws with Cairo
 # into an X11 window, and runs its tests without the validators' editor
 # tests, as a runner has no display; test_two_plugins, two plugins with
-# their editors open in one process, runs under xvfb. The built plugins are
-# uploaded, so a machine can try them
-# without building. A second job builds the gain example outside the tree,
-# from Q_ROOT, on all three.
+# their editors open in one process, runs under xvfb. Windows builds with
+# CMake's default generator, Visual Studio's, which keeps several
+# configurations in one tree; the others build with Ninja. The built plugins
+# are uploaded, so a machine can try them without building. A second job
+# builds the gain example outside the tree, from Q_ROOT, on all three.
 
 name: q_plug
 
@@ -113,7 +114,11 @@ jobs:
           endforeach()
         endif()
 
+        # Windows takes CMake's default, the generator a reader gets there.
         set(extra_args "")
+        if (NOT "${{ runner.os }}" STREQUAL "Windows")
+          list(APPEND extra_args -G Ninja -D CMAKE_MAKE_PROGRAM=ninja)
+        endif()
         if ("${{ runner.os }}" STREQUAL "Linux")
           # pluginval opens each editor, and a runner has no display.
           list(APPEND extra_args -DQ_BUILD_TEST=OFF)
@@ -123,8 +128,6 @@ jobs:
           COMMAND ${CMAKE_COMMAND}
             -S . -B build
             -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
-            -G Ninja
-            -D CMAKE_MAKE_PROGRAM=ninja
             -D Q_BUILD_PLUG=ON
             ${extra_args}
           RESULT_VARIABLE result ERROR_VARIABLE error_message)
@@ -148,7 +151,7 @@ jobs:
         endif()
 
         execute_process(
-          COMMAND ${CMAKE_COMMAND} --build build --config $ENV{BUILD_TYPE}
+          COMMAND ${CMAKE_COMMAND} --build build --config $ENV{BUILD_TYPE} --parallel
           RESULT_VARIABLE result ERROR_VARIABLE error_message)
         if (NOT result EQUAL 0)
           message(FATAL_ERROR "Build failed: ${error_message} - ${result}")
@@ -157,7 +160,7 @@ jobs:
     - name: Test (macOS, Windows)
       if: runner.os != 'Linux'
       working-directory: build
-      run: ctest --output-on-failure
+      run: ctest -C ${{ env.BUILD_TYPE }} --output-on-failure
 
     - name: Test (Linux)
       if: runner.os == 'Linux'

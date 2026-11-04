@@ -5,7 +5,9 @@
 ###############################################################################
 # Builds and tests QPlug on the drawing backends a platform offers besides
 # its own, chosen with Elements' switches: Skia everywhere, Cairo on macOS
-# and Windows. q_plug.yml covers each platform's own backend on every push;
+# and Windows. It also builds macOS's own backend with the Xcode generator,
+# which keeps several configurations in one tree, as Visual Studio does.
+# q_plug.yml covers each platform's own backend on every push;
 # these builds are long, so this runs weekly (GitHub schedules only the
 # default branch, master, which then tests develop), by hand, and when this
 # file changes. Linux runners have no display, so its editor tests are
@@ -44,6 +46,9 @@ jobs:
         - name: "macOS Cairo"
           os: macos-latest
           backend: ELEMENTS_CAIRO
+        - name: "macOS Xcode"
+          os: macos-latest
+          generator: Xcode
         - name: "Windows Skia"
           os: windows-latest
           backend: ELEMENTS_SKIA
@@ -89,9 +94,9 @@ jobs:
     - name: Build and Test (macOS)
       if: runner.os == 'macOS'
       run: |
-        cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DQ_BUILD_PLUG=ON -D${{ matrix.config.backend }}=ON
-        cmake --build build
-        ctest --test-dir build --output-on-failure
+        cmake -B build -G "${{ matrix.config.generator || 'Ninja' }}" -DCMAKE_BUILD_TYPE=Release -DQ_BUILD_PLUG=ON ${{ matrix.config.backend && format('-D{0}=ON', matrix.config.backend) || '' }}
+        cmake --build build --config Release --parallel
+        ctest --test-dir build -C Release --output-on-failure
 
     # The runner has no GPU, and Windows' own OpenGL is 1.1, too old for Skia
     # to open an editor. Mesa's opengl32.dll beside each validator, and beside
