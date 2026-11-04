@@ -813,6 +813,9 @@ noise reduction.</p>
 <div class="paragraph">
 <p>Aside from its common use as a window function, the Q DSP library also utilizes the Hamming window generator for modulating the audio signal and generating complex envelopes.</p>
 </div>
+<div class="paragraph">
+<p>The generator is a class template, <code>basic_hamming_gen&lt;T&gt;</code>, where <code>T</code> is the type of the <code><a href="sin_cos_gen.html" class="xref page">Sine Cosine Generator</a></code> that makes the cosine; <code>hamming_gen</code> is its <code>double</code> instantiation. <code>float</code> suits a single-precision FPU (see the <code><a href="sin_cos_gen.html" class="xref page">Sine Cosine Generator</a></code> Precision section).</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -830,15 +833,36 @@ noise reduction.</p>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct hamming_gen
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
+struct basic_hamming_gen
 {
-            hamming_gen(duration width, float sps);
+            basic_hamming_gen(duration width, float sps);
 
    float    operator()();
    void     config(duration width, float sps, bool reset_ = false);
    void     reset();
    void     midpoint();
-};</code></pre>
+};
+
+using hamming_gen = basic_hamming_gen&lt;double&gt;;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_template_instantiations"><a class="anchor" href="#_template_instantiations"></a>Template Instantiations</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>hamming_gen</code></dt>
+<dd>
+<p>A Hamming window generator in <code>double</code>.</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using hamming_gen = basic_hamming_gen&lt;double&gt;;</code></pre>
 </div>
 </div>
 </div>
@@ -847,15 +871,19 @@ noise reduction.</p>
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>hamming_gen</code> is a model of <code><a href="../../synth.html#_generator" class="xref page">Generator</a></code>. In addition to valid expressions for <code><a href="../../synth.html#_generator" class="xref page">Generator</a></code>, <code>hamming_gen</code> allows these expressions.</p>
+<p><code>basic_hamming_gen&lt;T&gt;</code> is a model of <code><a href="../../synth.html#_generator" class="xref page">Generator</a></code>. In addition to valid expressions for <code><a href="../../synth.html#_generator" class="xref page">Generator</a></code>, <code>basic_hamming_gen&lt;T&gt;</code> allows these expressions.</p>
 </div>
 <div class="sect2">
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
+<dt class="hdlist1"><code>G</code>               </dt>
+<dd>
+<p>A <code>basic_hamming_gen&lt;T&gt;</code> type.</p>
+</dd>
 <dt class="hdlist1"><code>g</code>               </dt>
 <dd>
-<p>Object of type <code>hamming_gen</code>.</p>
+<p>Object of type <code>G</code>.</p>
 </dd>
 <dt class="hdlist1"><code>w</code>               </dt>
 <dd>
@@ -887,8 +915,8 @@ noise reduction.</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hamming_gen(w, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>hamming_gen</code> given window width, <code>w</code>,
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>G(w, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>G</code> given window width, <code>w</code>,
                              and samples per second, <code>sps</code>.</p></td>
 </tr>
 </tbody>

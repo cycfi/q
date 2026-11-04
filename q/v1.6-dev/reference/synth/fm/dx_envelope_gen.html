@@ -824,6 +824,13 @@ retrigger or an early key-off is click-free.</p>
 <p>Each call returns the linear gain of the current level, times a master
 volume, <code>gain</code>, which is 1 by default.</p>
 </div>
+<div class="paragraph">
+<p><code>dx_envelope_gen</code> is the <code>double</code> instantiation of a class template,
+<code>basic_dx_envelope_gen&lt;T&gt;</code>, where <code>T</code> is the type of the level and its
+steps. A slow rate moves a small fraction of a dB per sample, which <code>float</code>
+rounds coarsely near the floor; <code>float</code> suits a single-precision FPU where
+the slowest rates are not needed.</p>
+</div>
 <div class="sect2">
 <h3 id="_the_attack_curve"><a class="anchor" href="#_the_attack_curve"></a>The Attack Curve</h3>
 <div class="paragraph">
@@ -879,7 +886,8 @@ operator or a voice can take a different envelope in its place.
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct dx_envelope_gen
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
+struct basic_dx_envelope_gen
 {
    static constexpr decibel floor = dB(-89.93);
    static constexpr decibel attack_from = dB(-49.95);
@@ -897,8 +905,8 @@ operator or a voice can take a different envelope in its place.
       r1, r2, r3, sustain, release_phase, idle
    };
 
-                  dx_envelope_gen();
-                  dx_envelope_gen(config const&amp; cfg, float sps);
+                  basic_dx_envelope_gen();
+                  basic_dx_envelope_gen(config const&amp; cfg, float sps);
 
    void           set(config const&amp; cfg, float sps);
 
@@ -914,7 +922,27 @@ operator or a voice can take a different envelope in its place.
    std::size_t    index() const;
    bool           in_idle_phase() const;
    bool           in_release_phase() const;
-};</code></pre>
+};
+
+using dx_envelope_gen = basic_dx_envelope_gen&lt;double&gt;;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_template_instantiations"><a class="anchor" href="#_template_instantiations"></a>Template Instantiations</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>dx_envelope_gen</code></dt>
+<dd>
+<p>The DX envelope in <code>double</code>.</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using dx_envelope_gen = basic_dx_envelope_gen&lt;double&gt;;</code></pre>
 </div>
 </div>
 </div>
@@ -923,21 +951,25 @@ operator or a voice can take a different envelope in its place.
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>dx_envelope_gen</code> is a model of <code><a href="../../synth.html#_envelopegenerator" class="xref page">EnvelopeGenerator</a></code>. In addition to valid
-expressions for <a href="../../synth.html#_envelopegenerator" class="xref page">EnvelopeGenerator</a>, <code>dx_envelope_gen</code> allows these
-expressions.</p>
+<p><code>basic_dx_envelope_gen&lt;T&gt;</code> is a model of <code><a href="../../synth.html#_envelopegenerator" class="xref page">EnvelopeGenerator</a></code>. In addition
+to valid expressions for <a href="../../synth.html#_envelopegenerator" class="xref page">EnvelopeGenerator</a>, <code>basic_dx_envelope_gen&lt;T&gt;</code>
+allows these expressions.</p>
 </div>
 <div class="sect2">
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
+<dt class="hdlist1"><code>E</code>            </dt>
+<dd>
+<p>A <code>basic_dx_envelope_gen&lt;T&gt;</code> type.</p>
+</dd>
 <dt class="hdlist1"><code>e</code>            </dt>
 <dd>
-<p>Object of type <code>dx_envelope_gen</code>.</p>
+<p>Object of type <code>E</code>.</p>
 </dd>
 <dt class="hdlist1"><code>cfg</code>          </dt>
 <dd>
-<p>Object of type <code>dx_envelope_gen::config</code>.</p>
+<p>Object of type <code>E::config</code>.</p>
 </dd>
 <dt class="hdlist1"><code>i</code>            </dt>
 <dd>
@@ -962,8 +994,8 @@ and L4).</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_envelope_gen()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct an idle, silent <code>dx_envelope_gen</code>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>E()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct an idle, silent <code>E</code>
                                with the default configuration at 44.1 kHz.</p></td>
 </tr>
 </tbody>
@@ -1016,27 +1048,27 @@ and L4).</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_envelope_gen::floor</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>E::floor</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the level below which the
                                       envelope is silent,
                                       -89.93 dB.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="../../units/decibel.html" class="xref page">decibel</a></code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_envelope_gen::attack_from</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>E::attack_from</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the level an attack from
                                       silence starts at, -49.95 dB.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="../../units/decibel.html" class="xref page">decibel</a></code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_envelope_gen::range</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>E::range</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the range a rate&#8217;s time
                                       covers, floor to full,
                                       89.93 dB.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="../../units/decibel.html" class="xref page">decibel</a></code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_envelope_gen::fastest</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>E::fastest</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the DX7&#8217;s fastest rate,
                                       5.56 ms.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="../../units/duration.html" class="xref page">duration</a></code></p></td>

@@ -814,6 +814,9 @@
 <div class="paragraph">
 <p>Decibel is non-linear and operates on the logarithmic domain. The <code>decibel</code> class is perfectly suitable for dynamics processing (e.g. compressors and limiters and envelopes). Q provides fast <code>decibel</code> computations using lookup tables for converting to and from scalars, exact to about 1e-5 dB over the whole <code>float</code> range, and a coarser bit-trick approximation.</p>
 </div>
+<div class="paragraph">
+<p>The value is a <code>float</code>. It holds a level to about 1e-5 dB at audio levels, finer than the conversions to and from scalars, so a single-precision FPU, such as a Cortex-M4F, does decibel arithmetic in hardware.</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -982,7 +985,7 @@ auto db = q::lin_to_db(2.0);  // 6 dB</code></pre>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>lin_double</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">exact</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">any <code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">any <code>float</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">about 23 ns</p></td>
 </tr>
 <tr>

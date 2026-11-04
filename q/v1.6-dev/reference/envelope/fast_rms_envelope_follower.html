@@ -834,6 +834,9 @@ The fast RMS envelope follower is a fast level <em>detector</em> computed in the
 <div class="paragraph">
 <p>The <code>fast_rms_envelope_follower_db</code> variant works in the dB domain, for the dynamic range processors (compressor, expander and agc) that already work in decibels. It saves a linear to decibel conversion, and takes the square root as a division by 2.</p>
 </div>
+<div class="paragraph">
+<p>Both are the <code>double</code> instantiations of class templates on <code>T</code>, the type of the averaging&#8217;s accumulator. <code>float</code> suits a single-precision FPU.</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -865,28 +868,56 @@ The fast RMS envelope follower is a fast level <em>detector</em> computed in the
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct fast_rms_envelope_follower
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
+struct basic_fast_rms_envelope_follower
 {
     static constexpr auto threshold = lin_float(-240_dB);
 
-            fast_rms_envelope_follower(duration hold, float sps);
+                        basic_fast_rms_envelope_follower(duration hold, float sps);
 
-    float   operator()(float s);
-    float   operator()() const;
-    float   peak_square() const;
+    float               operator()(float s);
+    float               operator()() const;
+    float               peak_square() const;
 };
 
-struct fast_rms_envelope_follower_db : fast_rms_envelope_follower
+template &lt;typename T&gt;
+struct basic_fast_rms_envelope_follower_db
+ : basic_fast_rms_envelope_follower&lt;T&gt;
 {
-    using fast_rms_envelope_follower::fast_rms_envelope_follower;
+    using base_type = basic_fast_rms_envelope_follower&lt;T&gt;;
+    using base_type::base_type;
 
-    decibel operator()(float s);
-    decibel operator()() const;
+    decibel             operator()(float s);
+    decibel             operator()() const;
 };</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p><code>fast_rms_envelope_follower</code> essentially follows the same API as <a href="fast_envelope_follower.html" class="xref page">Fast Envelope Follower</a>. The <code>fast_rms_envelope_follower_db</code> variant works in the dB domain and returns <code>decibel</code> instead of <code>float</code>.</p>
+<p><code>fast_rms_envelope_follower</code> essentially follows the same API as <a href="fast_envelope_follower.html" class="xref page">Fast Envelope Follower</a>. The <code>_db</code> variant works in the dB domain and returns <code>decibel</code> instead of <code>float</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_template_instantiations"><a class="anchor" href="#_template_instantiations"></a>Template Instantiations</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>fast_rms_envelope_follower</code></dt>
+<dd>
+<p>A fast RMS envelope follower in <code>double</code>.</p>
+</dd>
+<dt class="hdlist1"><code>fast_rms_envelope_follower_db</code></dt>
+<dd>
+<p>Its dB domain variant, returning <code>decibel</code>.</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using fast_rms_envelope_follower = basic_fast_rms_envelope_follower&lt;double&gt;;
+using fast_rms_envelope_follower_db =
+   basic_fast_rms_envelope_follower_db&lt;double&gt;;</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -899,11 +930,11 @@ struct fast_rms_envelope_follower_db : fast_rms_envelope_follower
 <dl>
 <dt class="hdlist1"><code>env_t</code>             </dt>
 <dd>
-<p>A <code>fast_rms_envelope_follower</code> or <code>fast_rms_envelope_follower_db</code>.</p>
+<p>A <code>basic_fast_rms_envelope_follower&lt;T&gt;</code> or <code>basic_fast_rms_envelope_follower_db&lt;T&gt;</code>.</p>
 </dd>
 <dt class="hdlist1"><code>env</code>, <code>a</code>, <code>b</code>     </dt>
 <dd>
-<p>Objects of type <code>fast_rms_envelope_follower</code> or <code>fast_rms_envelope_follower_db</code>.</p>
+<p>Objects of type <code>env_t</code>.</p>
 </dd>
 <dt class="hdlist1"><code>hold</code>              </dt>
 <dd>
@@ -961,7 +992,7 @@ C++ brace initialization may also be used.
 </table>
 </div>
 <div class="paragraph">
-<p><code>env_t</code> is a shortcut notation for <code>fast_rms_envelope_follower</code> or <code>fast_rms_envelope_follower_db</code>.</p>
+<p><code>env_t</code> is a shortcut notation for <code>basic_fast_rms_envelope_follower&lt;T&gt;</code> or <code>basic_fast_rms_envelope_follower_db&lt;T&gt;</code>.</p>
 </div>
 </div>
 <div class="sect2">

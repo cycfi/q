@@ -989,10 +989,11 @@ for (auto&amp; s : in)
 <h3 id="_declaration_2"><a class="anchor" href="#_declaration_2"></a>Declaration</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
-struct basic_moving_average_ref : basic_moving_sum_ref&lt;T&gt;
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T, typename Accumulator = decltype(promote(T()))&gt;
+struct basic_moving_average_ref : basic_moving_sum_ref&lt;T, Accumulator&gt;
 {
-   using basic_moving_sum_ref&lt;T&gt;::basic_moving_sum_ref;
+   using base_type = basic_moving_sum_ref&lt;T, Accumulator&gt;;
+   using base_type::base_type;
    using value_type = T;
 
    T  operator()(value_type s, value_type departing);
@@ -1023,9 +1024,13 @@ using moving_average_ref = basic_moving_average_ref&lt;float&gt;;</code></pre>
 <dd>
 <p>Element type, e.g. <code>float</code>.</p>
 </dd>
+<dt class="hdlist1"><code>A</code>            </dt>
+<dd>
+<p>Accumulator type, e.g. <code>double</code>.</p>
+</dd>
 <dt class="hdlist1"><code>mar</code>          </dt>
 <dd>
-<p>Object of type <code>basic_moving_average_ref&lt;T&gt;</code>.</p>
+<p>Object of type <code>basic_moving_average_ref&lt;T, A&gt;</code>.</p>
 </dd>
 <dt class="hdlist1"><code>s</code>            </dt>
 <dd>
@@ -1057,9 +1062,11 @@ using moving_average_ref = basic_moving_average_ref&lt;float&gt;;</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_moving_average_ref&lt;T&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_moving_average_ref&lt;T [, A]&gt;</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Instantiate a <code>basic_moving_average_ref</code> type
-                                    given <code>T</code>, the element type, e.g. <code>float</code>.</p></td>
+                                    given <code>T</code>, the element type, e.g. <code>float</code>, and
+                                    optionally <code>A</code>, the type the sum is kept in. See
+                                    the accumulator on the <a href="moving_sum.html" class="xref page">Moving Sum</a> page.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>moving_average_ref</code></p></td>

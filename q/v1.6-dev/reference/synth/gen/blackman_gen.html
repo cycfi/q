@@ -812,6 +812,9 @@
 <div class="paragraph">
 <p>Aside from its common use as a window function, the Q DSP library also utilizes the Blackman window generator for modulating the audio signal and generating complex envelopes.</p>
 </div>
+<div class="paragraph">
+<p>The generators on this page are class templates on <code>T</code>, the type of the <code><a href="sin_cos_gen.html" class="xref page">Sine Cosine Generator</a></code> objects that make the cosines; the names without the <code>basic_</code> prefix are their <code>double</code> instantiations. <code>float</code> suits a single-precision FPU (see the <code><a href="sin_cos_gen.html" class="xref page">Sine Cosine Generator</a></code> Precision section).</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -829,30 +832,53 @@
 <h3 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct blackman_gen
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
+struct basic_blackman_gen
 {
-            blackman_gen(duration width, float sps);
+            basic_blackman_gen(duration width, float sps);
 
    float    operator()();
    void     config(duration width, float sps, bool reset_ = false);
    void     reset();
    void     midpoint();
-};</code></pre>
+};
+
+using blackman_gen = basic_blackman_gen&lt;double&gt;;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_template_instantiations"><a class="anchor" href="#_template_instantiations"></a>Template Instantiations</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>blackman_gen</code></dt>
+<dd>
+<p>A Blackman window generator in <code>double</code>.</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using blackman_gen = basic_blackman_gen&lt;double&gt;;</code></pre>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h3>
 <div class="paragraph">
-<p><code>blackman_gen</code> is a model of <code><a href="../../synth.html#_generator" class="xref page">Generator</a></code>. In addition to valid expressions for <code><a href="../../synth.html#_generator" class="xref page">Generator</a></code>, <code>blackman_gen</code> allows these expressions.</p>
+<p><code>basic_blackman_gen&lt;T&gt;</code> is a model of <code><a href="../../synth.html#_generator" class="xref page">Generator</a></code>. In addition to valid expressions for <code><a href="../../synth.html#_generator" class="xref page">Generator</a></code>, <code>basic_blackman_gen&lt;T&gt;</code> allows these expressions.</p>
 </div>
 <div class="sect3">
 <h4 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h4>
 <div class="dlist">
 <dl>
+<dt class="hdlist1"><code>G</code>               </dt>
+<dd>
+<p>A <code>basic_blackman_gen&lt;T&gt;</code> type.</p>
+</dd>
 <dt class="hdlist1"><code>g</code>               </dt>
 <dd>
-<p>Object of type <code>blackman_gen</code>.</p>
+<p>Object of type <code>G</code>.</p>
 </dd>
 <dt class="hdlist1"><code>w</code>               </dt>
 <dd>
@@ -884,8 +910,8 @@
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>blackman_gen(w, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>blackman_gen</code> given window width, <code>w</code>,
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>G(w, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>G</code> given window width, <code>w</code>,
                              and samples per second, <code>sps</code>.</p></td>
 </tr>
 </tbody>
@@ -1012,7 +1038,7 @@ for (auto&amp; s : grain)
 <h2 id="_ramp_generators"><a class="anchor" href="#_ramp_generators"></a>Ramp Generators</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Two subclasses of <code>blackman_gen</code> are specialized for ramp generation:</p>
+<p>Two subclasses of <code>basic_blackman_gen</code> are specialized for ramp generation:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -1038,30 +1064,56 @@ shape of the second half of a Blackman window taper.</p>
 <h3 id="_declaration_2"><a class="anchor" href="#_declaration_2"></a>Declaration</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct blackman_upward_ramp_gen : blackman_gen
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
+struct basic_blackman_upward_ramp_gen : basic_blackman_gen&lt;T&gt;
 {
-            blackman_upward_ramp_gen(duration width, float sps);
+            basic_blackman_upward_ramp_gen(duration width, float sps);
 
    void     config(duration width, float sps, bool reset_ = false);
 };
 
-struct blackman_downward_ramp_gen : blackman_gen
+template &lt;typename T&gt;
+struct basic_blackman_downward_ramp_gen : basic_blackman_gen&lt;T&gt;
 {
-            blackman_downward_ramp_gen(duration width, float sps);
+            basic_blackman_downward_ramp_gen(duration width, float sps);
 
    void     reset();
    void     config(duration width, float sps, bool reset_ = false);
-};</code></pre>
+};
+
+using blackman_upward_ramp_gen = basic_blackman_upward_ramp_gen&lt;double&gt;;
+using blackman_downward_ramp_gen = basic_blackman_downward_ramp_gen&lt;double&gt;;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_template_instantiations_2"><a class="anchor" href="#_template_instantiations_2"></a>Template Instantiations</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>blackman_upward_ramp_gen</code></dt>
+<dd>
+<p>A Blackman upward ramp generator in <code>double</code>.</p>
+</dd>
+<dt class="hdlist1"><code>blackman_downward_ramp_gen</code></dt>
+<dd>
+<p>A Blackman downward ramp generator in <code>double</code>.</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using blackman_upward_ramp_gen = basic_blackman_upward_ramp_gen&lt;double&gt;;
+using blackman_downward_ramp_gen = basic_blackman_downward_ramp_gen&lt;double&gt;;</code></pre>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_expressions_2"><a class="anchor" href="#_expressions_2"></a>Expressions</h3>
 <div class="paragraph">
-<p><code>blackman_upward_ramp_gen</code> and <code>blackman_downward_ramp_gen</code> are models of
-<code><a href="../../synth.html#_ramp" class="xref page">Ramp</a></code> and implement all valid expressions of <code><a href="../../synth.html#_ramp" class="xref page">Ramp</a></code>. In addition to
-valid expressions for <code><a href="../../synth.html#_ramp" class="xref page">Ramp</a></code>, <code>blackman_upward_ramp_gen</code> and
-<code>blackman_downward_ramp_gen</code> allow these expressions.</p>
+<p><code>basic_blackman_upward_ramp_gen&lt;T&gt;</code> and <code>basic_blackman_downward_ramp_gen&lt;T&gt;</code> are
+models of <code><a href="../../synth.html#_ramp" class="xref page">Ramp</a></code> and implement all valid expressions of <code><a href="../../synth.html#_ramp" class="xref page">Ramp</a></code>. In
+addition to valid expressions for <code><a href="../../synth.html#_ramp" class="xref page">Ramp</a></code>, <code>basic_blackman_upward_ramp_gen&lt;T&gt;</code>
+and <code>basic_blackman_downward_ramp_gen&lt;T&gt;</code> allow these expressions.</p>
 </div>
 <div class="sect3">
 <h4 id="_notation_2"><a class="anchor" href="#_notation_2"></a>Notation</h4>
@@ -1069,7 +1121,7 @@ valid expressions for <code><a href="../../synth.html#_ramp" class="xref page">R
 <dl>
 <dt class="hdlist1"><code>g</code>               </dt>
 <dd>
-<p>Object of type <code>blackman_upward_ramp_gen</code> or <code>blackman_downward_ramp_gen</code>.</p>
+<p>Object of type <code>basic_blackman_upward_ramp_gen&lt;T&gt;</code> or <code>basic_blackman_downward_ramp_gen&lt;T&gt;</code>.</p>
 </dd>
 <dt class="hdlist1"><code>w</code>               </dt>
 <dd>
@@ -1118,7 +1170,7 @@ valid expressions for <code><a href="../../synth.html#_ramp" class="xref page">R
 <i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
-<code>blackman_downward_ramp_gen</code> starts at the middle of the window: its
+<code>basic_blackman_downward_ramp_gen</code> starts at the middle of the window: its
 <code>reset()</code> sets the current phase to the midpoint.
 </td>
 </tr>

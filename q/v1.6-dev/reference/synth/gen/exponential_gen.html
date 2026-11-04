@@ -808,6 +808,9 @@ to a capacitor discharged through a resistor.</p>
 <div class="paragraph">
 <p>The Q DSP library utilizes the exponential ramp generators for generating complex envelopes.</p>
 </div>
+<div class="paragraph">
+<p>Both are class templates on <code>T</code>, the type of the rate and the running value; the names without the <code>basic_</code> prefix are their <code>double</code> instantiations. <code>float</code> suits a single-precision FPU.</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -825,9 +828,10 @@ to a capacitor discharged through a resistor.</p>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct exp_upward_ramp_gen
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
+struct basic_exp_upward_ramp_gen
 {
-            exp_upward_ramp_gen(duration width, float sps, float cv = 0.95);
+            basic_exp_upward_ramp_gen(duration width, float sps, float cv = 0.95);
 
    float    operator()();
    void     config(duration width, float sps);
@@ -835,12 +839,40 @@ to a capacitor discharged through a resistor.</p>
    void     reset();
 };
 
-struct exp_downward_ramp_gen : exp_upward_ramp_gen
+template &lt;typename T&gt;
+struct basic_exp_downward_ramp_gen : basic_exp_upward_ramp_gen&lt;T&gt;
 {
-   using exp_upward_ramp_gen::exp_upward_ramp_gen;
+   using base_type = basic_exp_upward_ramp_gen&lt;T&gt;;
+   using base_type::base_type;
 
    float    operator()();
-};</code></pre>
+};
+
+using exp_upward_ramp_gen = basic_exp_upward_ramp_gen&lt;double&gt;;
+using exp_downward_ramp_gen = basic_exp_downward_ramp_gen&lt;double&gt;;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_template_instantiations"><a class="anchor" href="#_template_instantiations"></a>Template Instantiations</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>exp_upward_ramp_gen</code></dt>
+<dd>
+<p>An exponential upward ramp generator in <code>double</code>.</p>
+</dd>
+<dt class="hdlist1"><code>exp_downward_ramp_gen</code></dt>
+<dd>
+<p>An exponential downward ramp generator in <code>double</code>.</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using exp_upward_ramp_gen = basic_exp_upward_ramp_gen&lt;double&gt;;
+using exp_downward_ramp_gen = basic_exp_downward_ramp_gen&lt;double&gt;;</code></pre>
 </div>
 </div>
 </div>
@@ -849,15 +881,23 @@ struct exp_downward_ramp_gen : exp_upward_ramp_gen
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>exp_upward_ramp_gen</code> and <code>exp_downward_ramp_gen</code> are models of <code><a href="../../synth.html#_ramp" class="xref page">Ramp</a></code>. In addition to valid expressions for <code><a href="../../synth.html#_ramp" class="xref page">Ramp</a></code>, <code>exp_upward_ramp_gen</code> and <code>exp_downward_ramp_gen</code> allow these expressions.</p>
+<p><code>basic_exp_upward_ramp_gen&lt;T&gt;</code> and <code>basic_exp_downward_ramp_gen&lt;T&gt;</code> are models of <code><a href="../../synth.html#_ramp" class="xref page">Ramp</a></code>. In addition to valid expressions for <code><a href="../../synth.html#_ramp" class="xref page">Ramp</a></code>, <code>basic_exp_upward_ramp_gen&lt;T&gt;</code> and <code>basic_exp_downward_ramp_gen&lt;T&gt;</code> allow these expressions.</p>
 </div>
 <div class="sect2">
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
+<dt class="hdlist1"><code>U</code>               </dt>
+<dd>
+<p>A <code>basic_exp_upward_ramp_gen&lt;T&gt;</code> type.</p>
+</dd>
+<dt class="hdlist1"><code>D</code>               </dt>
+<dd>
+<p>A <code>basic_exp_downward_ramp_gen&lt;T&gt;</code> type.</p>
+</dd>
 <dt class="hdlist1"><code>g</code>               </dt>
 <dd>
-<p>Object of type <code>exp_upward_ramp_gen</code> or <code>exp_downward_ramp_gen</code>.</p>
+<p>Object of type <code>U</code> or <code>D</code>.</p>
 </dd>
 <dt class="hdlist1"><code>w</code>               </dt>
 <dd>
@@ -889,13 +929,13 @@ struct exp_downward_ramp_gen : exp_upward_ramp_gen
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>exp_upward_ramp_gen(w, sps [, cv])</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct an <code>exp_upward_ramp_gen</code> given width, <code>w</code>,
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>U(w, sps [, cv])</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>U</code> given width, <code>w</code>,
                                               samples per second, <code>sps</code>, and exponential curvature, <code>cv</code>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>exp_downward_ramp_gen(w, sps [, cv])</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct an <code>exp_downward_ramp_gen</code> given width, <code>w</code>,
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>D(w, sps [, cv])</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>D</code> given width, <code>w</code>,
                                               samples per second, <code>sps</code>, and exponential curvature, <code>cv</code>.</p></td>
 </tr>
 </tbody>

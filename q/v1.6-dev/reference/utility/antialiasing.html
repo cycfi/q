@@ -876,7 +876,7 @@ These corrections assume <code>dt</code> is small relative to a cycle (the usual
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">constexpr float     poly_blep(phase p, phase dt);
-constexpr double    poly_blamp(phase p, phase dt, float scale);</code></pre>
+constexpr float     poly_blamp(phase p, phase dt, float scale);</code></pre>
 </div>
 </div>
 </div>
@@ -932,7 +932,7 @@ constexpr double    poly_blamp(phase p, phase dt, float scale);</code></pre>
                                  change of <code>2 * scale</code>: nonzero only when
                                  <code>p</code> is within <code>dt</code> of the start or end of
                                  the cycle.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 </tbody>
 </table>

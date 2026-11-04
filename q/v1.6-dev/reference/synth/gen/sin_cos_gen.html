@@ -805,7 +805,21 @@
 <p>Although <code>sin_cos_gen</code> is technically an oscillator that produces periodic waveforms, it is represented as a model of a <code><a href="../../synth.html#_generator" class="xref page">Generator</a></code> because it does not adhere to the <code><a href="../../synth.html#_oscillator" class="xref page">Oscillator</a></code> concept, which requires complete control over the <code><a href="../../units/phase.html" class="xref page">phase</a></code> for synchronicity. As a free-running oscillator, <code>sin_cos_gen</code> can exhibit phase drift over time due to accumulating floating-point errors.</p>
 </div>
 <div class="paragraph">
+<p>The generator is a class template, <code>basic_sin_cos_gen&lt;T&gt;</code>, where <code>T</code> is the type of its coefficient and state. <code>sin_cos_gen</code> is its <code>double</code> instantiation.</p>
+</div>
+<div class="paragraph">
 <p>Source: <a href="https://www.earlevel.com/main/2003/03/02/the-digital-state-variable-filter/">The digital state variable filter</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_precision"><a class="anchor" href="#_precision"></a>Precision</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The recurrence holds its amplitude in either precision: run free, the peak stays within about 1e-8 of its start in <code>double</code>, and within about 1e-6 in <code>float</code>, however long it runs. Rounding moves the frequency slightly in <code>float</code> at very low rates: at 0.1 Hz and 48 kHz it is off by about 7e-7 of itself, and exact in <code>double</code>.</p>
+</div>
+<div class="paragraph">
+<p><code>sin_cos_gen</code> is <code>double</code>, the choice for a free-running oscillator such as an LFO. <code>basic_sin_cos_gen&lt;float&gt;</code> suits a single-precision FPU, such as a Cortex-M4F, where <code>double</code> is computed in software, and a short run from a reset, such as a crossfade ramp, where its rounding is far below hearing.</p>
 </div>
 </div>
 </div>
@@ -824,15 +838,42 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct sin_cos_gen
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
+struct basic_sin_cos_gen
 {
-                              sin_cos_gen(frequency f, float sps);
+                              basic_sin_cos_gen(frequency f, float sps);
 
-   std::pair&lt;float, float&gt;    operator()();
+   std::pair&lt;T, T&gt;            operator()();
    void                       config(frequency f, float sps);
-   void                       reset(float sin = 0.0f, float cos = 1.0f);
+   void                       reset(T sin = 0, T cos = 1);
    void                       midpoint();
-};</code></pre>
+};
+
+using sin_cos_gen = basic_sin_cos_gen&lt;double&gt;;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>T</code> models <code>std::floating_point</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_template_instantiations"><a class="anchor" href="#_template_instantiations"></a>Template Instantiations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>sin_cos_gen</code> is the template instantiation of <code>basic_sin_cos_gen</code> that most code uses:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>sin_cos_gen</code></dt>
+<dd>
+<p>A sine and cosine generator in <code>double</code>.</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using sin_cos_gen = basic_sin_cos_gen&lt;double&gt;;</code></pre>
 </div>
 </div>
 </div>
@@ -841,15 +882,19 @@
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>sin_cos_gen</code> is a model of <code><a href="../../synth.html#_generator" class="xref page">Generator</a></code>. In addition to valid expressions for <code><a href="../../synth.html#_generator" class="xref page">Generator</a></code>, <code>sin_cos_gen</code> allows these expressions.</p>
+<p><code>basic_sin_cos_gen&lt;T&gt;</code> is a model of <code><a href="../../synth.html#_generator" class="xref page">Generator</a></code>. In addition to valid expressions for <code><a href="../../synth.html#_generator" class="xref page">Generator</a></code>, <code>basic_sin_cos_gen&lt;T&gt;</code> allows these expressions.</p>
 </div>
 <div class="sect2">
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
+<dt class="hdlist1"><code>G</code>               </dt>
+<dd>
+<p>A <code>basic_sin_cos_gen&lt;T&gt;</code> type.</p>
+</dd>
 <dt class="hdlist1"><code>g</code>               </dt>
 <dd>
-<p>Object of type <code>sin_cos_gen</code>.</p>
+<p>Object of type <code>G</code>.</p>
 </dd>
 <dt class="hdlist1"><code>f</code>               </dt>
 <dd>
@@ -861,7 +906,7 @@
 </dd>
 <dt class="hdlist1"><code>sval</code>, <code>cval</code>    </dt>
 <dd>
-<p>Floating point values.</p>
+<p>Values of type <code>T</code>.</p>
 </dd>
 </dl>
 </div>
@@ -881,8 +926,8 @@
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sin_cos_gen(f, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct <code>sin_cos_gen</code> given frequency, <code>f</code>,
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>G(f, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>G</code> given frequency, <code>f</code>,
                              and samples per second, <code>sps</code>.</p></td>
 </tr>
 </tbody>
@@ -920,21 +965,21 @@ C++ brace initialization may also be used.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>g()</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Generate a sin/cos signal and get
                     both <code>sin</code> and <code>cos</code> result. The return type
-                    is a <code>std::pair&lt;float, float&gt;</code> which stores
+                    is a <code>std::pair&lt;T, T&gt;</code> which stores
                     the <code>sin</code> and <code>cos</code> results.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::pair&lt;float, float&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::pair&lt;T, T&gt;</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>g().first</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Generate a sin/cos signal and get
                     only the <code>sin</code> result.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>T</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>g().second</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Generate a sin/cos signal and get only the <code>cos</code>
                     result.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>T</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -957,8 +1002,8 @@ C++ brace initialization may also be used.
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.reset()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Reset the current <code>sin</code> and <code>cos</code> to 0.0f and
-                          1.0f, respectively.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Reset the current <code>sin</code> and <code>cos</code> to 0 and
+                          1, respectively.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
 </tr>
 <tr>
@@ -969,7 +1014,7 @@ C++ brace initialization may also be used.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.midpoint()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Equivalent to <code>g.reset(0.0f, -1.0f)</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Equivalent to <code>g.reset(0, -1)</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
 </tr>
 </tbody>

@@ -902,6 +902,7 @@ velocity or key is one addition in decibels.</p>
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;
    concepts::Oscillator Osc = sin_osc
  , concepts::EnvelopeGenerator Env = dx_envelope_gen
+ , typename T = double
 &gt;
 struct basic_fm_operator
 {
@@ -909,7 +910,7 @@ struct basic_fm_operator
 
                   basic_fm_operator();
 
-   void           ratio(double r);
+   void           ratio(T r);
    void           fixed(phase step);
    void           envelope(typename Env::config const&amp; cfg, float sps);
 
@@ -948,9 +949,13 @@ using fm_operator = basic_fm_operator&lt;sin_osc, dx_envelope_gen&gt;;</code></p
 <dd>
 <p>A type that conforms to <code><a href="../../synth.html#_envelopegenerator" class="xref page">EnvelopeGenerator</a></code>.</p>
 </dd>
+<dt class="hdlist1"><code>T</code>            </dt>
+<dd>
+<p>The ratio&#8217;s floating point type, <code>double</code> by default.</p>
+</dd>
 <dt class="hdlist1"><code>op_type</code>      </dt>
 <dd>
-<p>A <code>basic_fm_operator&lt;Osc, Env&gt;</code> type.</p>
+<p>A <code>basic_fm_operator&lt;Osc, Env, T&gt;</code> type.</p>
 </dd>
 <dt class="hdlist1"><code>op</code>, <code>a</code>, <code>b</code> </dt>
 <dd>
@@ -962,7 +967,7 @@ using fm_operator = basic_fm_operator&lt;sin_osc, dx_envelope_gen&gt;;</code></p
 </dd>
 <dt class="hdlist1"><code>r</code>            </dt>
 <dd>
-<p><code>double</code> value for the frequency ratio to the master.</p>
+<p><code>T</code> value for the frequency ratio to the master.</p>
 </dd>
 <dt class="hdlist1"><code>step</code>         </dt>
 <dd>
@@ -1002,10 +1007,17 @@ using fm_operator = basic_fm_operator&lt;sin_osc, dx_envelope_gen&gt;;</code></p
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_fm_operator&lt;Osc, Env, T&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instantiate a <code>basic_fm_operator</code> type
+                                     given the oscillator type <code>Osc</code>, the
+                                     envelope generator type <code>Env</code> and the
+                                     ratio type <code>T</code>.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_fm_operator&lt;Osc, Env&gt;</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Instantiate a <code>basic_fm_operator</code> type
-                                     given the oscillator type <code>Osc</code> and the
-                                     envelope generator type <code>Env</code>.</p></td>
+                                     given <code>Osc</code> and <code>Env</code>, with a <code>double</code>
+                                     ratio.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_fm_operator&lt;Osc&gt;</code></p></td>

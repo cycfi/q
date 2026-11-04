@@ -1205,6 +1205,9 @@ for (auto&amp; s : in)
 <div class="paragraph">
 <p>The cost is twice the memory and a second store on every push. The capacity is exactly the size given to the constructor, with no rounding to a power of two, and the storage must be resizable. Elements are read only: writing one through a reference would put its two copies out of step.</p>
 </div>
+<div class="paragraph">
+<p>A shorter mirror trades the reach of a window for memory. Given a mirror length, <code>m</code>, only the first <code>m</code> elements are repeated after the end, so a window of up to <code>m + 1</code> elements is contiguous, at the cost of <code>m</code> extra elements instead of <code>size()</code>. A reader that takes a few elements at a time needs only a few: a 4-point interpolated read wants a mirror of 3. The default mirror is <code>size()</code>, every window contiguous.</p>
+</div>
 <div class="sect2">
 <h3 id="_include_2"><a class="anchor" href="#_include_2"></a>Include</h3>
 <div class="listingblock">
@@ -1228,8 +1231,10 @@ public:
    using interpolation_type = sample_interpolation::none;
 
    explicit          mirrored_ring_buffer(std::size_t size);
+                     mirrored_ring_buffer(std::size_t size, std::size_t mirror);
 
    std::size_t       size() const;
+   std::size_t       mirror() const;
    void              push(T val);
    T const&amp;          front() const;
    T const&amp;          back() const;
@@ -1264,7 +1269,7 @@ public:
 <dd>
 <p>Objects of type <code>mrb_type</code>.</p>
 </dd>
-<dt class="hdlist1"><code>s</code>, <code>i</code>, <code>age</code>   </dt>
+<dt class="hdlist1"><code>s</code>, <code>m</code>, <code>i</code>, <code>age</code> </dt>
 <dd>
 <p>Objects of type <code>std::size_t</code>.</p>
 </dd>
@@ -1365,7 +1370,13 @@ public:
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>mrb_type(s)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>mirrored_ring_buffer</code> with a capacity of
-                       exactly <code>s</code> elements, all zero.</p></td>
+                       exactly <code>s</code> elements, all zero, every one mirrored.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mrb_type(s, m)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>mirrored_ring_buffer</code> with a capacity of
+                       exactly <code>s</code> elements, all zero, the first <code>m</code> of
+                       them mirrored (at most <code>s</code>).</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>mrb_type(mrb)</code></p></td>
@@ -1454,6 +1465,11 @@ C++ brace initialization may also be used.
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the capacity.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mrb.mirror()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the mirror length.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
+</tr>
 </tbody>
 </table>
 <div class="admonitionblock warning">
@@ -1463,7 +1479,7 @@ C++ brace initialization may also be used.
 <i class="fa icon-warning" title="⚠️ &#160;WARNING"></i>
 </td>
 <td class="content">
-<code>mrb[i]</code> requires <code>i &lt; mrb.size()</code>, and <code>mrb.span(age)[k]</code> requires <code>age + k &lt; mrb.size()</code>. Anything past that is undefined behavior.
+<code>mrb[i]</code> requires <code>i &lt; mrb.size()</code>, and <code>mrb.span(age)[k]</code> requires <code>age + k &lt; mrb.size()</code> and <code>k &lt;= mrb.mirror()</code>. Anything past that is undefined behavior.
 </td>
 </tr>
 </table>
@@ -1497,7 +1513,7 @@ C++ brace initialization may also be used.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>mrb.store()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the storage, <code>2 * size()</code>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the storage, <code>size() + mirror()</code>
                        elements.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>S const&amp;</code></p></td>
 </tr>
