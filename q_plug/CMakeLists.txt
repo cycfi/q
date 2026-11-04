@@ -52,7 +52,7 @@ FetchContent_Declare(
 FetchContent_Declare(
    clap_wrapper
    GIT_REPOSITORY https://github.com/cycfi/clap-wrapper.git
-   GIT_TAG 248199dc8d9dfb269dd9ec656a47ce8418f914e3
+   GIT_TAG ac5f2db7e6edbe10aa24818e8a8f8e76aa0ed0ad
    SOURCE_SUBDIR do-not-add          # added below, EXCLUDE_FROM_ALL
 )
 FetchContent_Declare(
