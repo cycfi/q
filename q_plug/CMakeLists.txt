@@ -45,12 +45,14 @@ FetchContent_Declare(
    SOURCE_SUBDIR do-not-add          # clap-wrapper adds it
 )
 # Cycfi's fork, branch q-pin-0.17: upstream 0.17.0 (free-audio main
-# 806bba0) and a standalone that reports a plugin it cannot create instead
-# of crashing. Back to free-audio once that lands.
+# 806bba0), a standalone that reports a plugin it cannot create instead
+# of crashing, and a CLAP that stays out of a per-config folder under
+# multi-config generators (Visual Studio, Xcode). Back to free-audio once
+# those land.
 FetchContent_Declare(
    clap_wrapper
    GIT_REPOSITORY https://github.com/cycfi/clap-wrapper.git
-   GIT_TAG 5c0025948d84e6a55d58e0a3ca2627ba47bb57dd
+   GIT_TAG 248199dc8d9dfb269dd9ec656a47ce8418f914e3
    SOURCE_SUBDIR do-not-add          # added below, EXCLUDE_FROM_ALL
 )
 FetchContent_Declare(
