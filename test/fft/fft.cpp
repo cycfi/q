@@ -233,8 +233,8 @@ TEST_CASE("rfft: inverse ignores the imaginary parts of DC and Nyquist",
 
 TEST_CASE("float transforms work on a misaligned buffer", "[fft][rfft]")
 {
-   // One float past a 16-byte boundary: PFFFT on x86 needs its SIMD
-   // alignment, so this case goes through the object's aligned copy.
+   // One float past a 16-byte boundary: PFFFT needs its SIMD alignment,
+   // so this case goes through the object's aligned copy.
    constexpr std::size_t n = 256;
    alignas(16) float base[2*n + 4] = {};
    float* p = base + 1;

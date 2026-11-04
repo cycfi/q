@@ -52,10 +52,12 @@ namespace cycfi::q::detail::pffft
 #include <pffft.c>
 #include <pffft_common.c>
 
-   // PFFFT's own alignment test for its transform buffers.
+   // PFFFT reads its buffers as v4sf, so a buffer needs v4sf's alignment.
+   // PFFFT's own VALIGNED passes any float on NEON, where the hardware
+   // allows the unaligned load but C++ does not.
    inline bool is_aligned(void const* p)
    {
-      return VALIGNED(p);
+      return reinterpret_cast<uintptr_t>(p) % alignof(v4sf) == 0;
    }
 }
 
