@@ -28,7 +28,8 @@ public:
    enum
    {
       dive_id, pull_up_id, middle_id,
-      formants_id, amount_id, freeze_id
+      formants_id, amount_id, freeze_id,
+      bend_id
    };
 
    parameter_list       parameters() const override;
@@ -37,6 +38,7 @@ public:
    bool                 formants() const;
    float                amount() const;      // 0 to 1
    bool                 frozen() const;
+   float                wheel() const;       // -1 to 1, 0 at rest
 
    formant_worker       worker;
 
@@ -76,6 +78,11 @@ inline float bender_controller::amount() const
 inline bool bender_controller::frozen() const
 {
    return get_parameter<bool>(freeze_id);
+}
+
+inline float bender_controller::wheel() const
+{
+   return float(get_parameter<double>(bend_id));
 }
 
 #endif

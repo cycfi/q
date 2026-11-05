@@ -156,3 +156,27 @@ TEST_CASE("Back at the center, the pitch returns")
       fx.run(220.0f, nullptr, x, y);
    CHECK(frequency(y, sps / 2) == Approx(220.0f).epsilon(0.01));
 }
+
+TEST_CASE("The wheel at the top plays an octave up")
+{
+   effect fx;
+   std::vector<float> x, y;
+   param_events wheel{7, 1.0};               // Bend, its top
+   fx.run(220.0f, &wheel._in, x, y);
+   for (int i = 0; i != 80; ++i)
+      fx.run(220.0f, nullptr, x, y);
+   CHECK(frequency(y, sps / 2) == Approx(440.0f).epsilon(0.01));
+}
+
+TEST_CASE("With the wheel at rest, the host's bend plays")
+{
+   effect fx;
+   std::vector<float> x, y;
+   param_events wheel{7, 0.0};
+   fx.run(220.0f, &wheel._in, x, y);
+   auto bottom = bend(0);
+   fx.run(220.0f, &bottom._in, x, y);
+   for (int i = 0; i != 80; ++i)
+      fx.run(220.0f, nullptr, x, y);
+   CHECK(frequency(y, sps / 2) == Approx(110.0f).epsilon(0.01));
+}

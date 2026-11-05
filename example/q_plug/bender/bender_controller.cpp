@@ -16,7 +16,8 @@ parameter_list bender_controller::parameters() const
       parameter{ 3, "Middle", 1.0 }.range(0.0, 12.0).unit("st"),
       parameter{ 4, "Formants", true },
       parameter{ 5, "Formant Amount", 100.0 }.range(0.0, 100.0).unit("%"),
-      parameter{ 6, "Freeze", false }
+      parameter{ 6, "Freeze", false },
+      parameter{ 7, "Bend", 0.0 }.range(-1.0, 1.0).live().dont_save()
    };
 
    return { params };

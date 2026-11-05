@@ -110,6 +110,10 @@ void bender_presenter::on_attach(elements::view& view_)
    }
    auto scope = share(bend::scope{_ctl});
 
+   // The wheel moves the Bend parameter, -1 to 1, and springs back.
+   auto wheel = share(bend::wheel{});
+   bind(ctl::bend_id, wheel, params[ctl::bend_id]);
+
    // The formants.
    auto on = switch_button("On");
    bind(ctl::formants_id, on, params[ctl::formants_id]);
@@ -131,6 +135,8 @@ void bender_presenter::on_attach(elements::view& view_)
             vtile(
                hmargin({6, 6}, hold(make_header())),
                htile(
+                  margin({6, 6, 6, 6},
+                     layer(margin({8, 10, 8, 10}, hold(wheel)), frame{})),
                   framed("Bend",
                      layer(hold(editor), hold(scope))
                   ),

@@ -78,6 +78,49 @@ namespace bend
    };
 
    ////////////////////////////////////////////////////////////////////////////
+   // A bend wheel, sprung to center as on a keyboard's. Dragged up or down
+   // from wherever it is grabbed, it rolls by the drag; let go, it snaps
+   // back to center, within the same gesture, so the host records the
+   // return. The scroll wheel does not move it. Its value is 0 to 1, the
+   // center at 0.5, as a slider's is.
+   ////////////////////////////////////////////////////////////////////////////
+   class wheel : public elements::basic_slider_base
+   {
+   public:
+                              wheel();
+
+      elements::view_limits   limits(elements::basic_context const& ctx)
+                                 const override;
+      void                    draw(elements::context const& ctx) override;
+      void                    begin_tracking(
+                                 elements::context const& ctx
+                               , elements::tracker_info& track) override;
+      void                    keep_tracking(
+                                 elements::context const& ctx
+                               , elements::tracker_info& track) override;
+      void                    end_tracking(
+                                 elements::context const& ctx
+                               , elements::tracker_info& track) override;
+      bool                    scroll(
+                                 elements::context const& ctx
+                               , elements::point dir
+                               , elements::point p) override;
+
+      element const&          thumb() const override { return _none; }
+      element&                thumb() override { return _none; }
+      element const&          track() const override { return _none; }
+      element&                track() override { return _none; }
+
+      static constexpr float  width = 56.0f;
+
+   private:
+
+      elements::element       _none;
+      double                  _grab_value = 0.5;
+      float                   _grab_y = 0.0f;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
    // How much of the band the formant learner has seen, as a bar.
    ////////////////////////////////////////////////////////////////////////////
    class coverage : public elements::element

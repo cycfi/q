@@ -8,6 +8,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstring>
+#include <numbers>
 
 using namespace cycfi::elements;
 
@@ -213,6 +214,144 @@ namespace bend
       cnv.text_align(canvas::right | canvas::top);
       cnv.fill_style(line_color);
       cnv.fill_text(text, plot.right - 4, plot.top + 4);
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   wheel::wheel()
+    : basic_slider_base{0.5}
+   {}
+
+   view_limits wheel::limits(basic_context const&) const
+   {
+      return {{width + 14, 160}, {width + 14, full_extent}};
+   }
+
+   void wheel::begin_tracking(context const&, tracker_info& track)
+   {
+      _grab_value = value();
+      _grab_y = track.current.y;
+   }
+
+   // The whole travel, bottom to top, is the wheel's height.
+   void wheel::keep_tracking(context const& ctx, tracker_info& track)
+   {
+      auto const h = ctx.bounds.height();
+      auto const v = std::clamp(
+         _grab_value - (track.current.y - _grab_y) / h, 0.0, 1.0);
+      if (v != value())
+      {
+         edit_value(v);
+         ctx.view.refresh(ctx);
+      }
+   }
+
+   void wheel::end_tracking(context const& ctx, tracker_info&)
+   {
+      if (value() != 0.5)
+      {
+         edit_value(0.5);
+         ctx.view.refresh(ctx);
+      }
+   }
+
+   // The scroll wheel does not move it: a trackpad's momentum would keep
+   // it rolling after the fingers lift, and no host says when they do.
+   bool wheel::scroll(context const&, point, point)
+   {
+      return false;
+   }
+
+   // A broad, matte black wheel in a recessed slot, after the MONTAGE M's.
+   // The face darkens toward the ends, where it turns away; a concave
+   // detent across its middle marks the center and rolls with the wheel.
+   // The sides roll off into the dark, so the edges read round.
+   void wheel::draw(context const& ctx)
+   {
+      constexpr auto pi = std::numbers::pi_v<float>;
+      auto& cnv = ctx.canvas;
+      auto state = cnv.new_state();
+      auto const b = ctx.bounds;
+      auto const x = b.left + (b.width() - width) / 2;
+      auto const top = b.top + 6;
+      auto const h = b.height() - 12;
+      auto const cy = top + h / 2;
+      auto const roll = float(0.5 - value()) * 0.8f * pi;
+      constexpr float fillet = 9.0f;
+
+      // The slot, a shade darker than the panel, its lower lip lit.
+      cnv.begin_path();
+      cnv.add_round_rect(x - 6, top - 6, width + 12, h + 12, 11);
+      cnv.fill_style(rgba(14, 14, 15, 255));
+      cnv.fill();
+      cnv.begin_path();
+      cnv.move_to(x - 2, top + h + 5.5f);
+      cnv.line_to(x + width + 2, top + h + 5.5f);
+      cnv.stroke_style(rgba(70, 70, 75, 255));
+      cnv.line_width(1);
+      cnv.stroke();
+
+      // The face.
+      auto face = canvas::linear_gradient{{0, top}, {0, top + h}};
+      face.add_color_stop(0.0f, rgba(6, 6, 7, 255));
+      face.add_color_stop(0.25f, rgba(24, 24, 26, 255));
+      face.add_color_stop(0.5f, rgba(32, 32, 35, 255));
+      face.add_color_stop(0.75f, rgba(24, 24, 26, 255));
+      face.add_color_stop(1.0f, rgba(6, 6, 7, 255));
+      cnv.begin_path();
+      cnv.add_round_rect(x, top, width, h, fillet);
+      cnv.fill_style(face);
+      cnv.fill();
+
+      // The fillet along the sides: the face rolls off into the dark over
+      // its last few pixels, so its edges read round, not cut.
+      auto sides = canvas::linear_gradient{{x, 0}, {x + width, 0}};
+      auto const f = fillet / width;
+      sides.add_color_stop(0.0f, color{0, 0, 0, 0.75f});
+      sides.add_color_stop(f * 0.5f, color{0, 0, 0, 0.3f});
+      sides.add_color_stop(f, color{0, 0, 0, 0.0f});
+      sides.add_color_stop(1 - f, color{0, 0, 0, 0.0f});
+      sides.add_color_stop(1 - f * 0.5f, color{0, 0, 0, 0.3f});
+      sides.add_color_stop(1.0f, color{0, 0, 0, 0.75f});
+      cnv.begin_path();
+      cnv.add_round_rect(x, top, width, h, fillet);
+      cnv.fill_style(sides);
+      cnv.fill();
+
+      // The concave detent at the center, where the wheel has rolled it: a
+      // rounded scoop cut into the face, sharp where it meets it. Lit from
+      // above, its upper wall faces down and starts dark at a crisp edge;
+      // its lower wall faces up and brightens to a crisp edge.
+      auto const half = 0.065f * pi;
+      auto const a0 = roll - half, a1 = roll + half;
+      if (a1 > -pi / 2 && a0 < pi / 2)
+      {
+         auto const y0 = cy + std::sin(std::max(a0, -pi / 2)) * h / 2;
+         auto const y1 = cy + std::sin(std::min(a1, pi / 2)) * h / 2;
+         auto const lit = 0.4f + 0.6f * std::cos(roll);
+         auto dip = canvas::linear_gradient{{0, y0}, {0, y1}};
+         dip.add_color_stop(0.0f, color{0, 0, 0, 0.5f});
+         dip.add_color_stop(0.12f, color{0, 0, 0, 0.32f});
+         dip.add_color_stop(0.5f, color{0, 0, 0, 0.1f});
+         dip.add_color_stop(0.85f, color{1, 1, 1, 0.04f * lit});
+         dip.add_color_stop(1.0f, color{1, 1, 1, 0.07f * lit});
+         cnv.begin_path();
+         cnv.add_rect(x, y0, width, y1 - y0);
+         cnv.fill_style(dip);
+         cnv.fill();
+      }
+
+      // The slot's notches at the center.
+      cnv.fill_style(rgba(200, 200, 204, 255));
+      cnv.begin_path();
+      cnv.move_to(x - 6, cy - 5);
+      cnv.line_to(x - 1, cy);
+      cnv.line_to(x - 6, cy + 5);
+      cnv.fill();
+      cnv.begin_path();
+      cnv.move_to(x + width + 6, cy - 5);
+      cnv.line_to(x + width + 1, cy);
+      cnv.line_to(x + width + 6, cy + 5);
+      cnv.fill();
    }
 
    ////////////////////////////////////////////////////////////////////////////

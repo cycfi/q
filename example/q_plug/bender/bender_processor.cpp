@@ -48,6 +48,17 @@ void bender_processor::operator()(midi::pitch_bend msg, std::size_t)
    _bend = msg.value();
 }
 
+// The wheel, while it is off center; at rest, the host's pitch bend.
+std::uint32_t bender_processor::bend() const
+{
+   auto const travel = double(_ctl.wheel());
+   if (travel == 0)
+      return _bend;
+   constexpr double center = midi::pitch_bend::center;
+   auto const span = travel < 0 ? center : center - 1;
+   return std::uint32_t(center + travel * span);
+}
+
 // The latest table, once a block, and the amount, given to the corrector
 // only when they change: each sets it up afresh.
 void bender_processor::formants()
@@ -90,7 +101,7 @@ void bender_processor::process(
    formants();
 
    auto const range = _ctl.range();
-   auto const target = range.semitones(midi::pitch_bend{0, 0, _bend});
+   auto const target = range.semitones(midi::pitch_bend{0, 0, bend()});
    auto const frames = in.frames.size();
    auto i = in[0].begin();
    auto o = out[0].begin();

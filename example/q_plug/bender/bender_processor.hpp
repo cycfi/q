@@ -18,9 +18,10 @@ namespace q = cycfi::q;
 namespace midi = q::midi_2_0;
 
 ///////////////////////////////////////////////////////////////////////////////
-// The bar is the host's MIDI pitch bend. Each sample: the bend in
-// semitones, through the bend range and smoothed, as a ratio, drives the
-// shifter, then the formant corrector puts the instrument's formants back.
+// The bar is the editor's wheel, or, with the wheel at rest, the host's
+// MIDI pitch bend. Each sample: the bend in semitones, through the bend
+// range and smoothed, as a ratio, drives the shifter, then the formant
+// corrector puts the instrument's formants back.
 // At rest both pass the input through, with no latency.
 ///////////////////////////////////////////////////////////////////////////////
 class bender_processor
@@ -48,6 +49,7 @@ private:
 
    using table_type = q::formant_table;
 
+   std::uint32_t        bend() const;
    void                 formants();
    void                 to_scope(float semitones);
 
