@@ -54,7 +54,8 @@ TEST_CASE("transient_detector: one fire, at the release")
    for (auto const& n : notes)
    {
       float sps;
-      auto at = fires(load(n.name, sps), sps);
+      auto const x = load(n.name, sps);
+      auto at = fires(x, sps);
       INFO(n.name);
       REQUIRE(at.size() == 1);
       CHECK(at[0] == Approx(n.release).margin(0.001));
@@ -68,7 +69,8 @@ TEST_CASE("transient_detector: picks in a staccato line")
       0.5344, 0.9625, 1.8621, 2.3127, 2.7689, 2.9765, 3.2105, 3.4317
    };
    float sps;
-   auto at = fires(load("GStaccato", sps), sps);
+   auto const x = load("GStaccato", sps);
+   auto at = fires(x, sps);
    REQUIRE(at.size() >= 8);
    for (std::size_t i = 0; i != 8; ++i)
       CHECK(at[i] == Approx(releases[i]).margin(0.001));
