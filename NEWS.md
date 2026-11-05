@@ -5,19 +5,154 @@ High-level, user-facing changes only. For the day-to-day detail, see
 
 ## v1.6.0 (in development, on `develop`)
 
-**Breaking: the FFT is an object.** The compile-time functions
-`q::fft<N>`, `ifft<N>`, `rfft<N>`, `irfft<N>` and `magspec<N>` are gone.
-In their place, `q::fft` (complex) and `q::rfft` (real) are built once
-with their size and transform in place: `q::fft f{N};` then
-`f.forward(data)` and `f.inverse(data)`. The data layouts and the scaling
-are unchanged. `basic_fft<double>` and `basic_rfft<double>` cover double.
-Build the object outside the audio callback, since it allocates; a
-transform never does. See the FFT reference page, "Migrating from v1.5".
+APIs marked *(unstable)* are new in this release and may change in any
+release until they mature.
 
-**PFFFT.** Float transforms run on PFFFT, a SIMD FFT, about 4x faster
-than Q's own, which is also new and about 3x faster than v1.5's. It is
-header-only as Q uses it and on by default; `-DQ_USE_PFFFT=OFF` leaves it
-out.
+### Breaking changes
+
+Code written for v1.5 may need these changes.
+
+- **The FFT is an object.** The compile-time functions `q::fft<N>`,
+  `ifft<N>`, `rfft<N>`, `irfft<N>` and `magspec<N>` are gone. In their
+  place, `q::fft` (complex) and `q::rfft` (real) are built once with their
+  size and transform in place: `q::fft f{N};` then `f.forward(data)` and
+  `f.inverse(data)`. The data layouts and the scaling are unchanged.
+  `basic_fft<double>` and `basic_rfft<double>` cover double. Build the
+  object outside the audio callback, since it allocates; a transform never
+  does. See the FFT reference page, "Migrating from v1.5".
+- **`decibel` is a float unit** (it was double), and `dB()`, `_dB` and
+  `lin_to_db` give float.
+- **`lin_to_db` and `lin_float` read new tables**, exact to about 1e-5 dB
+  over the whole float range (the old ones clamped at 120 dB and were
+  coarser), so their results differ slightly.
+- **The RMS envelope followers' floor is -120 dB** (it was -60 dB): levels
+  below -60 dB now read true instead of as silence.
+- **`ar_envelope_follower::attack` and `release` take a `duration`**, such
+  as `10_ms`, instead of float seconds.
+- **`expander`'s ratio follows the 1:n notation**: below the threshold the
+  output falls n dB per dB, so a ratio of 1 does nothing. The same ratio
+  expands less than it did.
+- **`hilbert_quadrature`'s q output changed sign**: q lags i by 90 degrees,
+  so `atan2(q, i)` increases with time.
+- **The ladder cells are public**: `q::detail::moog_cell` and
+  `q::detail::ota_cell` are `q::moog_cell` and `q::ota_cell`.
+- **Dividing a number by a unit no longer compiles.** `1 / frequency`
+  returned a frequency, but the reciprocal of a unit is not that unit.
+- **Templates on the sample type.** `sin_cos_gen`, the Hann, Hamming,
+  Blackman and exponential generators, the RMS envelope followers and
+  `dx_envelope_gen` are now `basic_` templates on T, their old names the
+  double form, so a single-precision FPU can run them in float.
+  `basic_fm_operator` takes a third parameter, the ratio's type. Code that
+  forward-declares one of these classes no longer compiles.
+- **`sin_cos_gen` runs in double**: it returns `std::pair<double, double>`
+  (it was float). `poly_blamp` returns float (it was double).
+- **`pitch_detector` is `bacf_pitch_detector`**, in
+  `<q/pitch/bacf_pitch_detector.hpp>`. The old name stays as a deprecated
+  alias.
+- **A full `zero_crossing_collector` drops its oldest edge** instead of
+  resetting. `zero_crossing_ex::pulse_width_diff` is gone.
+- **q_io's `audio_stream`** returns its `time()` and latencies as
+  `cycfi::duration` whatever the include order.
+- **q_io's MIDI device ids are stable**: a port keeps its id across
+  listings and gets it back when it returns. An unknown audio device id
+  gives the default device, and departed audio devices are not listed.
+- **Subnormals flush to zero** inside q_io's audio callback and QPlug's
+  `process` and parameter flush, with the new `flush_denormals` guard.
+- **QPlug**: a direct subclass of `base_plugin` must implement
+  `view_aspect_ratio()`. The zoom range is 0.75 to 1.5 (it was 0.5 to 2).
+- **CMake 3.22** is the minimum throughout (it was 3.16).
+
+### New
+
+**Pitch shifting** *(unstable)*. `bacf_pitch_shifter` raises or lowers
+the pitch of a sound as it plays, by a ratio that may change every
+sample, on single notes and chords alike. It is a SOLA shifter whose
+splices are placed by bitstream autocorrelation, and at a ratio of 1 it
+passes the input with no latency. `varispeed_tap` is the delay line it
+reads, played at a varying speed. A new `whammy` example drives it from
+MIDI pitch bend. See the Pitch Shifting reference pages.
+
+**Formant preservation** *(unstable)*. `formant_learner` learns an
+instrument's fixed spectral envelope from its playing and fits a
+`formant_table`; `formant_corrector`, after the shifter, restores the
+instrument's own formants at the current ratio, with no latency.
+
+**Spectral tools** *(unstable)*. `spectral_learner` learns a sound's
+long-term spectrum and its spectral envelope. `lpc_fit` models a spectral
+envelope as an all-pole filter. `eq_matcher` gives a sound the spectral
+envelope of another, sample by sample, with no latency. `convolver`
+applies an impulse response, partitioned, with no latency.
+
+**Pitch tracking and attacks** *(unstable)*. `bacf_lag_tracker` follows
+the lag at which a signal repeats, for a time-domain splicer.
+`transient_detector` fires at each attack, within a fraction of a
+millisecond on a plucked string.
+
+**Faster FFTs.** Float transforms run on PFFFT, a SIMD FFT, about 4x
+faster than Q's own. It is header-only as Q uses it and on by default;
+`-DQ_USE_PFFFT=OFF` leaves it out. Q's own FFT, used for double and on
+microcontrollers, is also new: about 3x faster than v1.5's on an M2 and
+twice as fast again on a Cortex-M7. `rfft` and `irfft` transform real
+signals directly.
+
+**Real-time utilities** *(unstable)*. `handoff` sends objects that need
+allocation, such as a sample buffer, from one thread to another without
+a lock. `ring_allocator` hands out blocks of any size from one buffer to
+one thread and takes them back from another. `tasks` runs work posted
+from one thread on another, with no lock, wait or allocation at either
+end. `audio_clock` counts the frames the audio thread has processed. In
+QPlug, `controller::post` runs work on the main thread, now or after a
+delay. Two new QPlug tutorials, the Sampler and the Looper, use them.
+
+**Also new:** `one_pole_highpass` *(unstable)*; `flush_denormals`
+*(unstable)*, a scoped guard that flushes subnormals to zero on its
+thread; a mirror length for `mirrored_ring_buffer`, so a window of a few
+samples needs only that many extra elements; copy assignment for
+`biquad`, `peak` and `schmitt_trigger`.
+
+**QPlug.** An editor whose content fits its view keeps its proportions as
+the window is resized, and reopens at the size it was left. A plugin's
+view resizes when the host grants a resize without asking for a size.
+Preset writes are atomic: a failed write leaves the presets as they were.
+macOS bundles are signed ad hoc, which Ableton Live requires. A plugin
+example's library is named after the plugin, and IDEs show Q's targets
+and Elements' files in groups of their own.
+
+### Fixed
+
+- `pitch_names`' E flat held E's frequencies.
+- Mixing two units picked the first one's value type, not the larger.
+- `period.hpp` and `frequency.hpp` failed to compile in one include order.
+- `bitset` accepted an index one past its size, and set bits with a 32-bit
+  mask on 64-bit words; `bitstream_acf` mis-sized one-word bitsets.
+- `moving_sum::fill` did not reset its position, and multiplied in
+  unsigned arithmetic; `moving_maximum` started above the lowest float.
+- `onset_gate`'s slope went stale while the gate was open;
+  `signal_conditioner` left a member uninitialized;
+  `fast_rms_envelope_follower_db` took the log of 0.
+- `zero_crossing_ex` measured its peak from the offset signal.
+- `adsr_envelope_gen::sustain_level` overwrote a sustain's end level;
+  `lfo_gen::key_on` with a delay and no fade started at full;
+  `blackman_gen::midpoint` did not reset its state.
+- MIDI 1.0: a sysex manufacturer id's high byte was not masked to 7 bits.
+  MIDI 2.0: an overflowing flex-data message left a stale partial one.
+- `hilbert_quadrature.hpp` did not include what it needs.
+- q_io reports no MIDI 2.0 where libremidi was built without it, instead
+  of opening ports nothing sees.
+- Float literals replace stray doubles in `saw_osc`, `poly_blamp`,
+  `zero_crossing_collector`, `level_crossfade` and
+  `soft_knee_compressor`, so a single-precision FPU runs them in hardware.
+
+### Build and platforms
+
+- Windows on Arm64 builds.
+- Q builds as position-independent code when QPlug is on.
+- libremidi is back on upstream, with its JACK backend left out.
+- clap-wrapper moves to 0.17.0, with fixes for multi-config generators
+  and for macOS Ninja builds.
+- Elements moves to a newer develop commit (`fit`, a Direct2D resize
+  fix). Dexter follows the `swatch_highlighter` and `region_highlighter`
+  rename.
 
 ## v1.5.4 (2026-10-09)
 
