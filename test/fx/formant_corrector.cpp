@@ -8,6 +8,7 @@
 
 #include <q/fx/formant_corrector.hpp>
 
+#include <array>
 #include <cmath>
 #include <complex>
 #include <memory>

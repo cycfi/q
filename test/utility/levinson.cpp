@@ -8,6 +8,7 @@
 
 #include <q/utility/levinson.hpp>
 
+#include <array>
 #include <cmath>
 #include <random>
 #include <vector>

@@ -8,6 +8,7 @@
 
 #include <q/fx/lattice.hpp>
 
+#include <array>
 #include <cmath>
 #include <random>
 #include <vector>
