@@ -11,6 +11,15 @@ commits; the feature branches they first cited were squash-merged and no
 longer resolve. The full text before the trim: `git show
 308ddccb:docs/dev_log.md`.
 
+## 2026-11-05
+
+`173cf337`: the pitch shifting pages and the BACF Lag Tracker page play
+the blog's final 16:9 videos, `rotating_head_v2.mp4` and
+`chord_strobe_v2.mp4`; the lag tracker's own video was never uploaded to
+R2, and its caption now quotes the strobe video's numbers. `ad82ffc0`: the
+doc images no page used (11) and the generators that made only them (4)
+removed.
+
 ## 2026-11-04
 
 On `sola-shift`: `630627d6`, `pitch_detector` renamed `bacf_pitch_detector`
