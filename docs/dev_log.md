@@ -20,6 +20,13 @@ R2, and its caption now quotes the strobe video's numbers. `ad82ffc0`: the
 doc images no page used (11) and the generators that made only them (4)
 removed.
 
+`59cd11a3`: `q::midi::bend_range`, a pitch bend as semitones or a ratio,
+for MIDI 1.0 and 2.0, with its own depth down and up. Three straight
+segments: a middle of `linear` semitones either way (default 1) at the
+mean of the two rates, so a vibrato across the center stays even, then
+down and up to their depths. `example/whammy` uses it. First step of the
+Q Bender plugin.
+
 ## 2026-11-04
 
 On `sola-shift`: `630627d6`, `pitch_detector` renamed `bacf_pitch_detector`
