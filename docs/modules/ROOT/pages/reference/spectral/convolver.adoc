@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+CAUTION: {unstable}
+
 == Overview
 
 The convolver convolves a signal with an impulse response (IR): a guitar cabinet and its microphone after an amp, a room, an acoustic guitar's body. It runs sample by sample on the audio thread, with no latency: the first output sample already carries the IR's first tap.

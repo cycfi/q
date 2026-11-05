@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+CAUTION: {unstable}
+
 == Overview
 
 The formant table holds the spectral envelope `F` and the moved spectral envelope `F(f/r)` for every ratio on a grid: `steps` a semitone, from `lo` to `hi` semitones. Each row is an all-pole model of the spectral envelope. A table is plain data, about 50 KB at order 32: allocate it, have a `{formant_learner}` fit it, and hand it to a `{formant_corrector}`.

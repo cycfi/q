@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+CAUTION: {unstable}
+
 == Overview
 
 A varispeed tap is a delay line read at a varying speed, the way a tape machine replays faster or slower than it recorded. A write head puts each new sample into the delay line, one sample per sample. A read head plays the delay line back, moving at a speed given by a ratio. The distance between the two heads is the delay.

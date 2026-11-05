@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+CAUTION: {unstable}
+
 == Overview
 
 The EQ matcher gives a sound the spectral envelope of another: a Stratocaster the body and pickup tone of a Les Paul, a direct recording the tone of a reference. From the source's spectral envelope `A` and the target's `B`, it applies `B(f) / A(f)`: the source's shape comes out, the target's goes in, and the notes stay as they are. It runs on the audio thread, sample by sample, with no latency.

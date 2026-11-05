@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+CAUTION: {unstable}
+
 == Overview
 
 A ring allocator hands out blocks of any size from one buffer, to one

@@ -74,6 +74,8 @@ the two. See {parameter}.
 
 == From the Audio Thread
 
+CAUTION: `post` and the tasks under it are new and unstable: they may change in any release, without a deprecation, until they mature.
+
 The processor runs on the audio thread, where it may read the parameters
 but not edit them: edits reach the host from the main thread. When the
 processor needs the controller to act, it posts a task, and the task runs

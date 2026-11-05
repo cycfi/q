@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+CAUTION: {unstable}
+
 == Overview
 
 A handoff sends objects that need allocation, such as a sample buffer, a

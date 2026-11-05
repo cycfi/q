@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+CAUTION: {unstable}
+
 == Overview
 
 The formant learner learns an instrument's fixed spectral envelope from its playing, and fits the `{formant_table}` that the `{formant_corrector}` uses. It runs off the audio thread, a worker or an MCU's low-priority loop, and allocates only at construction. See `{formant_preservation}` for what it learns, the learning phase and an example.

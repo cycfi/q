@@ -6,6 +6,10 @@
 
 :warning-caption: ⚠️ {nbsp}WARNING
 
+:caution-caption: 🚧 {nbsp}UNSTABLE
+
+:unstable: This API is new and unstable: it may change in any release, without a deprecation, until it matures.
+
 :performance_note: Measured at 48 kHz in blocks of 32 samples (0.67 ms), on an Apple M2 and on an STM32H723 at 550 MHz with caches on. Average: the time a sample, and its share of a sample period. Worst: the slowest block, and its share of the block's 0.67 ms; over 100%, it runs late. Figures are rounded and vary with the build and the input.
 
 :fundamentals: xref:fundamentals.adoc[Fundamentals]

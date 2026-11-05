@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+CAUTION: {unstable}
+
 == Overview
 
 The formant corrector restores the spectral envelope a pitch shifter moved. After a shift by a ratio `r` it applies `F(f) / F(f/r)`, from a `{formant_table}`: it removes the moved formants and restores the instrument's own. It runs on the audio thread, after the shifter, and adds no latency. See `{formant_preservation}` for how it works and an example.

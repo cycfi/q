@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+CAUTION: {unstable}
+
 == Overview
 
 The BACF lag tracker follows the lag at which a signal repeats: its period, or a multiple of it. It is built for a time-domain splicer such as the `{bacf_pitch_shifter}`, which splices at how far back the sound repeats, whatever the note. The tracker is implemented by a class named `bacf_lag_tracker`.

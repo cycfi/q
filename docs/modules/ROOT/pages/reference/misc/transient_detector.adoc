@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+CAUTION: {unstable}
+
 == Overview
 
 A transient is the short burst at the start of a sound: the pick snapping off a string, a stick hitting a drum. The transient detector fires at each one, true for a single sample. It is a time-domain detector: there is no analysis frame to wait for, so on a plucked string it fires within a fraction of a millisecond of the pick leaving the string.

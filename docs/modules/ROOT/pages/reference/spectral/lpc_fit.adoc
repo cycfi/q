@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+CAUTION: {unstable}
+
 == Overview
 
 The LPC fit turns a spectral envelope into an all-pole model: a filter of a few poles, 32 by default, whose spectrum follows the spectral envelope. This is linear prediction (LPC). A spectral envelope of thousands of bins becomes a few numbers that a filter can apply at no latency: the reflection coefficients `k` that an `{eq_matcher}` takes, and a level.

@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+CAUTION: {unstable}
+
 == Overview
 
 The spectral learner learns a sound's long-term spectrum from its playing, and draws its spectral envelope: the shape that stays when the notes change, such as an electric guitar's pickup, electronics and body. Two learned spectral envelopes are what an `{eq_matcher}` matches; one learned spectral envelope is what `{formant_preservation}` restores.
