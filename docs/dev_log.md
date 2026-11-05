@@ -46,6 +46,19 @@ Parameters: Dive, Pull-up (0 to 12), Middle, Formants, Formant Amount,
 Freeze. clap-validator, pluginval and auval pass; not yet tried in a host
 with the e-Whammy.
 
+`9368bc46`: `test/q_plug/bender_audio.cpp` drives Q Bender through its
+CLAP entry: at rest the input passes bit for bit, the bar's ends play an
+octave up and down, and the pitch returns at the center.
+
+`332fd51d`: a bend wheel beside the Bend panel, drawn after the MONTAGE
+M's (matte black, rounded sides, a concave detent at the center that rolls
+with it). It moves a new Bend parameter, -1 to 1, live and not saved, and
+springs back to center on release. While it is off center it drives the
+bend; at rest the host's MIDI bend does. The scroll wheel does not move it:
+a trackpad's momentum would keep it rolling after the fingers lift, and
+only macOS (and Wayland) say when they do. Two more tests: the wheel's top
+plays an octave up, and at rest the MIDI bend plays.
+
 ## 2026-11-04
 
 On `sola-shift`: `630627d6`, `pitch_detector` renamed `bacf_pitch_detector`
