@@ -3,7 +3,7 @@
 High-level, user-facing changes only. For the day-to-day detail, see
 `docs/dev_log.md` (internal, not part of this file).
 
-## v1.6.0 (in development, on `develop`)
+## v1.6.0 (beta 1, on `develop`)
 
 APIs marked *(unstable)* are new in this release and may change in any
 release until they mature.
