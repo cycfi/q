@@ -110,7 +110,7 @@ namespace
    struct take
    {
       std::vector<float>         audio;
-      std::vector<bends::event>  bends;
+      std::vector<bends::event>  events;
       float                      sps = 44100;
    };
 
@@ -150,7 +150,7 @@ namespace
       }
       bends b;
       file(t.sps, b);
-      t.bends = std::move(b.events);
+      t.events = std::move(b.events);
       return true;
    }
 
@@ -159,7 +159,7 @@ namespace
       player(take const& t, q::formant_table const* table)
        : audio_stream(0, 2, t.sps)
        , _audio{t.audio}
-       , _whammy{t.bends, t.sps, table}
+       , _whammy{t.events, t.sps, table}
       {}
 
       void process(out_channels const& out)
