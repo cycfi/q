@@ -59,6 +59,11 @@ a trackpad's momentum would keep it rolling after the fingers lift, and
 only macOS (and Wayland) say when they do. Two more tests: the wheel's top
 plays an octave up, and at rest the MIDI bend plays.
 
+`a7e7a744`: eleven factory presets by interval. Seven symmetric
+(Octave ±12 down to Half Step ±1) and four asymmetric for guitar, deep
+down and short up, since a string bent far up breaks (Octave Down, Major
+Third Up is -12 / +4).
+
 ## 2026-11-04
 
 On `sola-shift`: `630627d6`, `pitch_detector` renamed `bacf_pitch_detector`
