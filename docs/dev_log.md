@@ -34,6 +34,18 @@ New Whammy Bar tutorial, in a Pitch Shifting group, covering the bar, the
 shifter, and learning, offline here and from the live input in a real-time
 program.
 
+`32d0e80b`: Q Bender, `example/q_plug/bender`, a mono QPlug effect (an
+`aumf` in Logic) driven by the host's MIDI pitch bend: `bend_range`,
+smoothed at 100 Hz, into `bacf_pitch_shifter`, then `formant_corrector`.
+A worker thread learns the formants from the dry input (blocks through a
+`ring_allocator`, tables back through a `handoff`) and the table rides in
+the session's state. The editor is the approved mock: a curve editor of
+the bend range over a fixed ±12 semitone frame with a live trace of the
+bend, and a Formants panel (On, Amount, Learn, Freeze, coverage).
+Parameters: Dive, Pull-up (0 to 12), Middle, Formants, Formant Amount,
+Freeze. clap-validator, pluginval and auval pass; not yet tried in a host
+with the e-Whammy.
+
 ## 2026-11-04
 
 On `sola-shift`: `630627d6`, `pitch_detector` renamed `bacf_pitch_detector`
