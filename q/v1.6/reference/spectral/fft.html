@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>FFT :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.5/reference/spectral/fft.html">
+    <meta name="generator" content="Antora 3.1.15">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+<script defer src="../../../../_/js/lightbox.js"></script>
+<meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
+<link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="96x96" href="https://cycfi.com/assets/icons/favicon-96x96.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="https://cycfi.com/assets/icons/android-chrome-192x192.png"/>
+<link rel="icon" type="image/png" sizes="256x256" href="https://cycfi.com/assets/icons/android-chrome-256x256.png"/>
+<link rel="apple-touch-icon" type="image/png" href="https://cycfi.com/assets/icons/apple-touch-icon.png"/>
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <!--  Cycfi Logo -->
+      <a class="m-nav__logo" href="https://www.cycfi.com">
+        <svg version="1.1" x="0px" y="0px" width="200" viewBox="0 0 600 100" style="padding-top: 15;" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(2.55, 0, 0, 2.62, -464.010406, -1042.918213)" fill="#202020">
+            <path d="M234.37,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.7-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-3.5-0.04-4.6,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.59,0.66-0.76,1.35c-0.14,0.84-0.18,1.03-0.19,1.43l-0.14,3.91 c-0.01,0.39,0.04,0.84,0.09,1.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h33.85 c0.8,0,1.45,0.67,1.42,1.47L234.37,431.65z"/>
+            <path d="M276.06,433.02H257.9c-0.8,0-1.45-0.67-1.42-1.47l0.15-4.18c0.03-0.76,0.65-1.37,1.42-1.37h14.16 c1.91,0,3.52,0,4.61-0.12c1.23-0.13,1.75-0.25,2.17-0.71c0.36-0.39,0.4-2.52,0.4-2.52h-27.92c-11.11,0-13.26-5.13-13.1-9.44 l0.12-3.38c0.03-0.76,0.65-1.37,1.42-1.37h8.43c0.8,0,1.45,0.67,1.42,1.47l-0.05,1.36c-0.02,0.46-0.01,2.03,0.11,2.51 c0.1,0.42,0.44,0.82,0.78,1.07c0.47,0.35,0.83,0.42,1.64,0.54c0.9,0.14,2.09,0.21,3.54,0.21h24.09l0.21-5.8 c0.03-0.76,0.65-1.37,1.42-1.37h8.46c0.8,0,1.45,0.67,1.42,1.47l-0.49,13.57c-0.06,1.58-0.46,3.96-1.12,5.07 c-0.68,1.15-1.71,2.08-3.04,2.76c-1.23,0.63-2.76,1.07-4.56,1.32C280.44,432.9,278.4,433.02,276.06,433.02L276.06,433.02z"/>
+            <path d="M401.95,431.55l0.78-21.72c0.03-0.76,0.65-1.37,1.42-1.37h8.59c0.8,0,1.45,0.67,1.42,1.47l-0.78,21.72 c-0.03,0.76-0.65,1.37-1.42,1.37h-8.59C402.56,433.02,401.92,432.35,401.95,431.55z"/>
+            <path d="M346.77,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.71-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-2.47-0.04-3.58,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.58,0.66-0.76,1.35c-0.14,0.84-0.22,2.03-0.23,2.43l-0.07,1.91 c-0.01,0.39,0.01,1.84,0.06,2.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h32.83 c0.8,0,1.45,0.67,1.42,1.47L346.77,431.65z"/>
+            <path d="M386.2,425.88l-24.93-0.03l-0.21,5.8c-0.03,0.76-0.65,1.37-1.42,1.37h-8.46c-0.8,0-1.45-0.67-1.42-1.47 l0.49-13.57c0.06-1.58,0.46-3.96,1.12-5.07c0.68-1.15,1.71-2.08,3.04-2.76c1.23-0.63,2.76-1.07,4.56-1.32 c1.7-0.24,3.75-0.36,6.08-0.36l0,0h33.68c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.18c-0.03,0.76-0.65,1.37-1.42,1.37H368.9 c-1.91,0-3.52,0-4.61,0.12c-1.23,0.13-1.75,0.25-2.17,0.71c-0.36,0.39-0.4,2.52-0.4,2.52h24.63c0.8,0,1.45,0.67,1.42,1.47 l-0.15,4.22C387.59,425.28,386.96,425.88,386.2,425.88z"/>
+          </g>
+        </svg>
+      </a>
+      <a class="navbar-item" href="https://www.cycfi.com">Q Docs</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="q" data-version="v1.6">
+  <aside class="nav">
+    <div class="panels">
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../../index.html">Q Audio DSP Library</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../installation.html">Setup and Installation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../setup.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../microcontrollers.html">Microcontrollers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../testing.html">Testing Q</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../q_plug/setup.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/standalone.html">The Standalone App</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/outside_project.html">Building Outside the Project</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/testing.html">Testing QPlug</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/advanced_builds.html">Advanced Builds</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials.html">Tutorials</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_basics">Basics</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/waveforms.html">Waveforms</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/io_delay.html">IO Delay</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_synthesis_and_midi">Synthesis and MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/square_synth.html">Square Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/poly_synth.html">Polyphonic Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/va_synth.html">Virtual Analog Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/fm_synth.html">FM Synth</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_granular">Granular</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/grain_freeze.html">Grain Freeze</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/sustain_hold.html">Sustain Hold</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../q_plug/tutorials/index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/gain.html">Your First Plugin: Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/sampler.html">Sampler: Handing Data to the Audio Thread</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/looper.html">Looper: Work for the Main Thread</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_1.html">Anna I: The Voice</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_2.html">Anna II: The Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_3.html">Anna III: The Chorus</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_4.html">Anna IV: Drawn Envelopes</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_5.html">Anna V: Presets</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/dexter.html">Dexter: Full Featured DX7 Synth</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference.html">Reference</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../q_lib.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../fundamentals.html">Fundamentals</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units.html">Units</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/frequency.html">Frequency</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/duration.html">Duration</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/period.html">Period</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units/phase.html">Phase</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../units/phase_iterator.html">Phase Iterator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/decibel.html">Decibel</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units/interval.html">Interval</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../units/pitch.html">Pitch</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/pitch_names.html">Pitch Names</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/literals.html">Literals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../biquad.html">Biquad</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/lowpass.html">Low Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/highpass.html">High Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/allpass.html">All Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/notch.html">Notch Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/peaking.html">Peaking Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/lowshelf.html">Low Shelf Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/highshelf.html">High Shelf Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../resonant.html">Resonant Filters</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../resonant/svf.html">State Variable Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../resonant/ladder.html">Ladder Filter</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../resonant/ota_ladder.html">OTA Ladder Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../resonant/chamberlin_filter.html">Chamberlin Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../envelope.html">Envelope</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/true_rms_envelope_follower.html">True RMS Envelope Follower</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../dynamic.html">Dynamic</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../dynamic/compressor.html">Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../dynamic/expander.html">Expander</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../dynamic/agc.html">AGC</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../misc.html">Miscellaneous</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/varispeed_tap.html">Varispeed Tap</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/sample_hold.html">Sample Hold</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/moving_maximum.html">Moving Maximum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/one_pole_highpass.html">One Pole High Pass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/dc_block.html">DC Block</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/dynamic_smoother.html">Dynamic Smoother</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/integrator.html">Integrator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/median3.html">Median</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/fast_downsample.html">Fast Downsample</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/differentiator.html">Differentiators</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/allpass.html">All-Pass Phase Shifters</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/hilbert_quadrature.html">Hilbert Quadrature</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/delta_gate.html">Delta Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/zero_crossing.html">Zero Crossing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/schmitt_trigger.html">Schmitt Trigger</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/window_comparator.html">Window Comparator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/edge.html">Edge Detectors</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/monostable.html">Monostable</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/peak.html">Peak</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/peak_picker.html">Peak Picker</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/spectral_flux.html">Spectral Flux</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/transient_detector.html">Transient Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/map.html">Map</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/clip.html">Clippers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/level_crossfade.html">Level Crossfade</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/signal_conditioner.html">Signal Conditioner</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth.html">Synthesizers</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/sin_osc.html">Sine Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/grain.html">Grain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/va.html">Virtual Analog</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/analog_osc.html">Analog Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/sync.html">Hard Sync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Generators</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/noise_gen.html">Noise Generators</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/lfo_gen.html">LFO Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/fm.html">FM Synthesis</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/fm_operator.html">FM Operator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/fm_routing.html">FM Routing</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/fm_algorithm.html">FM Algorithm</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/fm_voice.html">FM Voice</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/dx_patcher.html">DX Patcher</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/dx_sysex.html">DX System Exclusive</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/dx7_design.html">DX7 Design Notes</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../spectral.html">Frequency Domain</a>
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="4">
+    <a class="nav-link" href="fft.html">FFT</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="spectral_learner.html">Spectral Learner</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="lpc_fit.html">LPC Fit</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="eq_matcher.html">EQ Matcher</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="convolver.html">Convolver</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../support.html">Support</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../support/base.html">Base</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../support/fast_math.html">Fast Math</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../support/basic_concepts.html">Basic Concepts</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../support/flush_denormals.html">Flush Denormals</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../midi.html">MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../midi/messages.html">MIDI 1.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../midi/controller_numbers.html">MIDI Controller Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../midi/notes.html">MIDI Notes</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../midi/midi2_messages.html">MIDI 2.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../midi/processor.html">MIDI Processor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../midi/readers.html">MIDI Readers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../midi/stages.html">MIDI Stages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../midi/translation.html">MIDI Translation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../midi/per_note.html">Per-Note Expression</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../midi/endpoint.html">MIDI Endpoint</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../midi/ci.html">MIDI Capability Inquiry</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../midi/conformance.html">MIDI 2.0 Conformance</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../utility.html">Utility</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/ring_buffer.html">Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/sample_interpolation.html">Sample Interpolation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/best_lag.html">Best Lag</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/antialiasing.html">Antialiasing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/float_convert.html">Sample Format Conversion</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/bitset.html">Bitset</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/handoff.html">Handoff</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/ring_allocator.html">Ring Allocator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/tasks.html">Tasks</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/audio_clock.html">Audio Clock</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../pitch.html">Pitch Detection</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../pitch/bacf_period_detector.html">BACF Period Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../pitch/bacf_pitch_detector.html">BACF Pitch Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../pitch/bitstream_acf.html">Bitstream Autocorrelation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../pitch/zero_crossing_collector.html">Zero Crossing Collector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../pitch/bacf_lag_tracker.html">BACF Lag Tracker</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../pitch_shifting.html">Pitch Shifting</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../pitch_shifting/bacf_pitch_shifter.html">BACF Pitch Shifter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../pitch_shifting/formant_preservation.html">Formant Preservation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../pitch_shifting/formant_learner.html">Formant Learner</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../pitch_shifting/formant_table.html">Formant Table</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../pitch_shifting/formant_corrector.html">Formant Corrector</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../q_io.html">QIO</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/audio_device.html">Audio Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/audio_file.html">Audio File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/midi_file.html">MIDI File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/midi_device.html">MIDI Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/midi_stream.html">MIDI Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/midi2_stream.html">MIDI 2.0 Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../q_plug/index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/architecture.html">Architecture</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/parameter.html">Parameters</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/data_stream.html">Data Streams</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/processor.html">Processor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/midi.html">MIDI</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/presenter.html">Presenter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/header.html">The Header</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/zoom.html">Zoom and Display Scale</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Q Audio DSP Library</span>
+    <span class="version">v1.6-beta.1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../../../v1.5/index.html">Q Audio DSP Library</a></div>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="../../index.html">v1.6-beta.1</a>
+        </li>
+        <li class="version is-latest">
+          <a href="../../../v1.5/index.html">v1.5</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../v1.5/index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../index.html">Q Audio DSP Library</a></li>
+    <li><a href="../../reference.html">Reference</a></li>
+    <li><a href="../q_lib.html">Q</a></li>
+    <li><a href="../spectral.html">Frequency Domain</a></li>
+    <li><a href="fft.html">FFT</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">v1.6-beta.1</button>
+  <div class="version-menu">
+    <a class="version is-current" href="fft.html">v1.6-beta.1</a>
+    <a class="version" href="../../../v1.5/reference/spectral/fft.html">v1.5</a>
+  </div>
+</div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">FFT</h1>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Fast Fourier Transform (FFT) converts a block of time-domain samples into its frequency-domain representation and back. Q provides two transforms, each an object built for one size:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>fft</code>   </dt>
+<dd>
+<p>An FFT of <code>n</code> complex values, in place.</p>
+</dd>
+<dt class="hdlist1"><code>rfft</code>  </dt>
+<dd>
+<p>An FFT of <code>n</code> real samples to the <code>n/2+1</code> bins from DC to Nyquist, in place.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>Both are built once with their size, which must be a power of two, and then transform any number of blocks of that size. Building one allocates everything it needs; a transform never allocates, so it is safe on the audio thread. A size can follow the sample rate: a frame of a given duration takes twice the samples at 96 kHz as at 48 kHz.</p>
+</div>
+<div class="paragraph">
+<p><code>fft</code> and <code>rfft</code> work in <code>float</code>. <code>basic_fft&lt;T&gt;</code> and <code>basic_rfft&lt;T&gt;</code> are the templates they come from, for <code>double</code> as well. Float transforms of practical sizes run on PFFFT, a SIMD FFT, when Q is built with it (see <a href="#_backends">Backends</a>).</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="⚠️ &#160;WARNING"></i>
+</td>
+<td class="content">
+<strong>Breaking change in v1.6.</strong> The compile-time functions <code>fft&lt;N&gt;</code>, <code>ifft&lt;N&gt;</code>, <code>rfft&lt;N&gt;</code>, <code>irfft&lt;N&gt;</code> and <code>magspec&lt;N&gt;</code> of v1.5 and earlier are gone, replaced by the <code>fft</code> and <code>rfft</code> objects. Code that calls them no longer compiles. See <a href="#_migrating_from_v1_5">Migrating from v1.5</a> for the changes a client makes.
+</td>
+</tr>
+</table>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="../../_images/fft-spectrum.svg" alt="FFT magnitude spectrum" width="700px">
+</div>
+<div class="title">Figure 1. A composite of three tones and its magnitude spectrum</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_data_layout"><a class="anchor" href="#_data_layout"></a>Data Layout</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_complex_data"><a class="anchor" href="#_complex_data"></a>Complex Data</h3>
+<div class="paragraph">
+<p><code>fft</code> works on <strong>complex</strong> data packed as interleaved real and imaginary parts:</p>
+</div>
+<div class="ulist none">
+<ul class="none">
+<li>
+<p><code>data = [ re(0), im(0), re(1), im(1), &#8230;&#8203; , re(n-1), im(n-1) ]</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>So an <code>n</code>-point transform needs an array of <strong><code>2n</code> scalars</strong>. Bin <code>k</code> occupies <code>data[2k]</code> (real) and <code>data[2k+1]</code> (imaginary).</p>
+</div>
+<div class="paragraph">
+<p>The forward transform applies no scaling: a unit-amplitude complex exponential at bin <code>k</code> produces a peak of magnitude <code>n</code> at that bin. For a real input, the energy splits between the bin <code>k</code> and its conjugate mirror <code>n-k</code>, so a real tone of amplitude <code>A</code> reads <code>A * n/2</code> at its bin. The inverse divides by <code>n</code>, so a forward transform followed by the inverse restores the input to within rounding error.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_real_data"><a class="anchor" href="#_real_data"></a>Real Data</h3>
+<div class="paragraph">
+<p>The spectrum of a real signal is conjugate-symmetric, so its upper half repeats the lower half. <code>rfft</code> computes only the bins that carry information, DC through Nyquist, at about half the cost of <code>fft</code>. It takes an array of <strong><code>n+2</code> scalars</strong>:</p>
+</div>
+<div class="ulist none">
+<ul class="none">
+<li>
+<p>On input, the <code>n</code> samples: <code>data = [ x(0), x(1), &#8230;&#8203; , x(n-1), _, _ ]</code></p>
+</li>
+<li>
+<p>On output, <code>n/2+1</code> bins: <code>data = [ re(0), im(0), re(1), im(1), &#8230;&#8203; , re(n/2), im(n/2) ]</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The two extra scalars make room for the Nyquist bin. The imaginary parts of the DC and Nyquist bins are always zero, and the inverse ignores them. Scaling is the same as <code>fft&#8217;s: the forward transform applies none, and the inverse divides by `n</code>.</p>
+</div>
+<div class="paragraph">
+<p>To remove everything above 5 kHz from a frame of 1024 samples at <code>sps</code> samples per second, zero the bins above it and transform back:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fft/fft.hpp&gt;
+#include &lt;vector&gt;
+...
+namespace q = cycfi::q;
+
+float sps;                                // samples per second
+...
+constexpr std::size_t n = 1024;
+q::rfft f{n};                             // build it once
+std::vector&lt;float&gt; data(n + 2);           // n samples, then room for n/2+1 bins
+...
+f.forward(data.data());
+
+auto cutoff = std::size_t(5000.0f * n / sps);    // the bin at 5 kHz
+for (auto k = cutoff + 1; k &lt;= n/2; ++k)
+   data[2*k] = data[2*k + 1] = 0.0f;
+
+f.inverse(data.data());                   // data[0 .. n-1]: the filtered frame</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="⚠️ &#160;WARNING"></i>
+</td>
+<td class="content">
+The transforms are <strong>in place</strong>: they overwrite the input array with the result. Keep a copy if you still need the original samples.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_backends"><a class="anchor" href="#_backends"></a>Backends</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>With the CMake option <code>Q_USE_PFFFT</code> on (the default), the <code>float</code> transforms run on <a href="https://github.com/marton78/pffft">PFFFT</a>, a SIMD FFT using NEON on ARM and SSE on x86: <code>fft</code> from 16 points up, <code>rfft</code> from 32. <code>double</code>, and the smaller sizes, use the Q native implementation. The API, the data layout and the scaling are the same either way. Results agree to within rounding, but are not bit-identical between the two.</p>
+</div>
+<div class="paragraph">
+<p>Which is faster depends on the processor. On a computer, PFFFT&#8217;s SIMD makes it about three times faster than Q native. On a microcontroller without SIMD, such as an Arm Cortex-M7, PFFFT runs in scalar form and Q native is as fast or faster: leave <code>Q_USE_PFFFT</code> undefined there. See <a href="#_performance">Performance</a>, and run <code>test/benchmark/fft_bench</code> on your own target.</p>
+</div>
+<div class="paragraph">
+<p>An object owns everything a transform uses: PFFFT&#8217;s setup for its size and its work space, or the tables of the Q native implementation. Each object therefore makes one setup, for the one size it was built with. Because the work space is the object&#8217;s, two threads transforming at the same time need two objects.</p>
+</div>
+<div class="paragraph">
+<p>PFFFT on x86 needs its buffers 16-byte aligned. Any <code>float</code> pointer still works: a misaligned one goes through a buffer in the object, at the cost of a copy. Declaring the data <code>alignas(16)</code> avoids the copy. ARM has no such requirement.</p>
+</div>
+<div class="paragraph">
+<p>Q is header-only, and so is PFFFT as Q uses it: with the option on, Q&#8217;s CMake fetches PFFFT and gives <code>libq</code> the <code>Q_USE_PFFFT</code> definition and PFFFT&#8217;s include paths, and nothing is compiled. A build that does not use CMake gets the Q native implementation, unless it defines <code>Q_USE_PFFFT</code> and adds PFFFT&#8217;s <code>include/pffft</code> and <code>src</code> directories to its include path. Turn PFFFT off with <code>-DQ_USE_PFFFT=OFF</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_migrating_from_v1_5"><a class="anchor" href="#_migrating_from_v1_5"></a>Migrating from v1.5</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Up to v1.5, the transforms were free functions with the size as a template argument. From v1.6 they are objects built with the size. Each call changes as follows:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">v1.5</th>
+<th class="tableblock halign-left valign-top">v1.6</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q::fft&lt;N&gt;(data)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q::fft f{N};</code> once, then <code>f.forward(data)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q::ifft&lt;N&gt;(data)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>f.inverse(data)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A real signal through <code>fft&lt;N&gt;</code>,
+  imaginary slots zeroed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q::rfft r{N};</code> once, then <code>r.forward(rdata)</code>
+                                      (<code>N+2</code> scalars, the samples first)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q::magspec&lt;N&gt;(data)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r.forward(rdata)</code>, then <code>std::hypot</code> on each bin</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code> data</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q::basic_fft&lt;double&gt;</code>, <code>q::basic_rfft&lt;double&gt;</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Build the object where you set up, not in the audio callback: its constructor allocates. The data layouts, and the scaling (none on the forward transform, <code>1/n</code> on the inverse), are unchanged, so the code around the call stays the same.</p>
+</div>
+<div class="paragraph">
+<p>A magnitude spectrum, before and after:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fft/fft.hpp&gt;
+#include &lt;algorithm&gt;
+#include &lt;cmath&gt;
+#include &lt;vector&gt;
+...
+namespace q = cycfi::q;
+
+constexpr std::size_t n = 1024;
+std::vector&lt;float&gt; samples(n);          // a frame of real samples
+std::vector&lt;float&gt; mag(n/2 + 1);        // the magnitude of each bin
+...
+// v1.5: std::array&lt;float, 2*n&gt; d{}; real slots only, then
+//       q::magspec&lt;n&gt;(d.data()); mag[k] = d[k];
+
+q::rfft f{n};
+std::vector&lt;float&gt; data(n + 2);
+std::copy(samples.begin(), samples.end(), data.begin());
+f.forward(data.data());
+for (std::size_t k = 0; k &lt;= n/2; ++k)
+   mag[k] = std::hypot(data[2*k], data[2*k + 1]);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fft/fft.hpp&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;std::floating_point T&gt;
+class basic_fft
+{
+public:
+
+   explicit       basic_fft(std::size_t n);
+
+   std::size_t    size() const;
+   void           forward(T* data);
+   void           inverse(T* data);
+};
+
+template &lt;std::floating_point T&gt;
+class basic_rfft
+{
+public:
+
+   explicit       basic_rfft(std::size_t n);
+
+   std::size_t    size() const;
+   void           forward(T* data);
+   void           inverse(T* data);
+};
+
+using fft = basic_fft&lt;float&gt;;
+using rfft = basic_rfft&lt;float&gt;;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>T</code> is <code>float</code> or <code>double</code>. Copying an object makes a new setup for the same size, which allocates; moving one does not.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_template_instantiations"><a class="anchor" href="#_template_instantiations"></a>Template Instantiations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>fft</code> and <code>rfft</code> are the template instantiations of <code>basic_fft</code> and <code>basic_rfft</code> for <code>float</code>:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>fft</code></dt>
+<dd>
+<p>An FFT of <code>n</code> complex <code>float</code> values.</p>
+</dd>
+<dt class="hdlist1"><code>rfft</code></dt>
+<dd>
+<p>An FFT of <code>n</code> real <code>float</code> samples.</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using fft = basic_fft&lt;float&gt;;
+using rfft = basic_rfft&lt;float&gt;;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>T</code>       </dt>
+<dd>
+<p>A floating-point type, <code>float</code> or <code>double</code>.</p>
+</dd>
+<dt class="hdlist1"><code>n</code>       </dt>
+<dd>
+<p>A <code>std::size_t</code>, a power of two: the number of complex values (<code>basic_fft</code>) or real samples (<code>basic_rfft</code>, at least 2).</p>
+</dd>
+<dt class="hdlist1"><code>f</code>       </dt>
+<dd>
+<p>An object of type <code>basic_fft&lt;T&gt;</code>.</p>
+</dd>
+<dt class="hdlist1"><code>r</code>       </dt>
+<dd>
+<p>An object of type <code>basic_rfft&lt;T&gt;</code>.</p>
+</dd>
+<dt class="hdlist1"><code>data</code>    </dt>
+<dd>
+<p>A pointer to <code>2n</code> elements of type <code>T</code> (<code>n</code> interleaved complex values).</p>
+</dd>
+<dt class="hdlist1"><code>rdata</code>   </dt>
+<dd>
+<p>A pointer to <code>n+2</code> elements of type <code>T</code> (<code>n</code> real samples, or <code>n/2+1</code> interleaved complex bins).</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_constructors"><a class="anchor" href="#_constructors"></a>Constructors</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_fft&lt;T&gt;(n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>basic_fft</code> of <code>n</code> points. Allocates.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_rfft&lt;T&gt;(n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>basic_rfft</code> of <code>n</code> samples. Allocates.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fft(n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct an <code>fft</code> (<code>float</code>) of <code>n</code> points.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rfft(n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct an <code>rfft</code> (<code>float</code>) of <code>n</code> samples.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+C++ brace initialization may also be used.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_functions"><a class="anchor" href="#_functions"></a>Functions</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>f.forward(data)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Compute the forward FFT of the <code>n</code> complex
+                         values in <code>data</code>, in place.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>f.inverse(data)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Compute the inverse FFT of the <code>n</code> bins in
+                         <code>data</code>, in place, normalized by <code>n</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r.forward(rdata)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Compute the forward FFT of the <code>n</code> real samples
+                         in <code>rdata</code>, in place, giving the <code>n/2+1</code> bins
+                         from DC through Nyquist.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r.inverse(rdata)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Compute the inverse of <code>r.forward</code> from the
+                         <code>n/2+1</code> bins in <code>rdata</code>, in place, giving <code>n</code>
+                         real samples normalized by <code>n</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>f.size()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the number of points.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r.size()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the number of samples.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+For a real input signal, the magnitude at bin <code>k</code> is <code>std::hypot(rdata[2*k], rdata[2*k+1])</code> after <code>r.forward(rdata)</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_example"><a class="anchor" href="#_example"></a>Example</h3>
+<div class="paragraph">
+<p>A guitar tuner&#8217;s display wants the strongest partial in the input. Window a frame of 2048 samples of <code>in</code> at <code>sps</code> samples per second, transform it, and find the bin with the most energy:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fft/fft.hpp&gt;
+#include &lt;cmath&gt;
+#include &lt;numbers&gt;
+#include &lt;span&gt;
+#include &lt;vector&gt;
+...
+namespace q = cycfi::q;
+
+std::span&lt;float const&gt; in;              // the guitar input, at least n samples
+float sps;                              // samples per second
+...
+constexpr std::size_t n = 2048;
+q::rfft f{n};                                                            <i class="conum" data-value="1"></i><b>(1)</b>
+std::vector&lt;float&gt; data(n + 2);
+
+for (std::size_t i = 0; i != n; ++i)                                     <i class="conum" data-value="2"></i><b>(2)</b>
+   data[i] = in[i] * 0.5f * (1 - std::cos(2 * std::numbers::pi_v&lt;float&gt; * i / n));
+
+f.forward(data.data());                                                  <i class="conum" data-value="3"></i><b>(3)</b>
+
+std::size_t peak = 1;
+for (std::size_t k = 2; k &lt; n/2; ++k)                                    <i class="conum" data-value="4"></i><b>(4)</b>
+{
+   if (std::hypot(data[2*k], data[2*k + 1])
+      &gt; std::hypot(data[2*peak], data[2*peak + 1]))
+      peak = k;
+}
+auto freq = peak * sps / n;                                              <i class="conum" data-value="5"></i><b>(5)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Build the <code>rfft</code> once, where the tuner is set up: it allocates.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Load the samples with a Hann window, which keeps a partial&#8217;s energy from spreading across distant bins.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Compute the forward FFT in place: bin <code>k</code> is at <code>data[2 * k]</code> (real) and <code>data[2 * k + 1]</code> (imaginary).</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Find the bin with the largest magnitude, skipping DC and Nyquist.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Convert the bin to Hz: bin <code>k</code> is centred on <code>k * sps / n</code>, here within 11 Hz at 44.1 kHz. A tuner refines this further.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_implementation_details"><a class="anchor" href="#_implementation_details"></a>Implementation Details</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+Implementation details are subject to change without notice. Rely only on the expressions above.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The Q native complex FFT is an iterative Cooley-Tukey transform, its radix-2 stages taken two at a time as radix-4 butterflies: three twiddle multiplies for four points. The first two stages, whose twiddles are 1 and -i, need no multiplies at all. The twiddle factors are computed once, in double precision, and the bit-reversal order is a list of the pairs to swap; both are made by the constructor. The Q native real FFT reads the <code>n</code> samples as <code>n/2</code> complex values, <code>z(m) = x(2m) + i x(2m+1)</code>, and transforms those with a complex FFT of half the size. Each pair of bins <code>k</code> and <code>n/2-k</code> of the result then separates into the transforms of the even and the odd samples, <code>E(k)</code> and <code>O(k)</code>, and <code>X(k) = E(k) + exp(-2πik/n) O(k)</code>. The inverse runs the same steps backwards, its <code>1/n</code> folded into the separation.</p>
+</div>
+<div class="paragraph">
+<p>PFFFT comes from Cycfi&#8217;s fork, <a href="https://github.com/cycfi/pffft">cycfi/pffft</a>, and is compiled into each translation unit that includes <code>fft.hpp</code>, inside a namespace of Q&#8217;s, with internal linkage. With <code>Q_USE_PFFFT</code> and without it, the classes live in different inline namespaces, so translation units built with and without it still link together, each with its own implementation.</p>
+</div>
+<div class="sect2">
+<h3 id="_performance"><a class="anchor" href="#_performance"></a>Performance</h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+Measured at 48 kHz in blocks of 32 samples (0.67 ms), on an Apple M2 and on an STM32H723 at 550 MHz with caches on. Average: the time a sample, and its share of a sample period. Worst: the slowest block, and its share of the block&#8217;s 0.67 ms; over 100%, it runs late. Figures are rounded and vary with the build and the input.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>An FFT runs a frame at a time, so its cost is given per transform: a forward real FFT of <code>n</code> samples. The inverse takes within a few percent of the forward.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 11.1111%;">
+<col style="width: 22.2222%;">
+<col style="width: 22.2222%;">
+<col style="width: 22.2222%;">
+<col style="width: 22.2223%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"><code>n</code></th>
+<th class="tableblock halign-left valign-top">Apple M2, Q native</th>
+<th class="tableblock halign-left valign-top">Apple M2, PFFFT</th>
+<th class="tableblock halign-left valign-top">STM32H723, Q native</th>
+<th class="tableblock halign-left valign-top">STM32H723, PFFFT (scalar)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">256</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">290 ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">83 ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">15 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">16 µs</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1024</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.7 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">460 ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">69 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">67 µs</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2048</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.9 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.2 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">144 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">165 µs</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4096</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8.1 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.4 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">324 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">371 µs</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8192</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">18 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5.1 µs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.81 ms</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.08 ms</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>On the H723 the two are even up to 1024 points, and Q native is faster above: by 13% at 2048 and 25% at 8192. CMSIS-DSP&#8217;s <code>arm_rfft_fast_f32</code> (version 1.6.0, built the same way) takes 172 µs at 2048, slower than both.</p>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+<script src="../../../../_/js/vendor/lunr.js"></script>
+<script src="../../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../../.." data-snippet-length="100" data-stylesheet="../../../../_/css/search.css"></script>
+<script async src="../../../../search-index.js"></script>
+  </body>
+</html>

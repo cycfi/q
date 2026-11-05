@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Pitch Detection :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.5/reference/pitch.html">
+    <meta name="generator" content="Antora 3.1.15">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+<script defer src="../../../_/js/lightbox.js"></script>
+<meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
+<link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="96x96" href="https://cycfi.com/assets/icons/favicon-96x96.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="https://cycfi.com/assets/icons/android-chrome-192x192.png"/>
+<link rel="icon" type="image/png" sizes="256x256" href="https://cycfi.com/assets/icons/android-chrome-256x256.png"/>
+<link rel="apple-touch-icon" type="image/png" href="https://cycfi.com/assets/icons/apple-touch-icon.png"/>
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <!--  Cycfi Logo -->
+      <a class="m-nav__logo" href="https://www.cycfi.com">
+        <svg version="1.1" x="0px" y="0px" width="200" viewBox="0 0 600 100" style="padding-top: 15;" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(2.55, 0, 0, 2.62, -464.010406, -1042.918213)" fill="#202020">
+            <path d="M234.37,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.7-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-3.5-0.04-4.6,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.59,0.66-0.76,1.35c-0.14,0.84-0.18,1.03-0.19,1.43l-0.14,3.91 c-0.01,0.39,0.04,0.84,0.09,1.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h33.85 c0.8,0,1.45,0.67,1.42,1.47L234.37,431.65z"/>
+            <path d="M276.06,433.02H257.9c-0.8,0-1.45-0.67-1.42-1.47l0.15-4.18c0.03-0.76,0.65-1.37,1.42-1.37h14.16 c1.91,0,3.52,0,4.61-0.12c1.23-0.13,1.75-0.25,2.17-0.71c0.36-0.39,0.4-2.52,0.4-2.52h-27.92c-11.11,0-13.26-5.13-13.1-9.44 l0.12-3.38c0.03-0.76,0.65-1.37,1.42-1.37h8.43c0.8,0,1.45,0.67,1.42,1.47l-0.05,1.36c-0.02,0.46-0.01,2.03,0.11,2.51 c0.1,0.42,0.44,0.82,0.78,1.07c0.47,0.35,0.83,0.42,1.64,0.54c0.9,0.14,2.09,0.21,3.54,0.21h24.09l0.21-5.8 c0.03-0.76,0.65-1.37,1.42-1.37h8.46c0.8,0,1.45,0.67,1.42,1.47l-0.49,13.57c-0.06,1.58-0.46,3.96-1.12,5.07 c-0.68,1.15-1.71,2.08-3.04,2.76c-1.23,0.63-2.76,1.07-4.56,1.32C280.44,432.9,278.4,433.02,276.06,433.02L276.06,433.02z"/>
+            <path d="M401.95,431.55l0.78-21.72c0.03-0.76,0.65-1.37,1.42-1.37h8.59c0.8,0,1.45,0.67,1.42,1.47l-0.78,21.72 c-0.03,0.76-0.65,1.37-1.42,1.37h-8.59C402.56,433.02,401.92,432.35,401.95,431.55z"/>
+            <path d="M346.77,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.71-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-2.47-0.04-3.58,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.58,0.66-0.76,1.35c-0.14,0.84-0.22,2.03-0.23,2.43l-0.07,1.91 c-0.01,0.39,0.01,1.84,0.06,2.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h32.83 c0.8,0,1.45,0.67,1.42,1.47L346.77,431.65z"/>
+            <path d="M386.2,425.88l-24.93-0.03l-0.21,5.8c-0.03,0.76-0.65,1.37-1.42,1.37h-8.46c-0.8,0-1.45-0.67-1.42-1.47 l0.49-13.57c0.06-1.58,0.46-3.96,1.12-5.07c0.68-1.15,1.71-2.08,3.04-2.76c1.23-0.63,2.76-1.07,4.56-1.32 c1.7-0.24,3.75-0.36,6.08-0.36l0,0h33.68c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.18c-0.03,0.76-0.65,1.37-1.42,1.37H368.9 c-1.91,0-3.52,0-4.61,0.12c-1.23,0.13-1.75,0.25-2.17,0.71c-0.36,0.39-0.4,2.52-0.4,2.52h24.63c0.8,0,1.45,0.67,1.42,1.47 l-0.15,4.22C387.59,425.28,386.96,425.88,386.2,425.88z"/>
+          </g>
+        </svg>
+      </a>
+      <a class="navbar-item" href="https://www.cycfi.com">Q Docs</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="q" data-version="v1.6">
+  <aside class="nav">
+    <div class="panels">
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../index.html">Q Audio DSP Library</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../installation.html">Setup and Installation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../setup.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../microcontrollers.html">Microcontrollers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../testing.html">Testing Q</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../q_plug/setup.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/standalone.html">The Standalone App</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/outside_project.html">Building Outside the Project</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/testing.html">Testing QPlug</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/advanced_builds.html">Advanced Builds</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../tutorials.html">Tutorials</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../tutorials/index.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../tutorials/index.html#_basics">Basics</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../tutorials/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../tutorials/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../tutorials/waveforms.html">Waveforms</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../tutorials/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../tutorials/io_delay.html">IO Delay</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../tutorials/index.html#_synthesis_and_midi">Synthesis and MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../tutorials/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../tutorials/square_synth.html">Square Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../tutorials/poly_synth.html">Polyphonic Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../tutorials/va_synth.html">Virtual Analog Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../tutorials/fm_synth.html">FM Synth</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../tutorials/index.html#_granular">Granular</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../tutorials/grain_freeze.html">Grain Freeze</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../tutorials/sustain_hold.html">Sustain Hold</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../q_plug/tutorials/index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/tutorials/gain.html">Your First Plugin: Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/tutorials/sampler.html">Sampler: Handing Data to the Audio Thread</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/tutorials/looper.html">Looper: Work for the Main Thread</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/tutorials/anna_1.html">Anna I: The Voice</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/tutorials/anna_2.html">Anna II: The Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/tutorials/anna_3.html">Anna III: The Chorus</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/tutorials/anna_4.html">Anna IV: Drawn Envelopes</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/tutorials/anna_5.html">Anna V: Presets</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/tutorials/dexter.html">Dexter: Full Featured DX7 Synth</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../reference.html">Reference</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="q_lib.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../fundamentals.html">Fundamentals</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="units.html">Units</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="units/frequency.html">Frequency</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="units/duration.html">Duration</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="units/period.html">Period</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="units/phase.html">Phase</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="units/phase_iterator.html">Phase Iterator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="units/decibel.html">Decibel</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="units/interval.html">Interval</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="units/pitch.html">Pitch</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="units/pitch_names.html">Pitch Names</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="units/literals.html">Literals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="biquad.html">Biquad</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="biquad/lowpass.html">Low Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="biquad/highpass.html">High Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="biquad/allpass.html">All Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="biquad/notch.html">Notch Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="biquad/peaking.html">Peaking Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="biquad/lowshelf.html">Low Shelf Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="biquad/highshelf.html">High Shelf Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="resonant.html">Resonant Filters</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="resonant/svf.html">State Variable Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="resonant/ladder.html">Ladder Filter</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="resonant/ota_ladder.html">OTA Ladder Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="resonant/chamberlin_filter.html">Chamberlin Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="envelope.html">Envelope</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="envelope/true_rms_envelope_follower.html">True RMS Envelope Follower</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="dynamic.html">Dynamic</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="dynamic/compressor.html">Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="dynamic/expander.html">Expander</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="dynamic/agc.html">AGC</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="misc.html">Miscellaneous</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/varispeed_tap.html">Varispeed Tap</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/sample_hold.html">Sample Hold</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/moving_maximum.html">Moving Maximum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/one_pole_highpass.html">One Pole High Pass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/dc_block.html">DC Block</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/dynamic_smoother.html">Dynamic Smoother</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/integrator.html">Integrator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/median3.html">Median</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/fast_downsample.html">Fast Downsample</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/differentiator.html">Differentiators</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/allpass.html">All-Pass Phase Shifters</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/hilbert_quadrature.html">Hilbert Quadrature</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/delta_gate.html">Delta Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/zero_crossing.html">Zero Crossing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/schmitt_trigger.html">Schmitt Trigger</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/window_comparator.html">Window Comparator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/edge.html">Edge Detectors</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/monostable.html">Monostable</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/peak.html">Peak</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/peak_picker.html">Peak Picker</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/spectral_flux.html">Spectral Flux</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/transient_detector.html">Transient Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/map.html">Map</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/clip.html">Clippers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/level_crossfade.html">Level Crossfade</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="misc/signal_conditioner.html">Signal Conditioner</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="synth.html">Synthesizers</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="synth/sin_osc.html">Sine Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="synth/grain.html">Grain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="synth/va.html">Virtual Analog</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/va/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/va/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/va/analog_osc.html">Analog Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/va/sync.html">Hard Sync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Generators</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/gen/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/gen/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/gen/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/gen/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/gen/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/gen/noise_gen.html">Noise Generators</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/gen/lfo_gen.html">LFO Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="synth/fm.html">FM Synthesis</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/fm/fm_operator.html">FM Operator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/fm/fm_routing.html">FM Routing</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/fm/fm_algorithm.html">FM Algorithm</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/fm/fm_voice.html">FM Voice</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/fm/dx_patcher.html">DX Patcher</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/fm/dx_sysex.html">DX System Exclusive</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="synth/fm/dx7_design.html">DX7 Design Notes</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="spectral.html">Frequency Domain</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="spectral/fft.html">FFT</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="spectral/spectral_learner.html">Spectral Learner</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="spectral/lpc_fit.html">LPC Fit</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="spectral/eq_matcher.html">EQ Matcher</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="spectral/convolver.html">Convolver</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="support.html">Support</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="support/base.html">Base</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="support/fast_math.html">Fast Math</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="support/basic_concepts.html">Basic Concepts</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="support/flush_denormals.html">Flush Denormals</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="support/audio_stream.html">Audio Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="midi.html">MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="midi/messages.html">MIDI 1.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="midi/controller_numbers.html">MIDI Controller Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="midi/notes.html">MIDI Notes</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="midi/midi2_messages.html">MIDI 2.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="midi/processor.html">MIDI Processor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="midi/readers.html">MIDI Readers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="midi/stages.html">MIDI Stages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="midi/translation.html">MIDI Translation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="midi/per_note.html">Per-Note Expression</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="midi/endpoint.html">MIDI Endpoint</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="midi/ci.html">MIDI Capability Inquiry</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="midi/conformance.html">MIDI 2.0 Conformance</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="utility.html">Utility</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="utility/ring_buffer.html">Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="utility/sample_interpolation.html">Sample Interpolation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="utility/best_lag.html">Best Lag</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="utility/antialiasing.html">Antialiasing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="utility/float_convert.html">Sample Format Conversion</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="utility/bitset.html">Bitset</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="utility/handoff.html">Handoff</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="utility/ring_allocator.html">Ring Allocator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="utility/tasks.html">Tasks</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="utility/audio_clock.html">Audio Clock</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item is-current-page" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="pitch.html">Pitch Detection</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="pitch/bacf_period_detector.html">BACF Period Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="pitch/bacf_pitch_detector.html">BACF Pitch Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="pitch/bitstream_acf.html">Bitstream Autocorrelation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="pitch/zero_crossing_collector.html">Zero Crossing Collector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="pitch/bacf_lag_tracker.html">BACF Lag Tracker</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="pitch_shifting.html">Pitch Shifting</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="pitch_shifting/bacf_pitch_shifter.html">BACF Pitch Shifter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="pitch_shifting/formant_preservation.html">Formant Preservation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="pitch_shifting/formant_learner.html">Formant Learner</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="pitch_shifting/formant_table.html">Formant Table</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="pitch_shifting/formant_corrector.html">Formant Corrector</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="q_io.html">QIO</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="q_io/audio_device.html">Audio Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="q_io/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="q_io/audio_file.html">Audio File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="q_io/midi_file.html">MIDI File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="q_io/midi_device.html">MIDI Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="q_io/midi_stream.html">MIDI Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="q_io/midi2_stream.html">MIDI 2.0 Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../q_plug/index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/architecture.html">Architecture</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/reference/entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/reference/parameter.html">Parameters</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/reference/controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/reference/data_stream.html">Data Streams</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/reference/processor.html">Processor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/reference/midi.html">MIDI</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/reference/presenter.html">Presenter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/reference/header.html">The Header</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/reference/zoom.html">Zoom and Display Scale</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Q Audio DSP Library</span>
+    <span class="version">v1.6-beta.1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../../v1.5/index.html">Q Audio DSP Library</a></div>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="../index.html">v1.6-beta.1</a>
+        </li>
+        <li class="version is-latest">
+          <a href="../../v1.5/index.html">v1.5</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../v1.5/index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Q Audio DSP Library</a></li>
+    <li><a href="../reference.html">Reference</a></li>
+    <li><a href="q_lib.html">Q</a></li>
+    <li><a href="pitch.html">Pitch Detection</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">v1.6-beta.1</button>
+  <div class="version-menu">
+    <a class="version is-current" href="pitch.html">v1.6-beta.1</a>
+    <a class="version" href="../../v1.5/reference/pitch.html">v1.5</a>
+  </div>
+</div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Pitch Detection</h1>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Bitstream Autocorrelation, or BACF, is an accurate, extremely fast and efficient time-domain pitch detection algorithm, and the method of Q&#8217;s pitch detectors. BACF can be at least as accurate as any pitch detection scheme based on autocorrelation. Unlike the standard autocorrelation function (ACF), BACF works on zero crossings, the <strong>bitstream</strong>, using bitwise operations.</p>
+</div>
+<div class="paragraph">
+<p>Autocorrelation is the correlation of a signal with a delayed copy of itself, as a function of the delay. It finds repeating patterns, such as a periodic signal obscured by noise, or a missing fundamental implied by its harmonics.</p>
+</div>
+<div class="paragraph">
+<p>BACF is fast: about 50 nanoseconds a sample, on a 2016 MacBook Pro, tracking guitar phrases with legato, hammer-ons, pull-offs, vibrato, staccato and right-hand tapping (see <a href="#_performance">Performance</a>).</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="📢 &#160;IMPORTANT"></i>
+</td>
+<td class="content">
+Q&#8217;s BACF pitch detection is tuned for <strong>multichannel guitar</strong> and tested on it: the test suite covers a 2-octave range on every string of 6-string and 8-string guitars. The algorithm is generic and applies to other sources, but instruments outside that range, especially ones that need more than 2 octaves, may perform differently.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The API is documented on the member pages: <a href="pitch/bacf_pitch_detector.html" class="xref page">BACF Pitch Detector</a>, <a href="pitch/bacf_period_detector.html" class="xref page">BACF Period Detector</a>, <a href="pitch/bitstream_acf.html" class="xref page">Bitstream Autocorrelation</a> and <a href="pitch/zero_crossing_collector.html" class="xref page">Zero Crossing Collector</a>. The <a href="pitch/bacf_lag_tracker.html" class="xref page">BACF Lag Tracker</a> uses the same engine to follow the lag at which a signal repeats, a period or a multiple of one, for time-domain splicing.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_zero_crossings"><a class="anchor" href="#_zero_crossings"></a>Zero Crossings</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Timing the zero crossings gives the period, and its reciprocal, the frequency. It is the simplest form of pitch detection. It works on pure sine waves and on fairly clean waveforms such as triangle, sawtooth, pulse and square waves, and fails when a cycle has several transitions.</p>
+</div>
+<div id="fig-pitch-pattern" class="imageblock text-center">
+<div class="content">
+<a class="image" href="../_images/pitch_bacf_pattern.svg"><img src="../_images/pitch_bacf_pattern.svg" alt="A guitar low E and its zero crossings" width="820px"></a>
+</div>
+<div class="title">Figure 1. A guitar low E, a second after the pick, and its zero crossings: three pulses a cycle, a wide one followed by two narrower ones</div>
+</div>
+<div class="paragraph">
+<p><a href="#fig-pitch-pattern">Figure 1</a> is a guitar&#8217;s low E string, a second after the pick. Its 2nd and 3rd harmonics are strong, as is common with plucked strings, and each cycle crosses zero six times. Heavy low-pass filtering would tame the waveform, at the cost of phase lag, too much for a real-time detector.</p>
+</div>
+<div class="paragraph">
+<p>The crossings still form a pattern, one wide pulse followed by two successively narrower ones, repeating every cycle. Autocorrelation is the tool for finding repeating patterns.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_autocorrelation"><a class="anchor" href="#_autocorrelation"></a>Autocorrelation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Standard autocorrelation multiplies the signal by a delayed copy of itself and sums the products, at every lag (<a href="#fig-pitch-acf">Figure 2</a>). The sum peaks where the copy lines up with the signal: at the period.</p>
+</div>
+<div id="fig-pitch-acf" class="imageblock text-center">
+<div class="content">
+<a class="image" href="../_images/pitch_acf.svg"><img src="../_images/pitch_acf.svg" alt="Standard autocorrelation of a guitar low E" width="760px"></a>
+</div>
+<div class="title">Figure 2. The low E of Figure 1 against a copy delayed by 187 samples (top), and the normalized sum of products against lag (bottom): the peak is at the period, 536 samples</div>
+</div>
+<div class="paragraph">
+<p>The multiplication is the most expensive part: for a window of N samples, roughly N/2 x N/2 multiply-accumulates. Popular ACF-based detectors and their variants, AMDF (average magnitude difference function), ASDF (average squared difference function), YIN and MPM, have the same cost. An FFT computes the autocorrelation faster, and is still expensive for many channels on a small microcontroller.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_bitstream_autocorrelation"><a class="anchor" href="#_bitstream_autocorrelation"></a>Bitstream Autocorrelation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>BACF autocorrelates the zero-crossing bitstream in place of the samples. With only ones and zeros, the multiplication is a bitwise operation, and a machine word holds 32 or 64 samples.</p>
+</div>
+<div class="paragraph">
+<p>The product of two bits is an AND:</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 40%;">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-top">A</th>
+<th class="tableblock halign-center valign-top">B</th>
+<th class="tableblock halign-center valign-top">A * B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Binary 1 and 0 stand for other values, though, and 0 may as well stand for -1, since audio signals run from -1 to +1:</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 40%;">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-top">A</th>
+<th class="tableblock halign-center valign-top">B</th>
+<th class="tableblock halign-center valign-top">A * B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">+1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">+1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">+1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">+1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">+1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">+1</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>That is an XNOR. BACF takes its inverse, the XOR, which gives a 1 for each mismatch:</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 40%;">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-top">A</th>
+<th class="tableblock halign-center valign-top">B</th>
+<th class="tableblock halign-center valign-top">A ^ B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>After the XOR, the bits set to 1 are counted. The lower the count, the higher the periodicity. The count and the window size give a normalized periodicity from 0 to 1, where 1, a count of zero, is a perfect match. One XOR compares a whole word, so BACF is faster than the ACF by the word size (64 on a 64-bit machine), and integer bit operations are cheaper than floating-point multiplication.</p>
+</div>
+<div id="fig-pitch-bacf" class="imageblock text-center">
+<div class="content">
+<a class="image" href="../_images/pitch_bacf_low_e.svg"><img src="../_images/pitch_bacf_low_e.svg" alt="BACF of a guitar low E" width="760px"></a>
+</div>
+<div class="title">Figure 3. BACF of the low E of Figure 1: the input (top), the bitset (middle), and the periodicity of each analysis, one after another (bottom). Each analysis peaks at the period, 535 to 537 samples</div>
+</div>
+<div class="paragraph">
+<p><a href="#fig-pitch-bacf">Figure 3</a> is BACF on the low E of <a href="#fig-pitch-pattern">Figure 1</a>. The graphs on this page and the member pages are the output of Q&#8217;s test suite, <code>test/pitch/pitch_detector_ex.cpp</code>, which runs the <a href="pitch/bacf_pitch_detector.html" class="xref page">BACF Pitch Detector</a> on the guitar samples at 44.1 kHz and writes what it computes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Top:</strong> the detector&#8217;s input, band-passed, compressed and clipped by the test.</p>
+</li>
+<li>
+<p><strong>Middle:</strong> the bitset of each analysis. It holds only the significant pulses, those at least 60% as high as the highest: here, the wide pulse of each cycle.</p>
+</li>
+<li>
+<p><strong>Bottom:</strong> the bitstream autocorrelation, as periodicity, one analysis after another. The window spans two periods of the lowest frequency of interest, rounded to whole words: 1344 samples here, for a range of 66 to 412 Hz. An analysis runs every half window, 672 samples, over lags from 0 to half the window. Each starts with a blank, the lags below the shortest period of interest, which are not computed.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Each analysis peaks where the cycle starts to repeat: the period, here 535 to 537 samples, with a periodicity of 0.993. The height of the peak measures how periodic the signal is. The period is read from the interpolated zero crossings of the edges that bound it, to a fraction of a sample (see <a href="#_results">Results</a>).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_more_graphs"><a class="anchor" href="#_more_graphs"></a>More Graphs</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The open strings of a guitar, a second after the pick, from the same tests. Each detector&#8217;s range is 0.8 to 5 times the string&#8217;s open note, so the window is shorter on the higher strings.</p>
+</div>
+<div id="fig-pitch-a" class="imageblock text-center">
+<div class="content">
+<a class="image" href="../_images/pitch_bacf_a.svg"><img src="../_images/pitch_bacf_a.svg" alt="BACF of the A string" width="760px"></a>
+</div>
+<div class="title">Figure 4. The A string: each analysis peaks at 402 samples, periodicity 0.95 to 0.996</div>
+</div>
+<div id="fig-pitch-d" class="imageblock text-center">
+<div class="content">
+<a class="image" href="../_images/pitch_bacf_d.svg"><img src="../_images/pitch_bacf_d.svg" alt="BACF of the D string" width="760px"></a>
+</div>
+<div class="title">Figure 5. The D string: each analysis peaks at 301 samples, periodicity 0.997 to 1</div>
+</div>
+<div id="fig-pitch-g" class="imageblock text-center">
+<div class="content">
+<a class="image" href="../_images/pitch_bacf_g.svg"><img src="../_images/pitch_bacf_g.svg" alt="BACF of the G string" width="760px"></a>
+</div>
+<div class="title">Figure 6. The G string: each analysis peaks at 225 samples, periodicity 0.90 to 0.993</div>
+</div>
+<div id="fig-pitch-b" class="imageblock text-center">
+<div class="content">
+<a class="image" href="../_images/pitch_bacf_b.svg"><img src="../_images/pitch_bacf_b.svg" alt="BACF of the B string" width="760px"></a>
+</div>
+<div class="title">Figure 7. The B string: each analysis peaks at 175 to 179 samples, periodicity 1</div>
+</div>
+<div id="fig-pitch-high-e" class="imageblock text-center">
+<div class="content">
+<a class="image" href="../_images/pitch_bacf_high_e.svg"><img src="../_images/pitch_bacf_high_e.svg" alt="BACF of the high E string" width="760px"></a>
+</div>
+<div class="title">Figure 8. The high E string: each analysis peaks at 134 samples, periodicity 1</div>
+</div>
+<div class="paragraph">
+<p>The A, D, G, B and high E strings are in <a href="#fig-pitch-a">Figure 4</a>, <a href="#fig-pitch-d">Figure 5</a>, <a href="#fig-pitch-g">Figure 6</a>, <a href="#fig-pitch-b">Figure 7</a> and <a href="#fig-pitch-high-e">Figure 8</a>. Each analysis peaks at the string&#8217;s period. On the B and high E, the harmonics leave lower peaks early in each analysis: 0.84 at 36 samples on the B, 0.84 at 57 on the high E.</p>
+</div>
+<div id="fig-pitch-low-e-12th" class="imageblock text-center">
+<div class="content">
+<a class="image" href="../_images/pitch_bacf_low_e_12th.svg"><img src="../_images/pitch_bacf_low_e_12th.svg" alt="BACF of the low E at the 12th fret" width="760px"></a>
+</div>
+<div class="title">Figure 9. The low E string at the 12th fret, an octave up, in the window of the open string: two peaks per analysis, at 269 and 537 samples</div>
+</div>
+<div class="paragraph">
+<p>At the 12th fret, an octave up, the low E keeps the range of the open string, so half a window holds two cycles (<a href="#fig-pitch-low-e-12th">Figure 9</a>). Each analysis has two peaks of equal height, 0.999, at one and two periods. The detector settles the two candidates on the shorter period (see <a href="pitch/bacf_period_detector.html#_sub_collector" class="xref page">Sub-Collector</a>).</p>
+</div>
+<div class="paragraph">
+<p>Autocorrelation also finds the period of a missing fundamental, since the waveform still repeats at the fundamental&#8217;s period. The test suite checks it with a synthetic tone of the 2nd and 3rd harmonics only (see <a href="#_results">Results</a>).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_data_flow"><a class="anchor" href="#_the_data_flow"></a>The Data Flow</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The detector is a pipeline of four classes, from samples to frequency (<a href="#fig-pitch-flow">Figure 10</a>):</p>
+</div>
+<div id="fig-pitch-flow" class="imageblock text-center">
+<div class="content">
+<a class="image" href="../_images/pitch_detection_flow.svg"><img src="../_images/pitch_detection_flow.svg" alt="Pitch detection data flow" width="244px"></a>
+</div>
+<div class="title">Figure 10. The pitch detection pipeline, from samples to frequency</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Zero crossing.</strong> <a href="pitch/zero_crossing_collector.html" class="xref page">Zero Crossing Collector</a> records the crossings, with hysteresis, and the pulses between them, timing each crossing to a fraction of a sample.</p>
+</li>
+<li>
+<p><strong>Bitset and sub-collector.</strong> <a href="pitch/bacf_period_detector.html" class="xref page">BACF Period Detector</a> packs the significant pulses into a bitset, proposes candidate periods from pairs of edges, and keeps the pair that bounds one cycle (see <a href="pitch/bacf_period_detector.html#_sub_collector" class="xref page">Sub-Collector</a>).</p>
+</li>
+<li>
+<p><strong>BACF.</strong> <a href="pitch/bitstream_acf.html" class="xref page">Bitstream Autocorrelation</a> scores each candidate by XOR and bit count.</p>
+</li>
+<li>
+<p><strong>Bias.</strong> <a href="pitch/bacf_pitch_detector.html" class="xref page">BACF Pitch Detector</a> holds the octave against harmonic jumps, and passes the frequency through a 3-point median (see <a href="pitch/bacf_pitch_detector.html#_bias" class="xref page">Bias</a>).</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_results"><a class="anchor" href="#_results"></a>Results</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>From Q&#8217;s test suite (<code>test/pitch/pitch_detector.cpp</code>): one second of each test signal at 44.1 kHz, the partials at 0.3, 0.4 and 0.3 unless noted, the detector&#8217;s range 0.8 to 5 times the lowest note of the test, and the error of every frequency the detector reports, in cents.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 22.2222%;">
+<col style="width: 22.2222%;">
+<col style="width: 22.2223%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Test case</th>
+<th class="tableblock halign-left valign-top">Average error</th>
+<th class="tableblock halign-left valign-top">Min error</th>
+<th class="tableblock halign-left valign-top">Max error</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Middle C (261.63 Hz)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0015</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0001</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0025</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Middle A (440 Hz)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0028</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0001</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0061</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Low E (82.41 Hz)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00004</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00003</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0001</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Low E, 12th fret</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00007</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00003</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0001</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Low E, 24th fret</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0002</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00003</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0006</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A (110 Hz)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.000001</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0001</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A, 12th fret</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00008</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0001</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A, 24th fret</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0004</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0011</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">D (146.83 Hz)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0002</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00002</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0004</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">D, 12th fret</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0008</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00002</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0016</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">D, 24th fret</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0034</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00002</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0096</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">G (196 Hz)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00006</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00006</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00006</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">G, 12th fret</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00007</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00006</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00008</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">G, 24th fret</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0002</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00006</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0105</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">B (246.94 Hz)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0010</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.000002</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0019</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">B, 12th fret</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0052</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0002</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0160</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">B, 24th fret</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0055</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0003</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0362</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High E (329.63 Hz)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0011</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00003</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0031</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High E, 12th fret</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0042</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00003</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0133</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High E, 24th fret</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0230</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00003</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0649</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Phase offsets</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0001</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00003</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0003</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Missing fundamental</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0012</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.00003</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0046</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Non-integer harmonics</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.02</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.94</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.13</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The phase-offset case shifts the partials' phases (0.1, 0.5 and 0.4 of a cycle). The missing fundamental has the 2nd and 3rd harmonics at 0.5 each. The non-integer case puts the 2nd harmonic at 2.003 times the fundamental, so the waveform never repeats exactly.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_performance"><a class="anchor" href="#_performance"></a>Performance</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>On a 2016 MacBook Pro, the detector averages about 50 nanoseconds a sample on guitar phrases, with sub-cent accuracy on sustained notes. The speed comes from three savings: sparse zero-crossing edges in place of every sample, a word of bits per XOR in place of one multiply per sample, and a period read from the edges in place of a sweep over every lag.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_phrase_tests"><a class="anchor" href="#_phrase_tests"></a>Phrase Tests</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The tests use typical playing techniques: legato, hammer-ons and pull-offs, vibrato, staccato and right-hand tapping. In each recording, from the 2020 article, the left channel is the guitar and the right is a square wave that follows the detected pitch, with an envelope follower shaping its level and filter. All are recorded with the Nu multichannel pickup, except the short staccato, a synthesized sine burst.</p>
+</div>
+<div class="paragraph">
+<p><strong>Melodic lines (legato).</strong></p>
+</div>
+<div class="audioblock">
+<div class="title">Line 1</div>
+<div class="content">
+<audio src="https://media.cycfi.com/q/pitch-detection/pitch_follower_GLines1.mp3" controls>
+Your browser does not support the audio tag.
+</audio>
+</div>
+</div>
+<div class="audioblock">
+<div class="title">Line 2</div>
+<div class="content">
+<audio src="https://media.cycfi.com/q/pitch-detection/pitch_follower_GLines2.mp3" controls>
+Your browser does not support the audio tag.
+</audio>
+</div>
+</div>
+<div class="audioblock">
+<div class="title">Line 3</div>
+<div class="content">
+<audio src="https://media.cycfi.com/q/pitch-detection/pitch_follower_GLines3.mp3" controls>
+Your browser does not support the audio tag.
+</audio>
+</div>
+</div>
+<div class="audioblock">
+<div class="title">Short line</div>
+<div class="content">
+<audio src="https://media.cycfi.com/q/pitch-detection/pitch_follower_GShortLines.mp3" controls>
+Your browser does not support the audio tag.
+</audio>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Staccato.</strong></p>
+</div>
+<div class="audioblock">
+<div class="title">Staccato</div>
+<div class="content">
+<audio src="https://media.cycfi.com/q/pitch-detection/pitch_follower_GStaccato.mp3" controls>
+Your browser does not support the audio tag.
+</audio>
+</div>
+</div>
+<div class="audioblock">
+<div class="title">Short staccato</div>
+<div class="content">
+<audio src="https://media.cycfi.com/q/pitch-detection/pitch_follower_ShortStaccato.mp3" controls>
+Your browser does not support the audio tag.
+</audio>
+</div>
+</div>
+<div class="audioblock">
+<div class="title">Single staccato note</div>
+<div class="content">
+<audio src="https://media.cycfi.com/q/pitch-detection/pitch_follower_SingleStaccato.mp3" controls>
+Your browser does not support the audio tag.
+</audio>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Articulations.</strong></p>
+</div>
+<div class="audioblock">
+<div class="title">Hammer-ons and pull-offs</div>
+<div class="content">
+<audio src="https://media.cycfi.com/q/pitch-detection/pitch_follower_Hammer-Pull-High-E.mp3" controls>
+Your browser does not support the audio tag.
+</audio>
+</div>
+</div>
+<div class="audioblock">
+<div class="title">Right-hand tapping</div>
+<div class="content">
+<audio src="https://media.cycfi.com/q/pitch-detection/pitch_follower_Tapping-D.mp3" controls>
+Your browser does not support the audio tag.
+</audio>
+</div>
+</div>
+<div class="audioblock">
+<div class="title">Slide</div>
+<div class="content">
+<audio src="https://media.cycfi.com/q/pitch-detection/pitch_follower_Slide-G.mp3" controls>
+Your browser does not support the audio tag.
+</audio>
+</div>
+</div>
+<div class="audioblock">
+<div class="title">Bend and slide</div>
+<div class="content">
+<audio src="https://media.cycfi.com/q/pitch-detection/pitch_follower_Bend-Slide-G.mp3" controls>
+Your browser does not support the audio tag.
+</audio>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_prediction_and_zero_latency_attacks"><a class="anchor" href="#_prediction_and_zero_latency_attacks"></a>Prediction and Zero-Latency Attacks</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Any detector based on autocorrelation needs at least two cycles, since a cycle is correlated with the next. The zero-crossing edges on or just before the onset give an earlier prediction, from the first two similar pulses: one cycle at the least, about 12 ms for the low E string (1/82.41 Hz).</p>
+</div>
+<div id="fig-pitch-onset" class="imageblock text-center">
+<div class="content">
+<a class="image" href="../_images/pitch_bacf_low_e_onset.svg"><img src="../_images/pitch_bacf_low_e_onset.svg" alt="Prediction at a low E onset" width="760px"></a>
+</div>
+<div class="title">Figure 11. A guitar low E from the pick (top), and the frequency predicted from the zero-crossing edges (bottom)</div>
+</div>
+<div class="paragraph">
+<p><a href="#fig-pitch-onset">Figure 11</a> is the low E of the tests, from the pick. The test&#8217;s input opens at 0.992 s. The first prediction, 82.4 Hz, is at 1.029 s, three cycles in, and 82.6 Hz from 1.041 s. <code>bacf_pitch_detector</code> gives the prediction through <code>predict_frequency()</code>, and <code>bacf_period_detector</code> through <code>predict_period()</code>.</p>
+</div>
+<div class="paragraph">
+<p>Attack transients need not be periodic at all. A Hammond organ has its key click, a violin its bow noise, a voice its unvoiced consonants, and a guitar pick sounds "clik" or "clok" depending on where you pick. A percussive or semi-periodic sound under about 20 ms gives the note character without setting its pitch, and does not sound out of tune whatever its frequency. A synthesizer that follows the pitch can start at the pick with the attack, and take up the pitch from the prediction, with no audible latency.</p>
+</div>
+<div class="audioblock">
+<div class="title">Low E, tracked with a zero-latency attack</div>
+<div class="content">
+<audio src="https://media.cycfi.com/q/pitch-detection/pitch_follower_1a-Low-E.wav" controls>
+Your browser does not support the audio tag.
+</audio>
+</div>
+</div>
+<div class="paragraph">
+<p>A wrong prediction that corrects downward, from too high to the right pitch, is barely perceptible. One that corrects upward is more pronounced, as in the glitch below, a low onset predicted too low. When a prediction is uncertain, err high.</p>
+</div>
+<div class="audioblock">
+<div class="title">An audible glitch when a low onset is predicted too low and corrects upward</div>
+<div class="content">
+<audio src="https://media.cycfi.com/q/pitch-detection/glitch.mp3" controls>
+Your browser does not support the audio tag.
+</audio>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_history"><a class="anchor" href="#_history"></a>History</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>BACF was first published in the 2018 articles listed under <a href="#_further_reading">Further Reading</a>; the 2020 article describes the algorithm as Q implements it. After the first article, I learned of David Warrender&#8217;s hardware pitch analyzer from the 1980s, whose patent (since expired) covers a related zero-crossing correlation technique: prior art, credited here.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_further_reading"><a class="anchor" href="#_further_reading"></a>Further Reading</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The three articles this overview is based on, with the full derivation, measurements, and listening tests:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://www.cycfi.com/2018/03/fast-and-efficient-pitch-detection-bitstream-autocorrelation/" target="_blank" rel="noopener">Fast and Efficient Pitch Detection: Bitstream Autocorrelation</a> (2018), the original method.</p>
+</li>
+<li>
+<p><a href="https://www.cycfi.com/2018/04/fast-and-efficient-pitch-detection-bliss/" target="_blank" rel="noopener">Fast and Efficient Pitch Detection: Bliss!</a> (2018), BACF on real guitar recordings: harmonics, multiple edges and note onsets.</p>
+</li>
+<li>
+<p><a href="https://www.cycfi.com/2020/07/fast-and-efficient-pitch-detection-revisited/" target="_blank" rel="noopener">Fast and Efficient Pitch Detection: Revisited</a> (2020), the matured algorithm and the data flow above.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The wider reading those articles collect, on pitch detection in general:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://www.cycfi.com/2017/10/fast-and-efficient-pitch-detection/" target="_blank" rel="noopener">Fast and Efficient Pitch Detection</a></p>
+</li>
+<li>
+<p><a href="https://www.cycfi.com/2017/11/fast-and-efficient-pitch-detection-double-trouble/" target="_blank" rel="noopener">Fast and Efficient Pitch Detection: Double Trouble</a></p>
+</li>
+<li>
+<p><a href="https://gerrybeauregard.wordpress.com/2013/07/15/high-accuracy-monophonic-pitch-estimation-using-normalized-autocorrelation/" target="_blank" rel="noopener">High Accuracy Monophonic Pitch Estimation Using Normalized Autocorrelation</a></p>
+</li>
+<li>
+<p><a href="https://sound.eti.pg.gda.pl/papers/pitch_detection_algorithms.pdf" target="_blank" rel="noopener">High Accuracy and Octave Error Immune Pitch Detection Algorithms</a></p>
+</li>
+<li>
+<p><a href="https://github.com/dorajam/Voice-detection" target="_blank" rel="noopener">Sound recognition with neural networks</a></p>
+</li>
+<li>
+<p><a href="https://dsp.stackexchange.com/questions/13156/hps-algorithm-for-detecting-the-fundamental-frequency-of-a-guitar-string" target="_blank" rel="noopener">HPS Algorithm for detecting the fundamental frequency of a guitar string</a></p>
+</li>
+<li>
+<p><a href="https://music.columbia.edu/pipermail/music-dsp/2011-February/069743.html" target="_blank" rel="noopener">Adaptive filter pitch detection?</a></p>
+</li>
+<li>
+<p><a href="http://www.music.mcgill.ca/~ich/classes/mumt611_06/Presentations/savard/bib_pitchTrk.html" target="_blank" rel="noopener">An overview of monophonic pitch detection algorithms</a></p>
+</li>
+<li>
+<p><a href="https://stackoverflow.com/questions/1354084/real-time-pitch-detection" target="_blank" rel="noopener">Real time pitch detection</a></p>
+</li>
+<li>
+<p><a href="http://www.tedknowlton.com/resume/CCPPT.htm" target="_blank" rel="noopener">Computer Controlled Precision Piano Tuner Using DSP for Frequency Measurement</a></p>
+</li>
+<li>
+<p><a href="http://cnx.org/content/m11714/latest/" target="_blank" rel="noopener">Pitch Detection Algorithms</a></p>
+</li>
+<li>
+<p><a href="http://www.ime.usp.br/~mqz/Mitre_AESBR2006.pdf" target="_blank" rel="noopener">Accurate and Efficient Fundamental Frequency Determination from Precise Partial Estimates</a></p>
+</li>
+<li>
+<p><a href="http://bingweb.binghamton.edu/~hhu1/paper/Zahorian2008spectral.pdf" target="_blank" rel="noopener">A spectral/temporal method for robust fundamental frequency tracking</a></p>
+</li>
+<li>
+<p><a href="https://dsp.stackexchange.com/questions/42302/how-can-i-measure-the-harmonicity-of-an-audio-spectrum/42315" target="_blank" rel="noopener">How can I measure the harmonicity of an audio spectrum?</a> (Robert Bristow-Johnson)</p>
+</li>
+<li>
+<p><a href="https://dsp.stackexchange.com/questions/22067/what-is-an-amdf/22070" target="_blank" rel="noopener">What is an AMDF?</a> (Robert Bristow-Johnson)</p>
+</li>
+<li>
+<p><a href="https://dsp.stackexchange.com/questions/29962/how-to-deal-with-low-fundamental-when-using-amdf-for-pitch-extraction/29968" target="_blank" rel="noopener">How to deal with low fundamental when using AMDF for pitch extraction?</a> (Robert Bristow-Johnson)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script src="../../../_/js/vendor/lunr.js"></script>
+<script src="../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../.." data-snippet-length="100" data-stylesheet="../../../_/css/search.css"></script>
+<script async src="../../../search-index.js"></script>
+  </body>
+</html>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 390" font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'>
+<defs><marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/></marker></defs>
+<text x="75.0" y="26" font-size="15" fill="#1a1a1a">Pitch up: the read catches up. Before it reaches the write, it jumps back.</text>
+<rect x="75.0" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="94.0,93.0 94.0,90.1" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="94.0" cy="90.1" r="3" fill="#5d5d5d"/>
+<rect x="115.0" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="134.0,93.0 134.0,84.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="134.0" cy="84.2" r="3" fill="#5d5d5d"/>
+<rect x="155.0" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="174.0,93.0 174.0,88.9" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="174.0" cy="88.9" r="3" fill="#5d5d5d"/>
+<rect x="195.0" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="214.0,93.0 214.0,95.3" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="214.0" cy="95.3" r="3" fill="#5d5d5d"/>
+<rect x="235.0" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="254.0,93.0 254.0,106.5" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="254.0" cy="106.5" r="3" fill="#5d5d5d"/>
+<rect x="275.0" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="294.0,93.0 294.0,90.1" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="294.0" cy="90.1" r="3" fill="#5d5d5d"/>
+<rect x="315.0" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="334.0,93.0 334.0,84.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="334.0" cy="84.2" r="3" fill="#5d5d5d"/>
+<rect x="355.0" y="74" width="38" height="38" rx="4" fill="#fff3cd" stroke="#ffb300"/>
+<polyline points="374.0,93.0 374.0,88.9" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="374.0" cy="88.9" r="3" fill="#5d5d5d"/>
+<rect x="395.0" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="414.0,93.0 414.0,95.3" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="414.0" cy="95.3" r="3" fill="#5d5d5d"/>
+<rect x="435.0" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="454.0,93.0 454.0,106.5" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="454.0" cy="106.5" r="3" fill="#5d5d5d"/>
+<rect x="475.0" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="494.0,93.0 494.0,90.1" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="494.0" cy="90.1" r="3" fill="#5d5d5d"/>
+<rect x="515.0" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="534.0,93.0 534.0,84.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="534.0" cy="84.2" r="3" fill="#5d5d5d"/>
+<rect x="555.0" y="74" width="38" height="38" rx="4" fill="#fff3cd" stroke="#ffb300"/>
+<polyline points="574.0,93.0 574.0,88.9" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="574.0" cy="88.9" r="3" fill="#5d5d5d"/>
+<rect x="595.0" y="74" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="614.0,93.0 614.0,95.3" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="614.0" cy="95.3" r="3" fill="#5d5d5d"/>
+<text x="614.0" y="50" font-size="15" text-anchor="middle" fill="#1a1a1a">write</text>
+<line x1="614.0" y1="54" x2="614.0" y2="71" stroke="#1a1a1a" stroke-width="2" marker-end="url(#head)"/>
+<line x1="574.0" y1="132" x2="574.0" y2="115" stroke="#e53935" stroke-width="2" marker-end="url(#head)"/>
+<text x="574.0" y="148" font-size="15" text-anchor="middle" fill="#e53935">read</text>
+<path d="M574.0,66 Q474.0,32 374.0,66" fill="none" stroke="#e53935" stroke-width="1.6" stroke-dasharray="5 3" marker-end="url(#head)"/>
+<text x="474.0" y="40" font-size="15" text-anchor="middle" fill="#e53935">splice: back one period</text>
+<text x="641.0" y="98.0" font-size="15" fill="#1565c0">delay 1</text>
+<text x="75.0" y="216" font-size="15" fill="#1a1a1a">Pitch down: the read falls behind. Past a period behind, it jumps forward.</text>
+<rect x="75.0" y="264" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="94.0,283.0 94.0,280.1" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="94.0" cy="280.1" r="3" fill="#5d5d5d"/>
+<rect x="115.0" y="264" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="134.0,283.0 134.0,274.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="134.0" cy="274.2" r="3" fill="#5d5d5d"/>
+<rect x="155.0" y="264" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="174.0,283.0 174.0,278.9" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="174.0" cy="278.9" r="3" fill="#5d5d5d"/>
+<rect x="195.0" y="264" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="214.0,283.0 214.0,285.3" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="214.0" cy="285.3" r="3" fill="#5d5d5d"/>
+<rect x="235.0" y="264" width="38" height="38" rx="4" fill="#fff3cd" stroke="#ffb300"/>
+<polyline points="254.0,283.0 254.0,296.5" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="254.0" cy="296.5" r="3" fill="#5d5d5d"/>
+<rect x="275.0" y="264" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="294.0,283.0 294.0,280.1" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="294.0" cy="280.1" r="3" fill="#5d5d5d"/>
+<rect x="315.0" y="264" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="334.0,283.0 334.0,274.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="334.0" cy="274.2" r="3" fill="#5d5d5d"/>
+<rect x="355.0" y="264" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="374.0,283.0 374.0,278.9" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="374.0" cy="278.9" r="3" fill="#5d5d5d"/>
+<rect x="395.0" y="264" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="414.0,283.0 414.0,285.3" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="414.0" cy="285.3" r="3" fill="#5d5d5d"/>
+<rect x="435.0" y="264" width="38" height="38" rx="4" fill="#fff3cd" stroke="#ffb300"/>
+<polyline points="454.0,283.0 454.0,296.5" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="454.0" cy="296.5" r="3" fill="#5d5d5d"/>
+<rect x="475.0" y="264" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="494.0,283.0 494.0,280.1" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="494.0" cy="280.1" r="3" fill="#5d5d5d"/>
+<rect x="515.0" y="264" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="534.0,283.0 534.0,274.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="534.0" cy="274.2" r="3" fill="#5d5d5d"/>
+<rect x="555.0" y="264" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="574.0,283.0 574.0,278.9" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="574.0" cy="278.9" r="3" fill="#5d5d5d"/>
+<rect x="595.0" y="264" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="614.0,283.0 614.0,285.3" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="614.0" cy="285.3" r="3" fill="#5d5d5d"/>
+<text x="614.0" y="240" font-size="15" text-anchor="middle" fill="#1a1a1a">write</text>
+<line x1="614.0" y1="244" x2="614.0" y2="261" stroke="#1a1a1a" stroke-width="2" marker-end="url(#head)"/>
+<line x1="254.0" y1="322" x2="254.0" y2="305" stroke="#e53935" stroke-width="2" marker-end="url(#head)"/>
+<text x="254.0" y="338" font-size="15" text-anchor="middle" fill="#e53935">read</text>
+<path d="M254.0,256 Q354.0,222 454.0,256" fill="none" stroke="#e53935" stroke-width="1.6" stroke-dasharray="5 3" marker-end="url(#head)"/>
+<text x="354.0" y="230" font-size="15" text-anchor="middle" fill="#e53935">splice: forward one period</text>
+<text x="641.0" y="288.0" font-size="15" fill="#1565c0">delay 9</text>
+<text x="75.0" y="376" font-size="15" fill="#5d5d5d">The amber samples are one period apart: the same point in the cycle.</text>
+</svg>

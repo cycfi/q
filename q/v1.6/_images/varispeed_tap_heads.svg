@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 964" font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'>
+<defs><marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/></marker></defs>
+<text x="20" y="26" font-size="15" fill="#1a1a1a">Ratio 1: the read keeps pace with the write. The delay holds, and the pitch is unchanged.</text>
+<text x="134" y="98.0" font-size="15" text-anchor="end" fill="#5d5d5d">now</text>
+<rect x="150" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="169.0,93.0 169.0,93.0" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="169.0" cy="93.0" r="3" fill="#5d5d5d"/>
+<rect x="190" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="209.0,93.0 209.0,84.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="209.0" cy="84.6" r="3" fill="#5d5d5d"/>
+<rect x="230" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="249.0,93.0 249.0,80.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="249.0" cy="80.2" r="3" fill="#5d5d5d"/>
+<rect x="270" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="289.0,93.0 289.0,81.7" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="289.0" cy="81.7" r="3" fill="#5d5d5d"/>
+<rect x="310" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="329.0,93.0 329.0,88.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="329.0" cy="88.6" r="3" fill="#5d5d5d"/>
+<rect x="350" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="369.0,93.0 369.0,97.4" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="369.0" cy="97.4" r="3" fill="#5d5d5d"/>
+<rect x="390" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="409.0,93.0 409.0,104.3" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="409.0" cy="104.3" r="3" fill="#5d5d5d"/>
+<rect x="430" y="74" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="449.0,93.0 449.0,105.8" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="449.0" cy="105.8" r="3" fill="#5d5d5d"/>
+<rect x="470" y="74" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="489.0,93.0 489.0,101.4" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="489.0" cy="101.4" r="3" fill="#5d5d5d"/>
+<rect x="510" y="74" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="529.0,93.0 529.0,93.0" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="529.0" cy="93.0" r="3" fill="#5d5d5d"/>
+<rect x="550" y="74" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="569.0,93.0 569.0,84.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="569.0" cy="84.6" r="3" fill="#5d5d5d"/>
+<rect x="590" y="74" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="609.0,93.0 609.0,80.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="609.0" cy="80.2" r="3" fill="#5d5d5d"/>
+<text x="609.0" y="50" font-size="15" text-anchor="middle" fill="#1a1a1a">write</text>
+<line x1="609.0" y1="54" x2="609.0" y2="71" stroke="#1a1a1a" stroke-width="2" marker-end="url(#head)"/>
+<line x1="449.0" y1="132" x2="449.0" y2="115" stroke="#e53935" stroke-width="2" marker-end="url(#head)"/>
+<text x="449.0" y="148" font-size="15" text-anchor="middle" fill="#e53935">read</text>
+<text x="636" y="98.0" font-size="15" fill="#1565c0">delay 4</text>
+<text x="134" y="210.0" font-size="15" text-anchor="end" fill="#5d5d5d">4 samples later</text>
+<rect x="150" y="186" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="169.0,205.0 169.0,205.0" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="169.0" cy="205.0" r="3" fill="#5d5d5d"/>
+<rect x="190" y="186" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="209.0,205.0 209.0,196.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="209.0" cy="196.6" r="3" fill="#5d5d5d"/>
+<rect x="230" y="186" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="249.0,205.0 249.0,192.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="249.0" cy="192.2" r="3" fill="#5d5d5d"/>
+<rect x="270" y="186" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="289.0,205.0 289.0,193.7" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="289.0" cy="193.7" r="3" fill="#5d5d5d"/>
+<rect x="310" y="186" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="329.0,205.0 329.0,200.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="329.0" cy="200.6" r="3" fill="#5d5d5d"/>
+<rect x="350" y="186" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="369.0,205.0 369.0,209.4" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="369.0" cy="209.4" r="3" fill="#5d5d5d"/>
+<rect x="390" y="186" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="409.0,205.0 409.0,216.3" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="409.0" cy="216.3" r="3" fill="#5d5d5d"/>
+<rect x="430" y="186" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="449.0,205.0 449.0,217.8" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="449.0" cy="217.8" r="3" fill="#5d5d5d"/>
+<rect x="470" y="186" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="489.0,205.0 489.0,213.4" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="489.0" cy="213.4" r="3" fill="#5d5d5d"/>
+<rect x="510" y="186" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="529.0,205.0 529.0,205.0" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="529.0" cy="205.0" r="3" fill="#5d5d5d"/>
+<rect x="550" y="186" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="569.0,205.0 569.0,196.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="569.0" cy="196.6" r="3" fill="#5d5d5d"/>
+<rect x="590" y="186" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="609.0,205.0 609.0,192.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="609.0" cy="192.2" r="3" fill="#5d5d5d"/>
+<rect x="630" y="186" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="649.0,205.0 649.0,193.7" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="649.0" cy="193.7" r="3" fill="#5d5d5d"/>
+<rect x="670" y="186" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="689.0,205.0 689.0,200.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="689.0" cy="200.6" r="3" fill="#5d5d5d"/>
+<rect x="710" y="186" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="729.0,205.0 729.0,209.4" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="729.0" cy="209.4" r="3" fill="#5d5d5d"/>
+<rect x="750" y="186" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="769.0,205.0 769.0,216.3" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="769.0" cy="216.3" r="3" fill="#5d5d5d"/>
+<text x="769.0" y="162" font-size="15" text-anchor="middle" fill="#1a1a1a">write</text>
+<line x1="769.0" y1="166" x2="769.0" y2="183" stroke="#1a1a1a" stroke-width="2" marker-end="url(#head)"/>
+<line x1="609.0" y1="244" x2="609.0" y2="227" stroke="#e53935" stroke-width="2" marker-end="url(#head)"/>
+<text x="609.0" y="260" font-size="15" text-anchor="middle" fill="#e53935">read</text>
+<text x="796" y="210.0" font-size="15" fill="#1565c0">delay 4</text>
+<text x="20" y="344" font-size="15" fill="#1a1a1a">Ratio 0.5: the read moves half as fast and falls behind. The delay grows, and the pitch drops an octave.</text>
+<text x="134" y="416.0" font-size="15" text-anchor="end" fill="#5d5d5d">now</text>
+<rect x="150" y="392" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="169.0,411.0 169.0,411.0" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="169.0" cy="411.0" r="3" fill="#5d5d5d"/>
+<rect x="190" y="392" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="209.0,411.0 209.0,402.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="209.0" cy="402.6" r="3" fill="#5d5d5d"/>
+<rect x="230" y="392" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="249.0,411.0 249.0,398.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="249.0" cy="398.2" r="3" fill="#5d5d5d"/>
+<rect x="270" y="392" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="289.0,411.0 289.0,399.7" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="289.0" cy="399.7" r="3" fill="#5d5d5d"/>
+<rect x="310" y="392" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="329.0,411.0 329.0,406.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="329.0" cy="406.6" r="3" fill="#5d5d5d"/>
+<rect x="350" y="392" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="369.0,411.0 369.0,415.4" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="369.0" cy="415.4" r="3" fill="#5d5d5d"/>
+<rect x="390" y="392" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="409.0,411.0 409.0,422.3" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="409.0" cy="422.3" r="3" fill="#5d5d5d"/>
+<rect x="430" y="392" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="449.0,411.0 449.0,423.8" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="449.0" cy="423.8" r="3" fill="#5d5d5d"/>
+<rect x="470" y="392" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="489.0,411.0 489.0,419.4" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="489.0" cy="419.4" r="3" fill="#5d5d5d"/>
+<rect x="510" y="392" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="529.0,411.0 529.0,411.0" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="529.0" cy="411.0" r="3" fill="#5d5d5d"/>
+<rect x="550" y="392" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="569.0,411.0 569.0,402.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="569.0" cy="402.6" r="3" fill="#5d5d5d"/>
+<rect x="590" y="392" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="609.0,411.0 609.0,398.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="609.0" cy="398.2" r="3" fill="#5d5d5d"/>
+<text x="609.0" y="368" font-size="15" text-anchor="middle" fill="#1a1a1a">write</text>
+<line x1="609.0" y1="372" x2="609.0" y2="389" stroke="#1a1a1a" stroke-width="2" marker-end="url(#head)"/>
+<line x1="449.0" y1="450" x2="449.0" y2="433" stroke="#e53935" stroke-width="2" marker-end="url(#head)"/>
+<text x="449.0" y="466" font-size="15" text-anchor="middle" fill="#e53935">read</text>
+<text x="636" y="416.0" font-size="15" fill="#1565c0">delay 4</text>
+<text x="134" y="528.0" font-size="15" text-anchor="end" fill="#5d5d5d">4 samples later</text>
+<rect x="150" y="504" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="169.0,523.0 169.0,523.0" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="169.0" cy="523.0" r="3" fill="#5d5d5d"/>
+<rect x="190" y="504" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="209.0,523.0 209.0,514.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="209.0" cy="514.6" r="3" fill="#5d5d5d"/>
+<rect x="230" y="504" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="249.0,523.0 249.0,510.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="249.0" cy="510.2" r="3" fill="#5d5d5d"/>
+<rect x="270" y="504" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="289.0,523.0 289.0,511.7" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="289.0" cy="511.7" r="3" fill="#5d5d5d"/>
+<rect x="310" y="504" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="329.0,523.0 329.0,518.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="329.0" cy="518.6" r="3" fill="#5d5d5d"/>
+<rect x="350" y="504" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="369.0,523.0 369.0,527.4" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="369.0" cy="527.4" r="3" fill="#5d5d5d"/>
+<rect x="390" y="504" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="409.0,523.0 409.0,534.3" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="409.0" cy="534.3" r="3" fill="#5d5d5d"/>
+<rect x="430" y="504" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="449.0,523.0 449.0,535.8" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="449.0" cy="535.8" r="3" fill="#5d5d5d"/>
+<rect x="470" y="504" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="489.0,523.0 489.0,531.4" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="489.0" cy="531.4" r="3" fill="#5d5d5d"/>
+<rect x="510" y="504" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="529.0,523.0 529.0,523.0" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="529.0" cy="523.0" r="3" fill="#5d5d5d"/>
+<rect x="550" y="504" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="569.0,523.0 569.0,514.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="569.0" cy="514.6" r="3" fill="#5d5d5d"/>
+<rect x="590" y="504" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="609.0,523.0 609.0,510.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="609.0" cy="510.2" r="3" fill="#5d5d5d"/>
+<rect x="630" y="504" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="649.0,523.0 649.0,511.7" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="649.0" cy="511.7" r="3" fill="#5d5d5d"/>
+<rect x="670" y="504" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="689.0,523.0 689.0,518.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="689.0" cy="518.6" r="3" fill="#5d5d5d"/>
+<rect x="710" y="504" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="729.0,523.0 729.0,527.4" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="729.0" cy="527.4" r="3" fill="#5d5d5d"/>
+<rect x="750" y="504" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="769.0,523.0 769.0,534.3" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="769.0" cy="534.3" r="3" fill="#5d5d5d"/>
+<text x="769.0" y="480" font-size="15" text-anchor="middle" fill="#1a1a1a">write</text>
+<line x1="769.0" y1="484" x2="769.0" y2="501" stroke="#1a1a1a" stroke-width="2" marker-end="url(#head)"/>
+<line x1="529.0" y1="562" x2="529.0" y2="545" stroke="#e53935" stroke-width="2" marker-end="url(#head)"/>
+<text x="529.0" y="578" font-size="15" text-anchor="middle" fill="#e53935">read</text>
+<text x="796" y="528.0" font-size="15" fill="#1565c0">delay 6</text>
+<text x="20" y="662" font-size="15" fill="#1a1a1a">Ratio 2: the read moves twice as fast and catches up. At delay 0 it can go no further.</text>
+<text x="134" y="734.0" font-size="15" text-anchor="end" fill="#5d5d5d">now</text>
+<rect x="150" y="710" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="169.0,729.0 169.0,729.0" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="169.0" cy="729.0" r="3" fill="#5d5d5d"/>
+<rect x="190" y="710" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="209.0,729.0 209.0,720.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="209.0" cy="720.6" r="3" fill="#5d5d5d"/>
+<rect x="230" y="710" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="249.0,729.0 249.0,716.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="249.0" cy="716.2" r="3" fill="#5d5d5d"/>
+<rect x="270" y="710" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="289.0,729.0 289.0,717.7" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="289.0" cy="717.7" r="3" fill="#5d5d5d"/>
+<rect x="310" y="710" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="329.0,729.0 329.0,724.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="329.0" cy="724.6" r="3" fill="#5d5d5d"/>
+<rect x="350" y="710" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="369.0,729.0 369.0,733.4" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="369.0" cy="733.4" r="3" fill="#5d5d5d"/>
+<rect x="390" y="710" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="409.0,729.0 409.0,740.3" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="409.0" cy="740.3" r="3" fill="#5d5d5d"/>
+<rect x="430" y="710" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="449.0,729.0 449.0,741.8" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="449.0" cy="741.8" r="3" fill="#5d5d5d"/>
+<rect x="470" y="710" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="489.0,729.0 489.0,737.4" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="489.0" cy="737.4" r="3" fill="#5d5d5d"/>
+<rect x="510" y="710" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="529.0,729.0 529.0,729.0" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="529.0" cy="729.0" r="3" fill="#5d5d5d"/>
+<rect x="550" y="710" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="569.0,729.0 569.0,720.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="569.0" cy="720.6" r="3" fill="#5d5d5d"/>
+<rect x="590" y="710" width="38" height="38" rx="4" fill="#e8f2fd" stroke="#1565c0"/>
+<polyline points="609.0,729.0 609.0,716.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="609.0" cy="716.2" r="3" fill="#5d5d5d"/>
+<text x="609.0" y="686" font-size="15" text-anchor="middle" fill="#1a1a1a">write</text>
+<line x1="609.0" y1="690" x2="609.0" y2="707" stroke="#1a1a1a" stroke-width="2" marker-end="url(#head)"/>
+<line x1="449.0" y1="768" x2="449.0" y2="751" stroke="#e53935" stroke-width="2" marker-end="url(#head)"/>
+<text x="449.0" y="784" font-size="15" text-anchor="middle" fill="#e53935">read</text>
+<text x="636" y="734.0" font-size="15" fill="#1565c0">delay 4</text>
+<text x="134" y="846.0" font-size="15" text-anchor="end" fill="#5d5d5d">4 samples later</text>
+<rect x="150" y="822" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="169.0,841.0 169.0,841.0" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="169.0" cy="841.0" r="3" fill="#5d5d5d"/>
+<rect x="190" y="822" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="209.0,841.0 209.0,832.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="209.0" cy="832.6" r="3" fill="#5d5d5d"/>
+<rect x="230" y="822" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="249.0,841.0 249.0,828.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="249.0" cy="828.2" r="3" fill="#5d5d5d"/>
+<rect x="270" y="822" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="289.0,841.0 289.0,829.7" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="289.0" cy="829.7" r="3" fill="#5d5d5d"/>
+<rect x="310" y="822" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="329.0,841.0 329.0,836.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="329.0" cy="836.6" r="3" fill="#5d5d5d"/>
+<rect x="350" y="822" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="369.0,841.0 369.0,845.4" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="369.0" cy="845.4" r="3" fill="#5d5d5d"/>
+<rect x="390" y="822" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="409.0,841.0 409.0,852.3" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="409.0" cy="852.3" r="3" fill="#5d5d5d"/>
+<rect x="430" y="822" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="449.0,841.0 449.0,853.8" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="449.0" cy="853.8" r="3" fill="#5d5d5d"/>
+<rect x="470" y="822" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="489.0,841.0 489.0,849.4" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="489.0" cy="849.4" r="3" fill="#5d5d5d"/>
+<rect x="510" y="822" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="529.0,841.0 529.0,841.0" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="529.0" cy="841.0" r="3" fill="#5d5d5d"/>
+<rect x="550" y="822" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="569.0,841.0 569.0,832.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="569.0" cy="832.6" r="3" fill="#5d5d5d"/>
+<rect x="590" y="822" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="609.0,841.0 609.0,828.2" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="609.0" cy="828.2" r="3" fill="#5d5d5d"/>
+<rect x="630" y="822" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="649.0,841.0 649.0,829.7" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="649.0" cy="829.7" r="3" fill="#5d5d5d"/>
+<rect x="670" y="822" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="689.0,841.0 689.0,836.6" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="689.0" cy="836.6" r="3" fill="#5d5d5d"/>
+<rect x="710" y="822" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="729.0,841.0 729.0,845.4" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="729.0" cy="845.4" r="3" fill="#5d5d5d"/>
+<rect x="750" y="822" width="38" height="38" rx="4" fill="#f3f3f3" stroke="#9e9e9e"/>
+<polyline points="769.0,841.0 769.0,852.3" stroke="#5d5d5d" stroke-width="1.5"/>
+<circle cx="769.0" cy="852.3" r="3" fill="#5d5d5d"/>
+<text x="769.0" y="798" font-size="15" text-anchor="middle" fill="#1a1a1a">write</text>
+<line x1="769.0" y1="802" x2="769.0" y2="819" stroke="#1a1a1a" stroke-width="2" marker-end="url(#head)"/>
+<line x1="769.0" y1="880" x2="769.0" y2="863" stroke="#e53935" stroke-width="2" marker-end="url(#head)"/>
+<text x="769.0" y="896" font-size="15" text-anchor="middle" fill="#e53935">read</text>
+<text x="796" y="846.0" font-size="15" fill="#1565c0">delay 0</text>
+</svg>

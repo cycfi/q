@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="287"
+     viewBox="0 0 750 287"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+
+  <rect x="185.094" y="74" width="87.125" height="61" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="228.656" y="109.4" text-anchor="middle" fill="#1a1a1a">delay line</text>
+
+  <rect x="322.219" y="74" width="101.719" height="61" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="373.078" y="100.9" text-anchor="middle" fill="#1a1a1a">read heads</text>
+  <text x="373.078" y="117.9" text-anchor="middle" fill="#1a1a1a">+ crossfade</text>
+
+  <rect x="473.938" y="74" width="90.9688" height="61" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="519.422" y="100.9" text-anchor="middle" fill="#1a1a1a">formant</text>
+  <text x="519.422" y="117.9" text-anchor="middle" fill="#1a1a1a">correction</text>
+
+  <rect x="305.688" y="193" width="134.781" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="373.078" y="219.9" text-anchor="middle" fill="#1a1a1a">BACF lag tracker</text>
+
+  <rect x="457.742" y="193" width="123.359" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="519.422" y="219.9" text-anchor="middle" fill="#1a1a1a">formant learner</text>
+
+  <line x1="272.219" y1="104.5" x2="322.219" y2="104.5" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="423.938" y1="104.5" x2="473.938" y2="104.5" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="373.078" y1="34" x2="373.078" y2="74" stroke="#d81b60" stroke-width="1.4"/>
+  <line x1="564.906" y1="104.5" x2="598.906" y2="104.5" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="373.078" y1="193" x2="373.078" y2="135" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="519.422" y1="193" x2="519.422" y2="135" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="115.094" y1="104.5" x2="185.094" y2="104.5" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 155.09 104.5 L 155.09 207 Q 155.09 215 163.09 215 L 305.69 215" fill="none" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 155.09 215 L 155.09 265 Q 155.09 273 163.09 273 L 511.42 273 Q 519.42 273 519.42 265 L 519.42 237" fill="none" stroke="#1565c0" stroke-width="1.4"/>
+  <circle cx="155.094" cy="104.5" r="3.5" fill="#1565c0"/>
+  <circle cx="155.094" cy="215" r="3.5" fill="#1565c0"/>
+
+  <text x="373.078" y="26" text-anchor="middle" fill="#1a1a1a">pitch ratio</text>
+  <text x="604.906" y="109.4" fill="#1a1a1a">out</text>
+  <text x="109.094" y="109.5" text-anchor="end" fill="#1a1a1a">in</text>
+
+  <polygon points="322.219,104.5 313.219,108.5 313.219,100.5" fill="#1565c0"/>
+  <polygon points="473.938,104.5 464.938,108.5 464.938,100.5" fill="#1565c0"/>
+  <polygon points="373.078,74 369.078,65 377.078,65" fill="#d81b60"/>
+  <polygon points="598.906,104.5 589.906,108.5 589.906,100.5" fill="#1565c0"/>
+  <polygon points="373.078,135 377.078,144 369.078,144" fill="#43a047"/>
+  <polygon points="519.422,135 523.422,144 515.422,144" fill="#43a047"/>
+  <polygon points="185.094,104.5 176.094,108.5 176.094,100.5" fill="#1565c0"/>
+  <polygon points="305.688,215 296.688,219 296.688,211" fill="#1565c0"/>
+  <polygon points="519.422,237 523.422,246 515.422,246" fill="#1565c0"/>
+</svg>

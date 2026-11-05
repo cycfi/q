@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>DX Patcher :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.5/reference/synth/fm/dx_patcher.html">
+    <meta name="generator" content="Antora 3.1.15">
+    <link rel="stylesheet" href="../../../../../_/css/site.css">
+<script defer src="../../../../../_/js/lightbox.js"></script>
+<meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
+<link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="96x96" href="https://cycfi.com/assets/icons/favicon-96x96.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="https://cycfi.com/assets/icons/android-chrome-192x192.png"/>
+<link rel="icon" type="image/png" sizes="256x256" href="https://cycfi.com/assets/icons/android-chrome-256x256.png"/>
+<link rel="apple-touch-icon" type="image/png" href="https://cycfi.com/assets/icons/apple-touch-icon.png"/>
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <!--  Cycfi Logo -->
+      <a class="m-nav__logo" href="https://www.cycfi.com">
+        <svg version="1.1" x="0px" y="0px" width="200" viewBox="0 0 600 100" style="padding-top: 15;" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(2.55, 0, 0, 2.62, -464.010406, -1042.918213)" fill="#202020">
+            <path d="M234.37,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.7-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-3.5-0.04-4.6,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.59,0.66-0.76,1.35c-0.14,0.84-0.18,1.03-0.19,1.43l-0.14,3.91 c-0.01,0.39,0.04,0.84,0.09,1.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h33.85 c0.8,0,1.45,0.67,1.42,1.47L234.37,431.65z"/>
+            <path d="M276.06,433.02H257.9c-0.8,0-1.45-0.67-1.42-1.47l0.15-4.18c0.03-0.76,0.65-1.37,1.42-1.37h14.16 c1.91,0,3.52,0,4.61-0.12c1.23-0.13,1.75-0.25,2.17-0.71c0.36-0.39,0.4-2.52,0.4-2.52h-27.92c-11.11,0-13.26-5.13-13.1-9.44 l0.12-3.38c0.03-0.76,0.65-1.37,1.42-1.37h8.43c0.8,0,1.45,0.67,1.42,1.47l-0.05,1.36c-0.02,0.46-0.01,2.03,0.11,2.51 c0.1,0.42,0.44,0.82,0.78,1.07c0.47,0.35,0.83,0.42,1.64,0.54c0.9,0.14,2.09,0.21,3.54,0.21h24.09l0.21-5.8 c0.03-0.76,0.65-1.37,1.42-1.37h8.46c0.8,0,1.45,0.67,1.42,1.47l-0.49,13.57c-0.06,1.58-0.46,3.96-1.12,5.07 c-0.68,1.15-1.71,2.08-3.04,2.76c-1.23,0.63-2.76,1.07-4.56,1.32C280.44,432.9,278.4,433.02,276.06,433.02L276.06,433.02z"/>
+            <path d="M401.95,431.55l0.78-21.72c0.03-0.76,0.65-1.37,1.42-1.37h8.59c0.8,0,1.45,0.67,1.42,1.47l-0.78,21.72 c-0.03,0.76-0.65,1.37-1.42,1.37h-8.59C402.56,433.02,401.92,432.35,401.95,431.55z"/>
+            <path d="M346.77,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.71-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-2.47-0.04-3.58,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.58,0.66-0.76,1.35c-0.14,0.84-0.22,2.03-0.23,2.43l-0.07,1.91 c-0.01,0.39,0.01,1.84,0.06,2.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h32.83 c0.8,0,1.45,0.67,1.42,1.47L346.77,431.65z"/>
+            <path d="M386.2,425.88l-24.93-0.03l-0.21,5.8c-0.03,0.76-0.65,1.37-1.42,1.37h-8.46c-0.8,0-1.45-0.67-1.42-1.47 l0.49-13.57c0.06-1.58,0.46-3.96,1.12-5.07c0.68-1.15,1.71-2.08,3.04-2.76c1.23-0.63,2.76-1.07,4.56-1.32 c1.7-0.24,3.75-0.36,6.08-0.36l0,0h33.68c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.18c-0.03,0.76-0.65,1.37-1.42,1.37H368.9 c-1.91,0-3.52,0-4.61,0.12c-1.23,0.13-1.75,0.25-2.17,0.71c-0.36,0.39-0.4,2.52-0.4,2.52h24.63c0.8,0,1.45,0.67,1.42,1.47 l-0.15,4.22C387.59,425.28,386.96,425.88,386.2,425.88z"/>
+          </g>
+        </svg>
+      </a>
+      <a class="navbar-item" href="https://www.cycfi.com">Q Docs</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="q" data-version="v1.6">
+  <aside class="nav">
+    <div class="panels">
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../../../index.html">Q Audio DSP Library</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../../installation.html">Setup and Installation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../../setup.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../microcontrollers.html">Microcontrollers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../testing.html">Testing Q</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../../q_plug/setup.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/standalone.html">The Standalone App</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/outside_project.html">Building Outside the Project</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/testing.html">Testing QPlug</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/advanced_builds.html">Advanced Builds</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../../tutorials.html">Tutorials</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../../tutorials/index.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../../tutorials/index.html#_basics">Basics</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../../tutorials/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../../tutorials/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../../tutorials/waveforms.html">Waveforms</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../../tutorials/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../../tutorials/io_delay.html">IO Delay</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../../tutorials/index.html#_synthesis_and_midi">Synthesis and MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../../tutorials/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../../tutorials/square_synth.html">Square Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../../tutorials/poly_synth.html">Polyphonic Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../../tutorials/va_synth.html">Virtual Analog Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../../tutorials/fm_synth.html">FM Synth</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../../tutorials/index.html#_granular">Granular</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../../tutorials/grain_freeze.html">Grain Freeze</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../../tutorials/sustain_hold.html">Sustain Hold</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../../q_plug/tutorials/index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/tutorials/gain.html">Your First Plugin: Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/tutorials/sampler.html">Sampler: Handing Data to the Audio Thread</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/tutorials/looper.html">Looper: Work for the Main Thread</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/tutorials/anna_1.html">Anna I: The Voice</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/tutorials/anna_2.html">Anna II: The Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/tutorials/anna_3.html">Anna III: The Chorus</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/tutorials/anna_4.html">Anna IV: Drawn Envelopes</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/tutorials/anna_5.html">Anna V: Presets</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/tutorials/dexter.html">Dexter: Full Featured DX7 Synth</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../../reference.html">Reference</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../q_lib.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../fundamentals.html">Fundamentals</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../units.html">Units</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../units/frequency.html">Frequency</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../units/duration.html">Duration</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../units/period.html">Period</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../units/phase.html">Phase</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../units/phase_iterator.html">Phase Iterator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../units/decibel.html">Decibel</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../units/interval.html">Interval</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../units/pitch.html">Pitch</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../units/pitch_names.html">Pitch Names</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../units/literals.html">Literals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../biquad.html">Biquad</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../biquad/lowpass.html">Low Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../biquad/highpass.html">High Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../biquad/allpass.html">All Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../biquad/notch.html">Notch Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../biquad/peaking.html">Peaking Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../biquad/lowshelf.html">Low Shelf Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../biquad/highshelf.html">High Shelf Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../resonant.html">Resonant Filters</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../resonant/svf.html">State Variable Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../resonant/ladder.html">Ladder Filter</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../resonant/ota_ladder.html">OTA Ladder Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../resonant/chamberlin_filter.html">Chamberlin Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../envelope.html">Envelope</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../envelope/true_rms_envelope_follower.html">True RMS Envelope Follower</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../dynamic.html">Dynamic</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../dynamic/compressor.html">Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../dynamic/expander.html">Expander</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../dynamic/agc.html">AGC</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../misc.html">Miscellaneous</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/varispeed_tap.html">Varispeed Tap</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/sample_hold.html">Sample Hold</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/moving_maximum.html">Moving Maximum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/one_pole_highpass.html">One Pole High Pass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/dc_block.html">DC Block</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/dynamic_smoother.html">Dynamic Smoother</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/integrator.html">Integrator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/median3.html">Median</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/fast_downsample.html">Fast Downsample</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/differentiator.html">Differentiators</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/allpass.html">All-Pass Phase Shifters</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/hilbert_quadrature.html">Hilbert Quadrature</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/delta_gate.html">Delta Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/zero_crossing.html">Zero Crossing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/schmitt_trigger.html">Schmitt Trigger</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/window_comparator.html">Window Comparator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/edge.html">Edge Detectors</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/monostable.html">Monostable</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/peak.html">Peak</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/peak_picker.html">Peak Picker</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/spectral_flux.html">Spectral Flux</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/transient_detector.html">Transient Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/map.html">Map</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/clip.html">Clippers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/level_crossfade.html">Level Crossfade</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../misc/signal_conditioner.html">Signal Conditioner</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../synth.html">Synthesizers</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../sin_osc.html">Sine Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../grain.html">Grain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../va.html">Virtual Analog</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../va/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../va/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../va/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../va/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../va/analog_osc.html">Analog Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../va/sync.html">Hard Sync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Generators</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../gen/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../gen/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../gen/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../gen/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../gen/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../gen/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../gen/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../gen/noise_gen.html">Noise Generators</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../gen/lfo_gen.html">LFO Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../fm.html">FM Synthesis</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="fm_operator.html">FM Operator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="fm_routing.html">FM Routing</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="fm_algorithm.html">FM Algorithm</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="fm_voice.html">FM Voice</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="dx_envelope_gen.html">DX Envelope Generator</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="5">
+    <a class="nav-link" href="dx_patcher.html">DX Patcher</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="dx_sysex.html">DX System Exclusive</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="dx7_design.html">DX7 Design Notes</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../spectral.html">Frequency Domain</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../spectral/fft.html">FFT</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../spectral/spectral_learner.html">Spectral Learner</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../spectral/lpc_fit.html">LPC Fit</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../spectral/eq_matcher.html">EQ Matcher</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../spectral/convolver.html">Convolver</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../support.html">Support</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../support/base.html">Base</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../support/fast_math.html">Fast Math</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../support/basic_concepts.html">Basic Concepts</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../support/flush_denormals.html">Flush Denormals</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../support/audio_stream.html">Audio Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../midi.html">MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../midi/messages.html">MIDI 1.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../midi/controller_numbers.html">MIDI Controller Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../midi/notes.html">MIDI Notes</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../midi/midi2_messages.html">MIDI 2.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../midi/processor.html">MIDI Processor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../midi/readers.html">MIDI Readers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../midi/stages.html">MIDI Stages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../midi/translation.html">MIDI Translation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../midi/per_note.html">Per-Note Expression</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../midi/endpoint.html">MIDI Endpoint</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../midi/ci.html">MIDI Capability Inquiry</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../midi/conformance.html">MIDI 2.0 Conformance</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../utility.html">Utility</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../utility/ring_buffer.html">Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../utility/sample_interpolation.html">Sample Interpolation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../utility/best_lag.html">Best Lag</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../utility/antialiasing.html">Antialiasing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../utility/float_convert.html">Sample Format Conversion</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../utility/bitset.html">Bitset</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../utility/handoff.html">Handoff</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../utility/ring_allocator.html">Ring Allocator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../utility/tasks.html">Tasks</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../utility/audio_clock.html">Audio Clock</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../pitch.html">Pitch Detection</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../pitch/bacf_period_detector.html">BACF Period Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../pitch/bacf_pitch_detector.html">BACF Pitch Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../pitch/bitstream_acf.html">Bitstream Autocorrelation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../pitch/zero_crossing_collector.html">Zero Crossing Collector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../pitch/bacf_lag_tracker.html">BACF Lag Tracker</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../pitch_shifting.html">Pitch Shifting</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../pitch_shifting/bacf_pitch_shifter.html">BACF Pitch Shifter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../pitch_shifting/formant_preservation.html">Formant Preservation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../pitch_shifting/formant_learner.html">Formant Learner</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../pitch_shifting/formant_table.html">Formant Table</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../pitch_shifting/formant_corrector.html">Formant Corrector</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../q_io.html">QIO</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_io/audio_device.html">Audio Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_io/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_io/audio_file.html">Audio File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_io/midi_file.html">MIDI File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_io/midi_device.html">MIDI Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_io/midi_stream.html">MIDI Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_io/midi2_stream.html">MIDI 2.0 Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../../q_plug/index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/architecture.html">Architecture</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/reference/entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/reference/parameter.html">Parameters</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/reference/controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/reference/data_stream.html">Data Streams</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/reference/processor.html">Processor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/reference/midi.html">MIDI</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/reference/presenter.html">Presenter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/reference/header.html">The Header</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../../q_plug/reference/zoom.html">Zoom and Display Scale</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Q Audio DSP Library</span>
+    <span class="version">v1.6-beta.1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../../../../v1.5/index.html">Q Audio DSP Library</a></div>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="../../../index.html">v1.6-beta.1</a>
+        </li>
+        <li class="version is-latest">
+          <a href="../../../../v1.5/index.html">v1.5</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../../v1.5/index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../index.html">Q Audio DSP Library</a></li>
+    <li><a href="../../../reference.html">Reference</a></li>
+    <li><a href="../../q_lib.html">Q</a></li>
+    <li><a href="../../synth.html">Synthesizers</a></li>
+    <li><a href="../fm.html">FM Synthesis</a></li>
+    <li><a href="dx_patcher.html">DX Patcher</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">v1.6-beta.1</button>
+  <div class="version-menu">
+    <a class="version is-current" href="dx_patcher.html">v1.6-beta.1</a>
+    <a class="version" href="../../../../v1.5/reference/synth/fm/dx_patcher.html">v1.5</a>
+  </div>
+</div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">DX Patcher</h1>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A DX7 patch holds its 156 parameters as counts, mostly 0 to 99, each with a
+law of its own: an output level maps to decibels in steps of 0.75 dB, and an
+envelope rate to a slope set by the chip&#8217;s 49,096 Hz clock. <code>dx_patcher</code>
+compiles a patch, once, into what an <a href="fm_voice.html" class="xref page">FM Voice</a> takes: ratios, decibels,
+seconds and radians.</p>
+</div>
+<div class="paragraph">
+<p>The compilation also makes a note-on cheap. Keyboard scaling, velocity and
+rate scaling all depend on the key, so the patcher precomputes them for
+every key and every velocity, and a note-on is a set of table reads.</p>
+</div>
+<div class="paragraph">
+<p>The laws that map a DX7 patch&#8217;s counts are in <code>dx_patcher</code>. The DX7&#8217;s
+envelope shape and attack curve are in <a href="dx_envelope_gen.html" class="xref page">DX Envelope Generator</a>, and its 32
+algorithms in <a href="fm_routing.html" class="xref page">dx7_routing</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="_the_patch"><a class="anchor" href="#_the_patch"></a>The Patch</h3>
+<div class="paragraph">
+<p><code>dx_patch</code> is the patch as a cartridge stores it, so a preset maps one to
+one: six <code>dx_op_config</code> operators, the pitch envelope, the algorithm and
+feedback, the LFO, the modulation depths and sensitivities, the transpose and
+the name. <code>dx_patcher::config</code> is an alias for it. <a href="dx_sysex.html" class="xref page">DX System Exclusive</a> reads patches
+from the DX7&#8217;s <code>.syx</code> dumps.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_a_patcher"><a class="anchor" href="#_a_patcher"></a>A Patcher</h3>
+<div class="paragraph">
+<p><code>dx_patcher</code> models a <code><a href="fm_voice.html#_a_note_is_data" class="xref page">Patcher</a></code>: it holds the voice&#8217;s configuration, its
+sample rate, and fills a <code>note</code> for a key and a velocity. A voice takes one
+directly:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/synth/fm/dx_patcher.hpp&gt;
+#include &lt;q/synth/fm/fm_voice.hpp&gt;
+...
+namespace q = cycfi::q;
+
+q::dx_patch cfg;                    // a DX7 patch
+float sps;                          // samples per second
+...
+q::dx_patcher patch{cfg, sps};      // compiled once
+q::fm_voice voice{patch};           // settings and sample rate
+voice.attack(patch, 69, 0.8f);      // A4, velocity 0.8</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Any other type that conforms to <code><a href="fm_voice.html#_a_note_is_data" class="xref page">Patcher</a></code>, a JSON preset reader for
+example, plays a voice the same way.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_what_the_patcher_maps"><a class="anchor" href="#_what_the_patcher_maps"></a>What the Patcher Maps</h3>
+<div class="paragraph">
+<p>The header&#8217;s notes give each law in detail.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Patch parameter</th>
+<th class="tableblock halign-left valign-top">What the voice gets</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Output level, keyboard level
+  scaling, velocity</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A level in decibels, summed into the envelope&#8217;s
+                             levels. Scaling works in groups of three notes
+                             from the break point, with linear or
+                             exponential curves either side.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Envelope rates</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A time per segment, from the DX7&#8217;s rate law on
+                             its own 49,096 Hz clock, with keyboard rate
+                             scaling folded in.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Coarse, fine, detune</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A frequency ratio to the key, or a fixed
+                             frequency in Hz. Detune is a few cents, more at
+                             low frequencies than high.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Algorithm, feedback</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A <a href="fm_routing.html" class="xref page">FM Routing</a> from <code><a href="fm_routing.html" class="xref page">dx7_routing</a></code>, an index
+                             of 4π, and a feedback in radians: π/2 at level
+                             7 for a carrier, four times that for a
+                             modulator.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">LFO speed and delay</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A rate in Hz, and a wait then a fade in seconds.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pitch envelope</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Levels in semitones and rates in semitones a
+                             second.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pitch and amplitude
+  modulation depths</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Semitones at the LFO&#8217;s peak, and a decibel cut
+                             per operator at its trough, by the patch&#8217;s
+                             sensitivities. The mod wheel&#8217;s depths are the
+                             same laws at depth 99, the DX7&#8217;s full wheel
+                             range.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Transpose</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Moves the key the scalings see as well as the
+                             pitch.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_sources"><a class="anchor" href="#_sources"></a>Sources</h3>
+<div class="paragraph">
+<p>The laws are the DX7s measurements published by the Music Synthesizer for
+Android project (Raph Levien), with Ken Shirriff&#8217;s reverse engineering of
+the OPS and EGS chips for the hardware behind them. What those leave out was
+measured on Dexed (Pascal Gauthier), run as a black box. No emulator&#8217;s source
+code was read or used.</p>
+</div>
+<div class="paragraph">
+<p>The voice differs from Dexed in three ways:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The envelopes run on the DX7&#8217;s 49,096 Hz envelope clock. Dexed runs the
+same law at the audio sample rate, so at 44.1 kHz its envelopes are 11
+percent slower.</p>
+</li>
+<li>
+<p>The arithmetic is floating point, with the envelope in double precision.
+Dexed&#8217;s fixed point arithmetic adds quantization noise, audible as a
+broadband burst at each note&#8217;s onset.</p>
+</li>
+<li>
+<p>At feedback 6 or 7, with a modulator near full level, Dexed&#8217;s feedback
+loop turns chaotic, and this voice stays periodic.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The full account of the sources, the shape of the laws, the emulations
+before this one and how the voice was checked is in the <a href="dx7_design.html" class="xref page">DX7 Design Notes</a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/synth/fm/dx_patcher.hpp&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">enum dx_curve : std::uint8_t
+{
+   dx_neg_lin, dx_neg_exp, dx_pos_exp, dx_pos_lin
+};
+
+struct dx_eg_config
+{
+   std::uint8_t   rate[4]  = {99, 99, 99, 99};   // R1..R4
+   std::uint8_t   level[4] = {99, 99, 99, 0};    // L1..L4
+};
+
+struct dx_op_config
+{
+   std::uint8_t   output_level  = 99;    // 0..99
+   bool           fixed         = false; // fixed frequency
+   std::uint8_t   coarse        = 1;     // frequency coarse 0..31
+   std::uint8_t   fine          = 0;     // frequency fine 0..99
+   std::uint8_t   detune        = 7;     // 0..14, 7 is none
+   dx_eg_config   env;
+   std::uint8_t   break_point   = 39;    // 0..99, 39 is C3
+   std::uint8_t   left_depth    = 0;     // 0..99
+   std::uint8_t   right_depth   = 0;
+   std::uint8_t   left_curve    = dx_neg_lin;
+   std::uint8_t   right_curve   = dx_neg_lin;
+   std::uint8_t   rate_scaling  = 0;     // 0..7
+   std::uint8_t   amp_mod_sens  = 0;     // 0..3
+   std::uint8_t   velocity_sens = 0;     // 0..7
+};
+
+struct dx_algorithm_config
+{
+   std::uint8_t   algorithm = 1;         // 1..32
+   std::uint8_t   feedback  = 0;         // 0..7
+};
+
+struct dx_lfo_config
+{
+   std::uint8_t   speed     = 35;        // 0..99
+   std::uint8_t   delay     = 0;         // 0..99
+   bool           key_sync  = true;
+   std::uint8_t   wave      = lfo_gen::triangle;
+};
+
+struct dx_patch
+{
+   using eg_config = dx_eg_config;
+
+   dx_op_config   op[6];                 // OP1..OP6
+   eg_config      pitch_env = {{99, 99, 99, 99}, {50, 50, 50, 50}};
+   dx_algorithm_config algorithm;
+   dx_lfo_config  lfo;
+   std::uint8_t   pitch_mod_depth = 0;   // LFO PMD 0..99
+   std::uint8_t   amp_mod_depth = 0;     // LFO AMD 0..99
+   std::uint8_t   pitch_mod_sens = 3;    // 0..7
+   bool           osc_key_sync = true;
+   std::uint8_t   transpose = 24;        // 0..48, 24 is C3
+   char           name[11] = "INIT VOICE";
+};
+
+struct dx_op_patch
+{
+   double         ratio[128];            // to the key's
+   phase          fixed_step;            // fixed mode
+   std::uint8_t   qrate[4];              // envelope rates
+   std::uint8_t   qrate_offset[128];     // rate scaling per key
+   float          output_db[128];        // output level per key
+   float          velocity_db[128];      // dB per velocity
+   float          eg_db[4];              // envelope levels
+};
+
+struct dx_patcher
+{
+   using curve = dx_curve;
+   using config = dx_patch;
+   using op_config = dx_op_config;
+   using op_patch = dx_op_patch;
+
+   static constexpr auto neg_lin = dx_neg_lin;
+   static constexpr auto neg_exp = dx_neg_exp;
+   static constexpr auto pos_exp = dx_pos_exp;
+   static constexpr auto pos_lin = dx_pos_lin;
+
+                  dx_patcher(config const&amp; cfg, float sps);
+
+   void           note(
+                     std::uint8_t key, float velocity, fm_note&amp; out
+                  ) const;
+
+   config         cfg;
+   float          sps;
+   fm_voice_config voice;
+   op_patch       op[6];
+   double         rate_time[64];         // seconds, per qrate
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>dx_op_patch</code> is one compiled operator: the tables <code>note</code> reads for a key
+and a velocity.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>patch</code>, <code>a</code>, <code>b</code>  </dt>
+<dd>
+<p>Objects of type <code>dx_patcher</code>.</p>
+</dd>
+<dt class="hdlist1"><code>cfg</code>              </dt>
+<dd>
+<p>Object of type <code>dx_patch</code>.</p>
+</dd>
+<dt class="hdlist1"><code>op</code>               </dt>
+<dd>
+<p>Object of type <code>dx_op_config</code>.</p>
+</dd>
+<dt class="hdlist1"><code>eg</code>               </dt>
+<dd>
+<p>Object of type <code>dx_eg_config</code>.</p>
+</dd>
+<dt class="hdlist1"><code>sps</code>              </dt>
+<dd>
+<p>Floating point value for samples per second.</p>
+</dd>
+<dt class="hdlist1"><code>key</code>              </dt>
+<dd>
+<p><code>std::uint8_t</code> value for a MIDI key number, 0 to 127.</p>
+</dd>
+<dt class="hdlist1"><code>velocity</code>         </dt>
+<dd>
+<p>Floating point value from 0.0 to 1.0.</p>
+</dd>
+<dt class="hdlist1"><code>n</code>                </dt>
+<dd>
+<p>Object of type <code>fm_note</code>.</p>
+</dd>
+<dt class="hdlist1"><code>i</code>                </dt>
+<dd>
+<p><code>std::size_t</code> operator index, from 0 (OP1) to 5 (OP6).</p>
+</dd>
+<dt class="hdlist1"><code>j</code>                </dt>
+<dd>
+<p><code>std::size_t</code> envelope segment index, from 0 (R1, L1)
+to 3 (R4, L4).</p>
+</dd>
+<dt class="hdlist1"><code>k</code>                </dt>
+<dd>
+<p><code>std::size_t</code> internal rate, from 0 to 63.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_type_definitions"><a class="anchor" href="#_type_definitions"></a>Type Definitions</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_patcher::config</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the patch type.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_patch</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_patcher::op_config</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the operator patch type.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_op_config</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_patcher::op_patch</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the compiled operator type.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_op_patch</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_patcher::curve</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the keyboard level scaling
+                              curve type.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_curve</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_patch::eg_config</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the envelope patch type.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_eg_config</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_patcher(cfg, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>dx_patcher</code> by compiling <code>cfg</code>
+                               (patch) for <code>sps</code> (samples per second).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_patcher(patch)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>dx_patcher patch</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+C++ brace initialization may also be used.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_operation"><a class="anchor" href="#_operation"></a>Operation</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>patch.note(key, velocity, n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Fill <code>n</code> with the note for
+                                    <code>key</code> at <code>velocity</code>: each
+                                    operator&#8217;s ratio or fixed step,
+                                    and its envelope in decibels and
+                                    seconds.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_access"><a class="anchor" href="#_access"></a>Access</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>patch.cfg</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the patch.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_patch</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>patch.sps</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the sample rate the patch was
+                                compiled for.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>patch.voice</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the voice configuration: routing,
+                                index, feedback, LFO, pitch envelope
+                                and modulation depths, the mod
+                                wheel&#8217;s among them.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fm_voice_config</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>patch.op[i]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get operator <code>i</code>, compiled.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_op_patch</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>patch.rate_time[k]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the time, in seconds, the
+                                envelope&#8217;s whole range takes at the
+                                internal rate <code>k</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cfg.op[i]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get operator <code>i</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_op_config</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cfg.pitch_env</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the pitch envelope. A level of
+                                50 is the key&#8217;s pitch.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_eg_config</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cfg.algorithm.algorithm</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the algorithm, 1 to 32.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cfg.algorithm.feedback</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the feedback level, 0 to 7.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cfg.lfo.speed</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the LFO speed, 0 to 99.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cfg.lfo.delay</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the LFO delay, 0 to 99.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cfg.lfo.key_sync</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get whether the LFO restarts at each
+                                note.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cfg.lfo.wave</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the LFO waveform, an
+                                <code>lfo_gen::waveform</code> value. See
+                                <a href="../gen/lfo_gen.html" class="xref page">LFO Generator</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cfg.pitch_mod_depth</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the LFO pitch modulation depth,
+                                0 to 99.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cfg.amp_mod_depth</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the LFO amplitude modulation
+                                depth, 0 to 99.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cfg.pitch_mod_sens</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the pitch modulation
+                                sensitivity, 0 to 7.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cfg.osc_key_sync</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get whether the operators' phases
+                                restart at each note.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cfg.transpose</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the transpose, 0 to 48 semitones,
+                                24 for none.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cfg.name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the name, ten characters padded
+                                with spaces.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>char[11]</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>op.output_level</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the output level, 0 to 99.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>op.fixed</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get whether the frequency is fixed
+                                instead of a ratio to the key.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>op.coarse</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the coarse frequency, 0 to 31.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>op.fine</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the fine frequency, 0 to 99.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>op.detune</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the detune, 0 to 14, 7 for none.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>op.env</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the envelope.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_eg_config</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>op.break_point</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the keyboard level scaling break
+                                point, 0 to 99, 39 for C3.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>op.left_depth</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the scaling depth below the break
+                                point, 0 to 99.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>op.right_depth</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the scaling depth above the break
+                                point, 0 to 99.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>op.left_curve</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the scaling curve below the break
+                                point, a <code>dx_curve</code> value.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>op.right_curve</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the scaling curve above the break
+                                point, a <code>dx_curve</code> value.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>op.rate_scaling</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the keyboard rate scaling, 0
+                                to 7.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>op.amp_mod_sens</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the amplitude modulation
+                                sensitivity, 0 to 3.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>op.velocity_sens</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the velocity sensitivity, 0
+                                to 7.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>eg.rate[j]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the rate of segment <code>j</code>, 0 to 99.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>eg.level[j]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the level of segment <code>j</code>, 0 to
+                                99.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_patcher::neg_lin</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the curve that cuts linearly.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_curve</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_patcher::neg_exp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the curve that cuts
+                                exponentially.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_curve</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_patcher::pos_exp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the curve that boosts
+                                exponentially.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_curve</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_patcher::pos_lin</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the curve that boosts linearly.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dx_curve</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_example"><a class="anchor" href="#_example"></a>Example</h3>
+<div class="paragraph">
+<p>Play the factory patch E.PIANO 1 at <code>sps</code> samples per second:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace q = cycfi::q;
+
+// E.PIANO 1, as a cartridge stores it
+q::dx_patcher::config cfg = {
+   .op = {
+      {                        // OP1, the tine's carrier
+         .output_level = 99,
+         .coarse = 1,          // at the note
+         .detune = 10,         // three steps sharp
+         .env = {{96, 25, 25, 67}, {99, 75, 0, 0}}
+      },
+      {                        // OP2, the ping that strikes it
+         .output_level = 58,
+         .coarse = 14,         // fourteen times the note
+         .env = {{95, 50, 35, 78}, {99, 75, 0, 0}},
+         .velocity_sens = 7    // harder playing, brighter ping
+      }
+      // ... four more operators
+   },
+   .algorithm = {5, 6},        // algorithm 5, feedback 6
+   .lfo = {.speed = 34, .delay = 33},
+   .name = "E.PIANO 1"
+};
+
+q::dx_patcher patch{cfg, sps};                                 <i class="conum" data-value="1"></i><b>(1)</b>
+q::fm_voice voice{patch};                                      <i class="conum" data-value="2"></i><b>(2)</b>
+voice.attack(patch, 60, 0.7f);                                 <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Compile the patch for the sample rate, once.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Construct a voice of six sine operators from the patcher&#8217;s voice
+configuration and sample rate.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Start middle C at velocity 0.7, with the note the patcher compiles for
+that key and velocity.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../../../_/js/site.js" data-ui-root-path="../../../../../_"></script>
+<script async src="../../../../../_/js/vendor/highlight.js"></script>
+<script src="../../../../../_/js/vendor/lunr.js"></script>
+<script src="../../../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../../../.." data-snippet-length="100" data-stylesheet="../../../../../_/css/search.css"></script>
+<script async src="../../../../../search-index.js"></script>
+  </body>
+</html>

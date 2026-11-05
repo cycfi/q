@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="243.438" height="390"
+     viewBox="0 0 243.438 390"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+
+  <rect x="34" y="60" width="175.438" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="121.719" y="86.9" text-anchor="middle" fill="#1a1a1a">zero_crossing_collector</text>
+
+  <rect x="34" y="132" width="175.438" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="121.719" y="158.9" text-anchor="middle" fill="#1a1a1a">bitstream_acf</text>
+
+  <rect x="34" y="204" width="175.438" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="121.719" y="230.9" text-anchor="middle" fill="#1a1a1a">bacf_period_detector</text>
+
+  <rect x="34" y="276" width="175.438" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="121.719" y="302.9" text-anchor="middle" fill="#1a1a1a">bacf_pitch_detector</text>
+
+  <line x1="121.719" y1="26" x2="121.719" y2="60" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="121.719" y1="104" x2="121.719" y2="132" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="121.719" y1="176" x2="121.719" y2="204" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="121.719" y1="248" x2="121.719" y2="276" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="121.719" y1="320" x2="121.719" y2="354" stroke="#1565c0" stroke-width="1.4"/>
+
+  <text x="121.719" y="18" text-anchor="middle" fill="#1a1a1a">samples</text>
+  <text x="121.719" y="372" text-anchor="middle" fill="#1a1a1a">frequency</text>
+
+  <polygon points="121.719,60 117.719,51 125.719,51" fill="#1565c0"/>
+  <polygon points="121.719,132 117.719,123 125.719,123" fill="#1565c0"/>
+  <polygon points="121.719,204 117.719,195 125.719,195" fill="#1565c0"/>
+  <polygon points="121.719,276 117.719,267 125.719,267" fill="#1565c0"/>
+  <polygon points="121.719,354 117.719,345 125.719,345" fill="#1565c0"/>
+</svg>
