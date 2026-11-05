@@ -29,6 +29,7 @@ set(plugin_tests
    dexter_audio:q_plug_dexter
    dexter_presets:q_plug_dexter
    dexter_chart:q_plug_dexter
+   bender_audio:q_plug_bender
 )
 
 foreach(source ${test_sources})
