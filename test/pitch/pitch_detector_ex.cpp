@@ -7,7 +7,7 @@
 #include <infra/catch.hpp>
 
 #include <q/support/literals.hpp>
-#include <q/pitch/pitch_detector.hpp>
+#include <q/pitch/bacf_pitch_detector.hpp>
 #include <q_io/audio_file.hpp>
 #include <q/fx/envelope.hpp>
 #include <q/fx/lowpass.hpp>
@@ -109,7 +109,7 @@ void process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
-   q::pitch_detector          pd{ lowest_freq, highest_freq, sps, -40_dB };
+   q::bacf_pitch_detector     pd{ lowest_freq, highest_freq, sps, -40_dB };
    auto const&                bits = pd.bits();
    auto const&                edges = pd.edges();
    q::bitstream_acf<>         bacf{ bits };

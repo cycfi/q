@@ -17,6 +17,9 @@ compose freely with each other and with the rest of Q.
 | xref:reference/misc/delay.adoc[Delay]
 | Non-fractional and fractional delay lines, and one and two sample delays.
 
+| xref:reference/misc/varispeed_tap.adoc[Varispeed Tap]
+| A delay line read at a varying speed, for pitch and time effects, with splices.
+
 | xref:reference/misc/sample_hold.adoc[Sample Hold]
 | The value a signal had about a duration ago, without a delay line.
 
@@ -113,6 +116,9 @@ compose freely with each other and with the rest of Q.
 | xref:reference/misc/spectral_flux.adoc[Spectral Flux]
 | The level of the part of a signal above a cutoff frequency.
 
+| xref:reference/misc/transient_detector.adoc[Transient Detector]
+| Fires at each attack, within a fraction of a millisecond, tuned on guitar.
+
 |===
 
 == Onset Detection
@@ -127,7 +133,9 @@ block for each. They are separate blocks, combined to suit the instrument:
   Flux] is the level above a cutoff, which a pick or a pluck raises and a
   ringing string lets fall; a xref:reference/misc/delta_gate.adoc[Delta
   Gate] on it fires when it jumps against its own recent past, marking an
-  attack by its spectrum rather than its loudness.
+  attack by its spectrum rather than its loudness. The
+  xref:reference/misc/transient_detector.adoc[Transient Detector] is that
+  combination, ready made and tuned on guitar.
 * *A peak in an onset signal.* The xref:reference/misc/peak_picker.adoc[Peak
   Picker] marks the local maxima of any of these signals, one sample after
   each apex, and its qualifiers keep the ones that count.

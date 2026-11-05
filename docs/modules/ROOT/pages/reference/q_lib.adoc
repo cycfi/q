@@ -60,8 +60,8 @@ objects.
   ramps, windows, envelopes, noise and LFOs; FM synthesis and a DX7 patch
   compiler.
 
-| {fft}
-| The fast Fourier transform.
+| {frequency_domain}
+| Spectral processing, starting with the fast Fourier transform.
 
 | xref:reference/support.adoc[Support]
 | The foundations the rest is built on: base types, fast math, concepts,
@@ -78,6 +78,10 @@ objects.
 | xref:reference/pitch.adoc[Pitch Detection]
 | Real-time pitch and period detection with bitstream autocorrelation
   (BACF).
+
+| xref:reference/pitch_shifting.adoc[Pitch Shifting]
+| Real-time pitch shifting of a guitar, chords included, in the time
+  domain, and formant preservation.
 |===
 
 '''

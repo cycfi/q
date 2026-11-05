@@ -8,7 +8,10 @@ Produces, in docs/modules/ROOT/images/:
                              integer samples, the leading (rising) and trailing
                              (falling) crossings, and the sub-sample crossing
                              interpolated between the two samples P1 (last
-                             negative) and P2 (first positive) that straddle it.
+                             negative) and P2 (first positive) that straddle it,
+                             the peak height, and the width as the collector
+                             measures it: from the leading edge to the first
+                             sample below 0.3 of the peak.
 
 Style and palette follow gen_interpolation_figures.py (the canonical PALETTE
 lives there).
@@ -90,12 +93,23 @@ def gen_event():
    ax.text(n[peak_i] + 0.6, x[peak_i] * 0.5, 'peak\nheight',
            color=GREY, fontsize=9, va='center')
 
-   # pulse-width bracket
+   # the pulse, leading to trailing crossing
    ytop = x[peak_i] + 0.22
    ax.annotate('', xy=(xr, ytop), xytext=(xf, ytop),
                arrowprops=dict(arrowstyle='<|-|>', color=INK, lw=1.2))
-   ax.text((xr + xf) / 2, ytop + 0.04, 'pulse width', color=INK,
+   ax.text((xr + xf) / 2, ytop + 0.04, 'pulse', color=INK,
            fontsize=10, ha='center', va='bottom')
+
+   # _width: from the leading edge to the first sample below 0.3 of the peak
+   low = 0.3 * x[peak_i]
+   w_end = next(i for i in range(peak_i, falling + 1) if x[i] < low)
+   ax.axhline(low, color=GREY, lw=0.8, ls='--', zorder=1)
+   ax.text(falling + 3.8, low + 0.03, '0.3 of the peak', color=GREY,
+           fontsize=9, ha='right', va='bottom')
+   ax.annotate('', xy=(n[rising + 1], low), xytext=(n[w_end], low),
+               arrowprops=dict(arrowstyle='<|-|>', color=INK, lw=1.2))
+   ax.text((n[rising + 1] + n[w_end]) / 2, low - 0.04, 'width',
+           color=INK, fontsize=10, ha='center', va='top')
 
    ax.set_xlabel('Time (samples)')
    ax.set_yticks([])

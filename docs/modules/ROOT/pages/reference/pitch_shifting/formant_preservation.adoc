@@ -1,0 +1,125 @@
+= Formant Preservation
+
+include::../../common.adoc[]
+:xrefstyle: short
+
+== Overview
+
+A pitched sound has two parts. A source makes the notes: harmonics at the pitch and its multiples. A resonator shapes them with a fixed response, the same for every note. That response is the spectral envelope, and its peaks are the formants. On an electric guitar the strings are the source and the pickup, the electronics and the body the resonator, whose strongest formant is the pickup's resonance, between 1 and 6 kHz. Other resonators are a violin's body, a flute's bore and a singer's vocal tract; the learner and the corrector work on any of them.
+
+A pitch shifter such as the `{bacf_pitch_shifter}` moves the spectral envelope with the pitch: shifted up, a voice sounds like a chipmunk and a guitar like a ukulele, the chipmunk effect. Formant preservation removes the moved formants after the shift and restores the original ones.
+
+The spectral envelope is learned from the instrument's own playing: over many notes, what belongs to one note averages out and the fixed response remains. Three classes do the work, each on a page of its own:
+
+* The `{formant_learner}`, off the audio thread, learns the spectral envelope and fits a formant table to it by linear prediction (LPC).
+* The `{formant_table}` holds `F`, and `F(f/r)` for every ratio on a grid.
+* The `{formant_corrector}`, on the audio thread after the shifter, applies the table's correction for the current ratio. It adds no latency.
+
+== How It Works
+
+=== Why a Shift Moves the Formants
+
+Whether a pitch shifter keeps the formants depends on how it lays out the audio. PSOLA (Pitch-Synchronous Overlap-Add) cuts the audio into slices one period apart, each a period long plus some overlap for the crossfade. It then lays the slices out again, squeezed closer together to raise the pitch or spread farther apart to lower it, by the pitch ratio (<<fig-formant-psola>>). The slices themselves are never sped up or slowed down.
+
+[#fig-formant-psola]
+image::bacf_pitch_shifter_psola.svg[alt="PSOLA slices", title="PSOLA: the slices laid out closer together or farther apart", width="750px" align=center, link={imagesdir}/bacf_pitch_shifter_psola.svg]
+
+PSOLA is therefore formant preserving. Since the slices are never sped up or slowed down, the formants stay put; only the pitch changes.
+
+SOLA (Synchronized Overlap-Add), the method of the `{bacf_pitch_shifter}`, speeds the slices up or slows them down by the pitch ratio (<<fig-formant-sola>>). That moves the spectral envelope along with the pitch, and the effect grows the farther the shift. Shifted up, the resonances rise, and a guitar sounds like a ukulele: the chipmunk effect. Shifted down, the sound turns dull and oversized. It is a tradeoff: PSOLA keeps the formants but needs a single pitch; SOLA moves the formants but works on chords.
+
+[#fig-formant-sola]
+image::bacf_pitch_shifter_sola.svg[alt="SOLA slices", title="SOLA: the slices sped up or slowed down", width="750px" align=center, link={imagesdir}/bacf_pitch_shifter_sola.svg]
+
+=== The Correction Filter
+
+Formant preservation restores the spectral envelope. Write the spectral envelope as `F(f)`, its level at the frequency `f`, and the shift as a ratio `r`, the factor it multiplies every frequency by: 2 is an octave up, 0.5 an octave down. The shift moves what was at `f/r` to `f`, so the spectral envelope becomes `F(f/r)`. A filter applying `F(f) / F(f/r)` removes the moved formants and restores the original ones, and leaves the harmonics where the shift put them.
+
+[#fig-formant-chain]
+image::formant_chain.svg[alt="Formant preservation signal chain", title="Formant preservation: the shift, then the moved formants removed and the learned ones restored", width="750px" align=center, link={imagesdir}/formant_chain.svg]
+
+Both steps follow the shift (<<fig-formant-chain>>). Removed before it, the formants would take the strong partials down to the level of the noise, and the shifter would splice mostly noise.
+
+=== The Spectral Envelope
+
+[#fig-formant-envelope]
+image::formant_envelope.svg[alt="Formant envelope", title="The spectral envelope a formant_learner learned from a Stratocaster, and the same spectral envelope as a shift an octave up and down leaves it", width="750px" align=center, link={imagesdir}/formant_envelope.svg]
+
+<<fig-formant-envelope>> shows what a `formant_learner` learned from 22 seconds of a Stratocaster: an open E chord strummed, then left to ring. The light blue trace is the recording's average spectrum, its harmonics as peaks; the blue curve is the learned spectral envelope `F`, drawn through those peaks. It falls from the low strings' fundamentals to the top of the band, with the pickup's resonance as a shoulder near 3 kHz. The dashed curves are the same spectral envelope as a shift leaves it: an octave up (red) carries the resonance up an octave, an octave down (amber) carries it down.
+
+=== The Correction
+
+[#fig-formant-correction]
+image::formant_correction.svg[alt="Formant correction", title="The correction a formant_corrector applies for the spectral envelope in the figure above, a fifth (5 semitones) and an octave up and down", width="750px" align=center, link={imagesdir}/formant_correction.svg]
+
+<<fig-formant-correction>> is the difference between the curves: the correction `F(f) / F(f/r)`, in dB, for 5 and 12 semitones up and down. Going up (red), it cuts the band the shift has brightened, by up to 14 dB an octave up. Going down (amber), it lifts the band the shift has dulled.
+
+Going down, a full restoration would lift a band the shift has emptied by up to 30 dB, and with it whatever noise is there. So the lift is capped: before its level is set, the correction lifts no frequency more than 9 dB (`formant_learner::boost_cap_db`); cuts are not capped. Its level is then set so that it keeps the learned material's average loudness as the shift leaves it, so a bend does not get louder or softer as the correction comes in.
+
+=== Learning
+
+The learner averages frames of 50 ms, every 25 ms, and only those above -50 dBFS. Each frame counts at the same power, so loud notes do not outweigh soft ones. The average is cumulative: each new frame counts 1/N of it, so the longer one plays the steadier the spectral envelope gets, and a burst of unusual playing barely moves a model learned over minutes. Past 10 minutes the weight stops falling, so the spectral envelope can still follow slow changes, such as strings ageing.
+
+* **Learning phase.** `learn()` starts over: a new instrument, or a change of pickup or microphone. Right after it, each frame counts heavily, and the spectral envelope takes shape within seconds. What fills it in is variety rather than time, because the spectral envelope is only seen at the harmonics of what is played: open strings, notes up the neck and a few chords. One open E chord, strummed and left to ring for 22 seconds, covered 77 to 98% of the band on four guitars. `coverage()` says how much of the band, 80 Hz to 8 kHz, has had a harmonic land in it; the phase can end once it nears 1.
+* **Freeze.** `freeze(true)` stops learning and keeps the spectral envelope as it is, for a gig, say.
+* **Drift.** `drift()` compares the last few seconds with what was learned, in dB. A large drift, held for a while, suggests a different instrument and a new learning phase. It is a cue for the user, not a reason to start over unasked: one dark passage should not throw away a good model.
+
+`fit()` turns what has been learned into a table. It does not change while one plays between fits; refitting every few seconds, off the audio thread, is plenty.
+
+== Input
+
+What the learner learns is everything that is the same in every note, including what should not be there: hum and a steady noise floor are learned as part of the spectral envelope, and an effect such as distortion as part of the instrument. As with the shifter it follows, the best input is the guitar direct, before any processing (see the {bacf_pitch_shifter}'s xref:reference/pitch_shifting/bacf_pitch_shifter.adoc#_input[Input]).
+
+Learn from the same instrument, setting (a guitar's pickup selector, say) and chain that will be shifted. Learning from a single note learns that note, not the instrument: its own harmonic pattern is taken for the spectral envelope and frozen in place, so learn from varied playing.
+
+== Example
+
+A whammy with formant preservation. The audio thread shifts and corrects each sample, and passes its input on to a worker thread, which learns from it and refits the table every few seconds. The table goes from the worker to the audio thread through a `{handoff}`, so neither side waits or allocates on the other's behalf:
+
+```c++
+#include <q/fft/formant_learner.hpp>
+#include <q/fx/formant_corrector.hpp>
+#include <q/fx/bacf_pitch_shifter.hpp>   // For bacf_pitch_shifter
+#include <q/utility/handoff.hpp>         // For handoff
+#include <memory>
+#include <span>
+...
+namespace q = cycfi::q;
+
+float sps;                                // samples per second
+...
+// The worker thread, given the input in blocks of 256
+q::formant_learner learner{sps};
+q::handoff<q::formant_table> tables;
+std::size_t blocks = 0;
+
+void learn(std::span<float const> block)
+{
+   learner(block);                                           <1>
+   if (++blocks % 512 == 0)                                  <2>
+   {
+      auto table = std::make_unique<q::formant_table>();
+      if (learner.fit(*table))
+         tables.send(std::move(table));                      <3>
+   }
+}
+
+// The audio thread
+q::bacf_pitch_shifter shift{sps};
+q::formant_corrector correct;
+
+void process(std::span<float> io, float ratio)
+{
+   correct.table(tables.receive());                          <4>
+   for (auto& s : io)
+      s = correct(shift(s, ratio), ratio);                   <5>
+}
+```
+
+<1> Learn from the input, off the audio thread.
+<2> About every 3 seconds at 44.1 kHz.
+<3> Hand the new table to the audio thread; the handoff frees the old ones once the audio thread has moved on.
+<4> Take the latest table, once per block; until the first one, `receive` gives `nullptr` and the corrector passes its input through.
+<5> Shift, then restore the spectral envelope. With the bar at rest, both pass the input through untouched.
+
+A learn button calls `learner.learn()`; a freeze switch, `learner.freeze(true)`. On a microcontroller, the worker is the low-priority loop, and two tables taking turns can stand in for the handoff.

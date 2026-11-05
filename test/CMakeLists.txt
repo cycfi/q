@@ -19,6 +19,8 @@ endif()
 set(APP_SOURCES
 
    utility/best_lag.cpp
+   utility/zero_crossing_collector.cpp
+   utility/levinson.cpp
    utility/bitset.cpp
    fx/clip.cpp
    support/decibel.cpp
@@ -145,11 +147,22 @@ set(APP_SOURCES
    pitch/pitch_detector.cpp
    pitch/period_detector.cpp
    pitch/pitch_detector_ex.cpp
+   pitch/bacf_lag_tracker.cpp
    fft/fft.cpp
    fft/fft_native.cpp
    fft/stft.cpp
    fft/phase_tracker.cpp
    fft/spectral_peaks.cpp
+   fx/varispeed_tap.cpp
+   fx/transient_detector.cpp
+   fx/bacf_pitch_shifter.cpp
+   fx/lattice.cpp
+   fx/formant_corrector.cpp
+   fft/formant_learner.cpp
+   fft/lpc_fit.cpp
+   fft/spectral_learner.cpp
+   fx/eq_matcher.cpp
+   fft/convolver.cpp
    support/bypassable.cpp
    support/flush_denormals.cpp
    support/fast_trig.cpp
@@ -205,6 +218,17 @@ add_test(NAME test_fft_native COMMAND test_fft_native)
 add_test(NAME test_stft COMMAND test_stft)
 add_test(NAME test_phase_tracker COMMAND test_phase_tracker)
 add_test(NAME test_spectral_peaks COMMAND test_spectral_peaks)
+add_test(NAME test_varispeed_tap COMMAND test_varispeed_tap)
+add_test(NAME test_transient_detector COMMAND test_transient_detector)
+add_test(NAME test_bacf_pitch_shifter COMMAND test_bacf_pitch_shifter)
+add_test(NAME test_lattice COMMAND test_lattice)
+add_test(NAME test_formant_corrector COMMAND test_formant_corrector)
+add_test(NAME test_formant_learner COMMAND test_formant_learner)
+add_test(NAME test_lpc_fit COMMAND test_lpc_fit)
+add_test(NAME test_spectral_learner COMMAND test_spectral_learner)
+add_test(NAME test_eq_matcher COMMAND test_eq_matcher)
+add_test(NAME test_convolver COMMAND test_convolver)
+add_test(NAME test_levinson COMMAND test_levinson)
 add_test(NAME test_fast_trig COMMAND test_fast_trig)
 add_test(NAME test_bitset COMMAND test_bitset)
 add_test(NAME test_decibel COMMAND test_decibel)
@@ -269,12 +293,14 @@ set_tests_properties(
    test_audio_stream
    PROPERTIES TIMEOUT 60)
 add_test(NAME test_best_lag COMMAND test_best_lag)
+add_test(NAME test_zero_crossing_collector COMMAND test_zero_crossing_collector)
 add_test(NAME test_moving_sum COMMAND test_moving_sum)
 add_test(NAME test_moving_sum_ref COMMAND test_moving_sum_ref)
 add_test(NAME test_pitch COMMAND test_pitch)
 add_test(NAME test_period_detector COMMAND test_period_detector)
 add_test(NAME test_pitch_detector COMMAND test_pitch_detector)
 add_test(NAME test_pitch_detector_ex COMMAND test_pitch_detector_ex)
+add_test(NAME test_bacf_lag_tracker COMMAND test_bacf_lag_tracker)
 add_test(NAME test_sin COMMAND test_sin)
 add_test(NAME test_gen_envelope COMMAND test_gen_envelope)
 add_test(NAME test_gen_adsr_envelope COMMAND test_gen_adsr_envelope)

@@ -1,28 +1,69 @@
 = Pitch Detection
 
 include::../common.adoc[]
+:xrefstyle: short
 
 == Overview
 
-Q detects the pitch of a monophonic signal in the time domain using *Bitstream Autocorrelation* (BACF). It is accurate to a fraction of a cent, runs serially on a per-sample basis with low latency, and is cheap enough to track many channels at once on a microcontroller (see <<_performance>>).
+Bitstream Autocorrelation, or BACF, is an accurate, extremely fast and efficient time-domain pitch detection algorithm, and the method of Q's pitch detectors. BACF can be at least as accurate as any pitch detection scheme based on autocorrelation. Unlike the standard autocorrelation function (ACF), BACF works on zero crossings, the *bitstream*, using bitwise operations.
 
-IMPORTANT: Q's BACF pitch detection is tuned for *multichannel guitar* and tested on it: the test suite covers a 2-octave range on every string of 6-string and 8-string guitars. Instruments outside that range, especially ones that need more than 2 octaves, may perform differently.
+Autocorrelation is the correlation of a signal with a delayed copy of itself, as a function of the delay. It finds repeating patterns, such as a periodic signal obscured by noise, or a missing fundamental implied by its harmonics.
 
-The API is documented on the member pages: {pitch_detector}, {bacf_period_detector}, {bitstream_acf} and {zero_crossing_collector}.
+BACF is fast: about 50 nanoseconds a sample, on a 2016 MacBook Pro, tracking guitar phrases with legato, hammer-ons, pull-offs, vibrato, staccato and right-hand tapping (see <<_performance>>).
+
+IMPORTANT: Q's BACF pitch detection is tuned for *multichannel guitar* and tested on it: the test suite covers a 2-octave range on every string of 6-string and 8-string guitars. The algorithm is generic and applies to other sources, but instruments outside that range, especially ones that need more than 2 octaves, may perform differently.
+
+The API is documented on the member pages: {bacf_pitch_detector}, {bacf_period_detector}, {bitstream_acf} and {zero_crossing_collector}. The {bacf_lag_tracker} uses the same engine to follow the lag at which a signal repeats, a period or a multiple of one, for time-domain splicing.
 
 == Zero Crossings
 
-The period of a pure tone is easy to read off its zero crossings: a sine crosses zero exactly twice per cycle, so the spacing between crossings is half the period. Real instrument tones are not pure. With strong harmonics the waveform crosses zero many times per cycle, and the raw spacing no longer gives the period.
+Timing the zero crossings gives the period, and its reciprocal, the frequency. It is the simplest form of pitch detection. It works on pure sine waves and on fairly clean waveforms such as triangle, sawtooth, pulse and square waves, and fails when a cycle has several transitions.
 
-image::pitch_zero_crossings.svg[alt="Zero crossings of a pure tone vs a harmonically rich tone", width=820px, align=center, title="A pure tone crosses zero twice per cycle, so the crossing spacing gives the period. The same period with strong harmonics crosses zero many times per cycle, and the spacing alone is ambiguous", link={imagesdir}/pitch_zero_crossings.svg]
+[#fig-pitch-pattern]
+image::pitch_bacf_pattern.svg[alt="A guitar low E and its zero crossings", width=820px, align=center, title="A guitar low E, a second after the pick, and its zero crossings: three pulses a cycle, a wide one followed by two narrower ones", link={imagesdir}/pitch_bacf_pattern.svg]
 
-Heavy low-pass filtering would reduce the harmonics at the cost of phase lag, too much for a low-latency real-time detector. BACF instead looks for the *repeating pattern* in the crossings: autocorrelation.
+<<fig-pitch-pattern>> is a guitar's low E string, a second after the pick. Its 2nd and 3rd harmonics are strong, as is common with plucked strings, and each cycle crosses zero six times. Heavy low-pass filtering would tame the waveform, at the cost of phase lag, too much for a real-time detector.
+
+The crossings still form a pattern, one wide pulse followed by two successively narrower ones, repeating every cycle. Autocorrelation is the tool for finding repeating patterns.
+
+== Autocorrelation
+
+Standard autocorrelation multiplies the signal by a delayed copy of itself and sums the products, at every lag (<<fig-pitch-acf>>). The sum peaks where the copy lines up with the signal: at the period.
+
+[#fig-pitch-acf]
+image::pitch_acf.svg[alt="Standard autocorrelation of a guitar low E", width=760px, align=center, title="The low E of Figure 1 against a copy delayed by 187 samples (top), and the normalized sum of products against lag (bottom): the peak is at the period, 536 samples", link={imagesdir}/pitch_acf.svg]
+
+The multiplication is the most expensive part: for a window of N samples, roughly N/2 x N/2 multiply-accumulates. Popular ACF-based detectors and their variants, AMDF (average magnitude difference function), ASDF (average squared difference function), YIN and MPM, have the same cost. An FFT computes the autocorrelation faster, and is still expensive for many channels on a small microcontroller.
 
 == Bitstream Autocorrelation
 
-Autocorrelation measures how much a signal resembles a delayed copy of itself. Standard ACF multiplies the signal by a shifted version of itself and accumulates the products at each lag; it is the most accurate family of time-domain detectors, but the multiply-accumulate over every lag is roughly an O(N²) cost, too much for real-time multi-channel work on small hardware.
+BACF autocorrelates the zero-crossing bitstream in place of the samples. With only ones and zeros, the multiplication is a bitwise operation, and a machine word holds 32 or 64 samples.
 
-BACF keeps the accuracy and discards almost all of the cost by correlating the *bitstream* rather than the samples. The signal is reduced to one bit per sample, set inside each zero-crossing pulse. With only ones and zeros, the per-lag multiply-accumulate collapses to a bitwise *XOR* followed by a bit count:
+The product of two bits is an AND:
+
+[cols="^1,^1,^1",options="header",width="40%"]
+|===
+| A | B | A * B
+
+| 0 | 0 | 0
+| 0 | 1 | 0
+| 1 | 0 | 0
+| 1 | 1 | 1
+|===
+
+Binary 1 and 0 stand for other values, though, and 0 may as well stand for -1, since audio signals run from -1 to +1:
+
+[cols="^1,^1,^1",options="header",width="40%"]
+|===
+| A | B | A * B
+
+| -1 | -1 | +1
+| -1 | +1 | -1
+| +1 | -1 | -1
+| +1 | +1 | +1
+|===
+
+That is an XNOR. BACF takes its inverse, the XOR, which gives a 1 for each mismatch:
 
 [cols="^1,^1,^1",options="header",width="40%"]
 |===
@@ -34,77 +75,101 @@ BACF keeps the accuracy and discards almost all of the cost by correlating the *
 | 1 | 1 | 0
 |===
 
-XOR yields a `1` only where the two bitstreams disagree, so the count of set bits after the XOR is a mismatch score: the *lower* the count, the better the correlation, and a count of zero is a perfect match. One XOR operates on a whole machine word, so 64 samples are compared in a single instruction, and the bit count is a hardware popcount. The result is a mismatch curve whose deepest notch marks the period.
+After the XOR, the bits set to 1 are counted. The lower the count, the higher the periodicity. The count and the window size give a normalized periodicity from 0 to 1, where 1, a count of zero, is a perfect match. One XOR compares a whole word, so BACF is faster than the ACF by the word size (64 on a 64-bit machine), and integer bit operations are cheaper than floating-point multiplication.
 
-image::bitstream_acf_count.svg[alt="Signal, bitstream, and BACF mismatch count", width=720px, align=center, title="A harmonically rich signal (top), its one-bit-per-sample bitstream (middle), and the XOR mismatch count vs lag (bottom): the count falls to its deepest notch of 0 at the true period", link={imagesdir}/bitstream_acf_count.svg]
+[#fig-pitch-bacf]
+image::pitch_bacf_low_e.svg[alt="BACF of a guitar low E", width=760px, align=center, title="BACF of the low E of Figure 1: the input (top), the bitset (middle), and the periodicity of each analysis, one after another (bottom). Each analysis peaks at the period, 535 to 537 samples", link={imagesdir}/pitch_bacf_low_e.svg]
 
-This is the {bitstream_acf} engine. Its accuracy on a one-bit signal is comparable to floating-point autocorrelation, because the bitstream only selects the candidate period, and the period itself is read from the interpolated zero-crossing timings (see <<data-flow>>).
+<<fig-pitch-bacf>> is BACF on the low E of <<fig-pitch-pattern>>. The graphs on this page and the member pages are the output of Q's test suite, `test/pitch/pitch_detector_ex.cpp`, which runs the {bacf_pitch_detector} on the guitar samples at 44.1 kHz and writes what it computes:
 
-== Robustness
+* *Top:* the detector's input, band-passed, compressed and clipped by the test.
+* *Middle:* the bitset of each analysis. It holds only the significant pulses, those at least 60% as high as the highest: here, the wide pulse of each cycle.
+* *Bottom:* the bitstream autocorrelation, as periodicity, one analysis after another. The window spans two periods of the lowest frequency of interest, rounded to whole words: 1344 samples here, for a range of 66 to 412 Hz. An analysis runs every half window, 672 samples, over lags from 0 to half the window. Each starts with a blank, the lags below the shortest period of interest, which are not computed.
 
-As an autocorrelation method, BACF holds up against noise and a missing fundamental, and reports its confidence:
+Each analysis peaks where the cycle starts to repeat: the period, here 535 to 537 samples, with a periodicity of 0.993. The height of the peak measures how periodic the signal is. The period is read from the interpolated zero crossings of the edges that bound it, to a fraction of a sample (see <<_results>>).
 
-* *Noise.* Low-level noise stays within the hysteresis of the zero-crossing front-end and produces no crossings, and the random crossings of loud noise produce no false notch.
-* *Missing fundamental.* A tone built only from upper harmonics still repeats at the fundamental period, so the notch lands on the true fundamental even when there is no energy at that frequency.
-* *Confidence.* A normalized *periodicity* value in [0, 1] falls out of the same computation, so weak or aperiodic input can be rejected with a threshold.
+== More Graphs
 
-image::pitch_noise_robust.svg[alt="The notch survives additive noise", width=720px, align=center, title="Additive noise lifts the mismatch floor, but the deepest notch still lands on the true period", link={imagesdir}/pitch_noise_robust.svg]
+The open strings of a guitar, a second after the pick, from the same tests. Each detector's range is 0.8 to 5 times the string's open note, so the window is shorter on the higher strings.
 
-image::bacf_missing_fundamental.svg[alt="Period found despite a missing fundamental", width=720px, align=center, title="A signal made only of the 2nd, 3rd and 4th harmonics still repeats at the fundamental period; the deepest notch lands there, not on a harmonic", link={imagesdir}/bacf_missing_fundamental.svg]
+[#fig-pitch-a]
+image::pitch_bacf_a.svg[alt="BACF of the A string", width=760px, align=center, title="The A string: each analysis peaks at 402 samples, periodicity 0.95 to 0.996", link={imagesdir}/pitch_bacf_a.svg]
 
-[#data-flow]
+[#fig-pitch-d]
+image::pitch_bacf_d.svg[alt="BACF of the D string", width=760px, align=center, title="The D string: each analysis peaks at 301 samples, periodicity 0.997 to 1", link={imagesdir}/pitch_bacf_d.svg]
+
+[#fig-pitch-g]
+image::pitch_bacf_g.svg[alt="BACF of the G string", width=760px, align=center, title="The G string: each analysis peaks at 225 samples, periodicity 0.90 to 0.993", link={imagesdir}/pitch_bacf_g.svg]
+
+[#fig-pitch-b]
+image::pitch_bacf_b.svg[alt="BACF of the B string", width=760px, align=center, title="The B string: each analysis peaks at 175 to 179 samples, periodicity 1", link={imagesdir}/pitch_bacf_b.svg]
+
+[#fig-pitch-high-e]
+image::pitch_bacf_high_e.svg[alt="BACF of the high E string", width=760px, align=center, title="The high E string: each analysis peaks at 134 samples, periodicity 1", link={imagesdir}/pitch_bacf_high_e.svg]
+
+The A, D, G, B and high E strings are in <<fig-pitch-a>>, <<fig-pitch-d>>, <<fig-pitch-g>>, <<fig-pitch-b>> and <<fig-pitch-high-e>>. Each analysis peaks at the string's period. On the B and high E, the harmonics leave lower peaks early in each analysis: 0.84 at 36 samples on the B, 0.84 at 57 on the high E.
+
+[#fig-pitch-low-e-12th]
+image::pitch_bacf_low_e_12th.svg[alt="BACF of the low E at the 12th fret", width=760px, align=center, title="The low E string at the 12th fret, an octave up, in the window of the open string: two peaks per analysis, at 269 and 537 samples", link={imagesdir}/pitch_bacf_low_e_12th.svg]
+
+At the 12th fret, an octave up, the low E keeps the range of the open string, so half a window holds two cycles (<<fig-pitch-low-e-12th>>). Each analysis has two peaks of equal height, 0.999, at one and two periods. The detector settles the two candidates on the shorter period (see {bacf_sub_collector}).
+
+Autocorrelation also finds the period of a missing fundamental, since the waveform still repeats at the fundamental's period. The test suite checks it with a synthetic tone of the 2nd and 3rd harmonics only (see <<_results>>).
+
 == The Data Flow
 
-The detector is a pipeline of four stages, each a public class.
+The detector is a pipeline of four classes, from samples to frequency (<<fig-pitch-flow>>):
 
-image::pitch_detection_flow.svg[alt="Pitch detection data flow", width=750px, align=center, title="Zero-crossing edges feed a bitstream correlator. The correlation selects the edges that bound one period, and the period becomes a stable frequency", link={imagesdir}/pitch_detection_flow.svg]
+[#fig-pitch-flow]
+image::pitch_detection_flow.svg[alt="Pitch detection data flow", width=244px, align=center, title="The pitch detection pipeline, from samples to frequency", link={imagesdir}/pitch_detection_flow.svg]
 
-* {zero_crossing_collector} records the crossings, with hysteresis, and the pulses between them.
-* {bitstream_acf} correlates a bitset by XOR and popcount.
-* {bacf_period_detector} packs the pulses into the bitset, picks the pair of edges that bounds one cycle, and reports the period.
-* {pitch_detector} holds the octave against harmonic jumps and passes the frequency through a 3-point median.
+* *Zero crossing.* {zero_crossing_collector} records the crossings, with hysteresis, and the pulses between them, timing each crossing to a fraction of a sample.
+* *Bitset and sub-collector.* {bacf_period_detector} packs the significant pulses into a bitset, proposes candidate periods from pairs of edges, and keeps the pair that bounds one cycle (see {bacf_sub_collector}).
+* *BACF.* {bitstream_acf} scores each candidate by XOR and bit count.
+* *Bias.* {bacf_pitch_detector} holds the octave against harmonic jumps, and passes the frequency through a 3-point median (see {bacf_pitch_detector_bias}).
 
-Inside the period detector, an estimate takes four steps.
+== Results
 
-*Zero crossing.* The {zero_crossing_collector} records each crossing with hysteresis (so noise does not trip spurious edges), keeping the pulse height, width, and the samples straddling the crossing. The exact crossing is located to sub-sample precision by interpolating between the two samples, `P1` and `P2`, on either side of zero.
+From Q's test suite (`test/pitch/pitch_detector.cpp`): one second of each test signal at 44.1 kHz, the partials at 0.3, 0.4 and 0.3 unless noted, the detector's range 0.8 to 5 times the lowest note of the test, and the error of every frequency the detector reports, in cents.
 
-image::zero_crossing_event.svg[alt="A zero-crossing pulse with sub-sample interpolation", width=680px, align=center, title="The leading and trailing crossings bound a pulse; each crossing is interpolated between the two samples P1 and P2 that straddle it", link={imagesdir}/zero_crossing_event.svg]
-
-*Bitset.* Once about twice the correlation window of crossings has been collected, the significant pulses (those at or above 60% of the largest pulse height, which rejects spurious low-level pulses) are packed into a `bitset` of 64-bit words.
-
-*BACF.* {bitstream_acf} correlates the bitstream by XOR and popcount, as above.
-
-*Sub-collector.* Rather than sweeping every lag, the correlation is evaluated only at the candidate periods proposed by pairs of zero-crossing edges. The BACF score is a *hint*: it selects which edge pair bounds the true cycle. The period is then computed from those edges, interpolated to sub-sample precision, which is more accurate than reading it off the correlation notch. When several candidates correlate well (common at higher frequencies, where many cycles fit the window), the longer period is preferred: more samples and the sub-sample interpolation make it the more precise estimate.
-
-== Holding the Octave
-
-A note's harmonic balance shifts as it rings. On a guitar D string, for instance, the second harmonic can grow stronger than the fundamental, and its correlation eventually scores better. Without any memory, the detector would then report a pitch an octave too high.
-
-The *bias* stage guards against this. It compares each new estimate against the recent history: if a sudden jump matches a harmonic ratio of the established frequency (within a few cents), it keeps the established frequency. A 3-point median then removes isolated spikes while still allowing genuine note changes through.
-
-image::pitch_detector_bias.svg[alt="Bias holds the octave as a harmonic overtakes the fundamental", width=720px, align=center, title="As a note rings, the 2nd harmonic's periodicity overtakes the fundamental's. Without history the reported frequency jumps up an octave at the crossover; the bias holds it on the true fundamental", link={imagesdir}/pitch_detector_bias.svg]
-
-== Period and Pitch
-
-The bias, the median and the note-shift logic work on the frequency, and {pitch_detector} holds them. The classes below it work on the period:
-
-[cols="1,3"]
+[cols="3,2,2,2",options="header"]
 |===
-| Class | Role
+| Test case | Average error | Min error | Max error
 
-| {zero_crossing_collector} | Hysteretic zero-crossing front-end: records each pulse, proposes candidate periods.
-| {bitstream_acf}           | The engine: XOR + popcount autocorrelation of the bitstream.
-| {bacf_period_detector}    | Builds the bitstream, scores candidates, reconciles harmonics, reports the fundamental *period* and periodicity.
-| {pitch_detector}          | Period to stable *frequency*: bias against octave jumps, median smoothing, note-shift detection, low-latency prediction.
+| Middle C (261.63 Hz)             | 0.0015  | 0.0001  | 0.0025
+| Middle A (440 Hz)                | 0.0028  | 0.0001  | 0.0061
+| Low E (82.41 Hz)                 | 0.00004 | 0.00003 | 0.0001
+| Low E, 12th fret                 | 0.00007 | 0.00003 | 0.0001
+| Low E, 24th fret                 | 0.0002  | 0.00003 | 0.0006
+| A (110 Hz)                       | 0.000001 | 0      | 0.0001
+| A, 12th fret                     | 0.00008 | 0       | 0.0001
+| A, 24th fret                     | 0.0004  | 0       | 0.0011
+| D (146.83 Hz)                    | 0.0002  | 0.00002 | 0.0004
+| D, 12th fret                     | 0.0008  | 0.00002 | 0.0016
+| D, 24th fret                     | 0.0034  | 0.00002 | 0.0096
+| G (196 Hz)                       | 0.00006 | 0.00006 | 0.00006
+| G, 12th fret                     | 0.00007 | 0.00006 | 0.00008
+| G, 24th fret                     | 0.0002  | 0.00006 | 0.0105
+| B (246.94 Hz)                    | 0.0010  | 0.000002 | 0.0019
+| B, 12th fret                     | 0.0052  | 0.0002  | 0.0160
+| B, 24th fret                     | 0.0055  | 0.0003  | 0.0362
+| High E (329.63 Hz)               | 0.0011  | 0.00003 | 0.0031
+| High E, 12th fret                | 0.0042  | 0.00003 | 0.0133
+| High E, 24th fret                | 0.0230  | 0.00003 | 0.0649
+| Phase offsets                    | 0.0001  | 0.00003 | 0.0003
+| Missing fundamental              | 0.0012  | 0.00003 | 0.0046
+| Non-integer harmonics            | 1.02    | 0.94    | 1.13
 |===
+
+The phase-offset case shifts the partials' phases (0.1, 0.5 and 0.4 of a cycle). The missing fundamental has the 2nd and 3rd harmonics at 0.5 each. The non-integer case puts the 2nd harmonic at 2.003 times the fundamental, so the waveform never repeats exactly.
 
 == Performance
 
-On a 2016 MacBook Pro the detector averages about 50 nanoseconds per sample, fast enough for many simultaneous channels in real time, with sub-cent accuracy on sustained notes. The speed comes from three savings: sparse zero-crossing edges instead of every sample, N-bit-parallel XOR instead of scalar multiplies, and a sub-sample period read from the edges instead of an exhaustive lag sweep.
+On a 2016 MacBook Pro, the detector averages about 50 nanoseconds a sample on guitar phrases, with sub-cent accuracy on sustained notes. The speed comes from three savings: sparse zero-crossing edges in place of every sample, a word of bits per XOR in place of one multiply per sample, and a period read from the edges in place of a sweep over every lag.
 
 == Phrase Tests
 
-Beyond single notes, the detector is tested on guitar phrases: legato lines, staccato, hammer-ons and pull-offs, tapping, slides and bends. In each recording, from the 2020 article, the detected pitch is resynthesized.
+The tests use typical playing techniques: legato, hammer-ons and pull-offs, vibrato, staccato and right-hand tapping. In each recording, from the 2020 article, the left channel is the guitar and the right is a square wave that follows the detected pitch, with an envelope follower shaping its level and filter. All are recorded with the Nu multichannel pickup, except the short staccato, a synthesized sine burst.
 
 *Melodic lines (legato).*
 
@@ -147,27 +212,33 @@ audio::https://media.cycfi.com/q/pitch-detection/pitch_follower_Bend-Slide-G.mp3
 
 == Prediction and Zero-Latency Attacks
 
-Autocorrelation needs at least two cycles to confirm a period, so detection is inherently delayed, and more so for low notes (two cycles of the low E string is about 24 ms). That delay is audible as a latent onset.
+Any detector based on autocorrelation needs at least two cycles, since a cycle is correlated with the next. The zero-crossing edges on or just before the onset give an earlier prediction, from the first two similar pulses: one cycle at the least, about 12 ms for the low E string (1/82.41 Hz).
 
-The leading edge of a plucked or bowed note is a brief, non-periodic transient (pick noise, bow scrape), and the ear cannot resolve pitch from a non-periodic fragment shorter than roughly 20 ms. So during the attack a pitch can be *predicted* and synthesis can start immediately, with no audible penalty and effectively zero latency. `pitch_detector` exposes this through `predict_frequency()` (and `bacf_period_detector::predict_period()`).
+[#fig-pitch-onset]
+image::pitch_bacf_low_e_onset.svg[alt="Prediction at a low E onset", width=760px, align=center, title="A guitar low E from the pick (top), and the frequency predicted from the zero-crossing edges (bottom)", link={imagesdir}/pitch_bacf_low_e_onset.svg]
+
+<<fig-pitch-onset>> is the low E of the tests, from the pick. The test's input opens at 0.992 s. The first prediction, 82.4 Hz, is at 1.029 s, three cycles in, and 82.6 Hz from 1.041 s. `bacf_pitch_detector` gives the prediction through `predict_frequency()`, and `bacf_period_detector` through `predict_period()`.
+
+Attack transients need not be periodic at all. A Hammond organ has its key click, a violin its bow noise, a voice its unvoiced consonants, and a guitar pick sounds "clik" or "clok" depending on where you pick. A percussive or semi-periodic sound under about 20 ms gives the note character without setting its pitch, and does not sound out of tune whatever its frequency. A synthesizer that follows the pitch can start at the pick with the attack, and take up the pitch from the prediction, with no audible latency.
 
 .Low E, tracked with a zero-latency attack
 audio::https://media.cycfi.com/q/pitch-detection/pitch_follower_1a-Low-E.wav[opts=controls]
 
-A predicted pitch that later corrects *downward* is barely perceptible, while an upward correction is pronounced. Biasing the uncertain initial prediction slightly high keeps the rare error on the inaudible side.
+A wrong prediction that corrects downward, from too high to the right pitch, is barely perceptible. One that corrects upward is more pronounced, as in the glitch below, a low onset predicted too low. When a prediction is uncertain, err high.
 
 .An audible glitch when a low onset is predicted too low and corrects upward
 audio::https://media.cycfi.com/q/pitch-detection/glitch.mp3[opts=controls]
 
 == History
 
-BACF was first published in the 2018 article listed under <<_further_reading>>; the 2020 article describes the algorithm as Q implements it. After the first publication, the author learned of David Warrender's 1980s hardware patent (since expired) covering a related zero-crossing correlation technique, credited here as independent prior art.
+BACF was first published in the 2018 articles listed under <<_further_reading>>; the 2020 article describes the algorithm as Q implements it. After the first article, I learned of David Warrender's hardware pitch analyzer from the 1980s, whose patent (since expired) covers a related zero-crossing correlation technique: prior art, credited here.
 
 == Further Reading
 
-The two articles this overview is based on, with the full derivation, measurements, and listening tests:
+The three articles this overview is based on, with the full derivation, measurements, and listening tests:
 
 * link:https://www.cycfi.com/2018/03/fast-and-efficient-pitch-detection-bitstream-autocorrelation/[Fast and Efficient Pitch Detection: Bitstream Autocorrelation^] (2018), the original method.
+* link:https://www.cycfi.com/2018/04/fast-and-efficient-pitch-detection-bliss/[Fast and Efficient Pitch Detection: Bliss!^] (2018), BACF on real guitar recordings: harmonics, multiple edges and note onsets.
 * link:https://www.cycfi.com/2020/07/fast-and-efficient-pitch-detection-revisited/[Fast and Efficient Pitch Detection: Revisited^] (2020), the matured algorithm and the data flow above.
 
 The wider reading those articles collect, on pitch detection in general:

@@ -1,0 +1,203 @@
+= BACF Pitch Detector
+
+include::../../common.adoc[]
+:xrefstyle: short
+
+== Overview
+
+The BACF pitch detector turns the period estimates of a {bacf_period_detector} into a stable frequency in Hz. It is the class of the pitch detection stack that most applications use. The pitch detector is implemented by a class named `bacf_pitch_detector`.
+
+The period detector gives a new estimate every half window. Taken raw, the estimates wobble on the attack, jump octaves on notes rich in harmonics, and drift as a note decays. `bacf_pitch_detector` adds:
+
+* *Frequency*: the detected period, converted to Hz at the sample rate.
+* *Bias*: a new estimate within about half a semitone of the current frequency, or of one of its harmonics or sub-harmonics, keeps the current note, so a steady note holds its octave when a harmonic overtakes the fundamental.
+* *Smoothing*: a median of three removes single-frame outliers.
+* *Note-shift detection*: `is_note_shift()` marks the analysis frame where a new note takes over.
+* *Prediction*: `predict_frequency()` gives an estimate from the zero-crossing edges before the next analysis completes, at lower latency and lower confidence.
+
+The detection range and the sample rate are set at construction.
+
+== The Data Flow
+
+`bacf_pitch_detector` is the last of a pipeline of four classes, from samples to frequency (<<fig-pd-flow>>).
+
+[#fig-pd-flow]
+image::pitch_detection_flow.svg[alt="Pitch detection data flow", width=244px, align=center, title="The pitch detection pipeline, from samples to frequency", link={imagesdir}/pitch_detection_flow.svg]
+
+* {zero_crossing_collector} records the crossings, with hysteresis, and the pulses between them.
+* {bitstream_acf} correlates a bitset by XOR and bit count.
+* {bacf_period_detector} packs the pulses into the bitset, picks the pair of edges that bounds one cycle, and reports the period. Its {bacf_sub_collector} section has the details.
+* `bacf_pitch_detector` holds the octave against harmonic jumps and passes the frequency through a 3-point median.
+
+The classes below `bacf_pitch_detector` work on the period; the bias, the median and the note-shift logic work on the frequency. `get_period_detector()`, `edges()` and `bits()` give access to the stages below, for analysis or display.
+
+== Bias
+
+[#fig-pd-d-string]
+image::pitch_bacf_d_string.svg[alt="BACF of a guitar D string, 14 seconds in", width=760px, align=center, title="A guitar's D string, 14 seconds after the pick: each analysis peaks at the period, 301 samples, and the 2nd harmonic leaves a second peak near half the period, at 0.875", link={imagesdir}/pitch_bacf_d_string.svg]
+
+<<fig-pd-d-string>> is the BACF of a guitar's D string, 14 seconds after the pick, from the test suite. The 2nd harmonic dominates the fundamental and leaves a second peak near half the period, at 0.875. The fundamental's peak is still the higher, 0.997 at 301 samples. As the note evolves, though, the 2nd harmonic can grow stronger still, and its peak can catch up. Without the history of detected frequencies, the 2nd harmonic would then be detected as the fundamental: a sudden octave jump.
+
+Sudden jumps are not normal. The bias deals with abrupt harmonic shifts, of the 2nd harmonic and others, by comparing the incoming frequency with the current one. When the incoming frequency is a harmonic or a sub-harmonic of the current one, within about half a semitone, the bias keeps the older, stable frequency: the incoming frequency, which may have shifted a bit, divided or multiplied by its integer multiple of the current one. <<fig-pd-bias>> is a model of the effect, with drawn curves: the fundamental's periodicity falls from 0.99 to 0.90 while the 2nd harmonic's rises from 0.84 to 0.98, and they cross at about 260 ms. With no history, the frequency jumps from 110 to 220 Hz at the crossing; with the bias, it holds at 110 Hz.
+
+[#fig-pd-bias]
+image::pitch_detector_bias.svg[alt="Bias holds the octave as a harmonic overtakes the fundamental", width=720px, align=center, title="A model of a ringing note: the 2nd harmonic's periodicity overtakes the fundamental's at about 260 ms (top). Without the bias the frequency jumps an octave there; with it, it holds at 110 Hz (bottom)", link={imagesdir}/pitch_detector_bias.svg]
+
+A 3-point median then filters the frequency, for a true, non-harmonic shift: it removes the occasional spurious spike.
+
+== Note Shifts
+
+Note onsets show in the periodicity. At an onset the pick noise and the change of note leave little correlation, and the periodicity drops, even where the level hardly changes, as on a soft hammer-on or pull-off. A frame below `min_periodicity` restarts the count of `frames_after_shift()`, and on that frame and the next the bias holds no harmonic, so a new note an octave away comes through. `is_note_shift()` is `true` on the frame where a new frequency takes over.
+
+== Include
+
+```c++
+#include <q/pitch/bacf_pitch_detector.hpp>
+```
+
+NOTE: `pitch_detector`, the former name, remains a deprecated alias of `bacf_pitch_detector`, in `<q/pitch/pitch_detector.hpp>`.
+
+== Declaration
+
+```c++
+class bacf_pitch_detector
+{
+public:
+
+   static constexpr float  max_deviation = 0.90f;
+   static constexpr float  min_periodicity = 0.8f;
+
+                           bacf_pitch_detector(
+                              frequency lowest_freq
+                            , frequency highest_freq
+                            , float sps
+                            , decibel hysteresis
+                           );
+
+   bool                    operator()(float s);
+   float                   get_frequency() const;
+   float                   predict_frequency(bool init = false);
+   bool                    is_note_shift() const;
+   std::size_t             frames_after_shift() const;
+   float                   periodicity() const;
+   void                    reset();
+
+   bitset<> const&         bits() const;
+   zero_crossing_collector const& edges() const;
+   bacf_period_detector const&    get_period_detector() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`pd`, `a`, `b`                :: Objects of type `bacf_pitch_detector`.
+`lowest_freq`, `highest_freq` :: Objects of type `{frequency}`: the detection range.
+`sps`                         :: Floating point value for samples per second.
+`hysteresis`                  :: Object of type `{decibel}`: the zero-crossing hysteresis (e.g. `-30_dB`).
+`s`                           :: Floating point value for the latest input sample.
+`init`                        :: Object of type `bool`.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                    | Semantics
+
+| `bacf_pitch_detector(lowest_freq, highest_freq, sps, hysteresis)`
+                                | Construct a `bacf_pitch_detector` given
+                                  `lowest_freq` and `highest_freq` (the
+                                  detection range), `sps` (samples per
+                                  second) and `hysteresis` (zero-crossing
+                                  hysteresis).
+| `bacf_pitch_detector(pd)`     | Copy construct from `bacf_pitch_detector pd`.
+| `a = b`                       | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                     | Return Type
+
+| `pd(s)`      | Process the input sample `s` and return
+                 `true` when an analysis completes.            | `bool`
+|===
+
+=== Operation
+
+[cols="1,1,1"]
+|===
+| Expression                       | Semantics                                 | Return Type
+
+| `pd.predict_frequency([init])`   | Predict the frequency from the
+                                     zero-crossing edges, in Hz, or 0 when
+                                     there is no prediction. With `init`
+                                     `true`, the prediction also becomes
+                                     the held frequency.                     | `float`
+| `pd.reset()`                     | Reset the held frequency to 0.            | `void`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression                  | Semantics                                 | Return Type
+
+| `pd.get_frequency()`        | Get the frequency, in Hz.                 | `float`
+| `pd.periodicity()`          | Get the periodicity of the latest
+                                analysis, from 0 to 1.                    | `float`
+| `pd.is_note_shift()`        | Return `true` on the analysis frame of
+                                a note shift.                             | `bool`
+| `pd.frames_after_shift()`   | Get the number of analysis frames since
+                                the last note shift.                      | `std::size_t`
+| `pd.get_period_detector()`  | Get the period detector.                  | `bacf_period_detector const&`
+| `pd.edges()`                | Get the zero-crossing collector.          | `zero_crossing_collector const&`
+| `pd.bits()`                 | Get the bitstream of the latest analysis. | `bitset<> const&`
+|===
+
+NOTE: `pd.get_frequency()` is 0 until an analysis reaches a periodicity of `max_deviation`. Compare `pd.periodicity()` with `min_periodicity` before using the frequency. `pd.is_note_shift()` is `true` on the frame where a frequency takes over, the first one included, and on a frame below `min_periodicity` that finds no period.
+
+=== Access
+
+[cols="1,1,1"]
+|===
+| Expression                               | Semantics                                  | Return Type
+
+| `bacf_pitch_detector::max_deviation`     | Get the periodicity required for the
+                                             first frequency (0.9). Below it, a new
+                                             frequency is checked against the
+                                             frequency predicted from the edges.      | `float`
+| `bacf_pitch_detector::min_periodicity`   | Get the periodicity required for a new
+                                             frequency (0.8).                         | `float`
+|===
+
+=== Example
+
+Track the frequency of the input samples `in`, at `sps` samples per second, between 50 Hz and 500 Hz:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto pd = q::bacf_pitch_detector{50_Hz, 500_Hz, sps, -30_dB};          <1>
+float freq = 0;
+
+for (auto s : in)
+{
+   if (pd(s))                                                           <2>
+   {
+      if (pd.periodicity() > q::bacf_pitch_detector::min_periodicity)   <3>
+         freq = pd.get_frequency();                                     <4>
+   }
+   // Use freq
+}
+```
+
+<1> Construct a `bacf_pitch_detector` for 50 Hz to 500 Hz, with a zero-crossing hysteresis of -30 dB.
+<2> Process the sample; the result is `true` when an analysis completes.
+<3> Check the periodicity of the analysis.
+<4> Get the frequency, in Hz.

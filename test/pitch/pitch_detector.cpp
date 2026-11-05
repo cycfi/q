@@ -7,7 +7,7 @@
 #include <infra/catch.hpp>
 
 #include <q/support/literals.hpp>
-#include <q/pitch/pitch_detector.hpp>
+#include <q/pitch/bacf_pitch_detector.hpp>
 #include <q/fx/signal_conditioner.hpp>
 
 #include <vector>
@@ -27,15 +27,15 @@ constexpr auto verbosity = 0;
 
 TEST_CASE("Test_detector_assignment")
 {
-   static_assert(std::is_copy_assignable_v<q::pitch_detector>);
-   static_assert(std::is_move_assignable_v<q::pitch_detector>);
+   static_assert(std::is_copy_assignable_v<q::bacf_pitch_detector>);
+   static_assert(std::is_move_assignable_v<q::bacf_pitch_detector>);
    static_assert(std::is_copy_assignable_v<q::signal_conditioner>);
    static_assert(std::is_move_assignable_v<q::signal_conditioner>);
 
    auto conf = q::signal_conditioner::config{};
 
-   auto pd = q::pitch_detector{notes::low_e, notes::high_e, sps, -45_dB};
-   pd = q::pitch_detector{notes::low_e, notes::high_e, sps, -45_dB};
+   auto pd = q::bacf_pitch_detector{notes::low_e, notes::high_e, sps, -45_dB};
+   pd = q::bacf_pitch_detector{notes::low_e, notes::high_e, sps, -45_dB};
 
    auto sc = q::signal_conditioner{conf, notes::low_e, notes::high_e, sps};
    sc = q::signal_conditioner{conf, notes::low_e, notes::high_e, sps};
@@ -68,9 +68,9 @@ test_result process(
    ////////////////////////////////////////////////////////////////////////////
    // Process
 
-   q::pitch_detector    pd(lowest_freq, highest_freq, sps, -45_dB);
-   auto                 result = test_result{};
-   auto                 frames = 0;
+   q::bacf_pitch_detector  pd(lowest_freq, highest_freq, sps, -45_dB);
+   auto                    result = test_result{};
+   auto                    frames = 0;
 
    for (auto i = 0; i != in.size(); ++i)
    {

@@ -56,6 +56,47 @@ TEST_CASE("bitstream_acf: 64-bit words match the reference")
    check_against_reference<std::uint64_t>();
 }
 
+namespace
+{
+   // Any window: `words` words from word `start`, against `pos` later.
+   template <typename T>
+   void check_any_window()
+   {
+      constexpr auto word = q::bitset<T>::value_size;
+      q::bitset<T> bs{32 * word};
+      std::uint32_t x = 12345;
+      for (std::size_t i = 0; i != bs.size(); ++i)
+      {
+         x = x * 1664525u + 1013904223u;
+         bs.set(i, (x >> 31) != 0);
+      }
+
+      q::bitstream_acf<T> acf{bs};
+      for (std::size_t start : {0, 1, 5})
+         for (std::size_t words : {1, 4, 9})
+            for (std::size_t pos : {0, 1, 7, 31, 32, 33, 100})
+            {
+               INFO("start = " << start << ", words = " << words
+                  << ", pos = " << pos);
+               std::size_t ref = 0;
+               auto const from = start * word;
+               for (std::size_t i = 0; i != words * word; ++i)
+                  ref += bs.get(from + i) != bs.get(from + i + pos);
+               CHECK(acf(pos, start, words) == ref);
+            }
+
+      // The one-argument call is the window from the start.
+      for (std::size_t pos = 0; pos != 64; ++pos)
+         CHECK(acf(pos) == acf(pos, 0, acf._mid_array));
+   }
+}
+
+TEST_CASE("bitstream_acf: any window matches the reference")
+{
+   check_any_window<std::uint32_t>();
+   check_any_window<std::uint64_t>();
+}
+
 TEST_CASE("bitstream_acf: compares half the words less one, at least one")
 {
    using bits = q::bitset<std::uint32_t>;

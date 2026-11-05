@@ -1,0 +1,147 @@
+= Transient Detector
+
+include::../../common.adoc[]
+
+== Overview
+
+A transient is the short burst at the start of a sound: the pick snapping off a string, a stick hitting a drum. The transient detector fires at each one, true for a single sample. It is a time-domain detector: there is no analysis frame to wait for, so on a plucked string it fires within a fraction of a millisecond of the pick leaving the string.
+
+It looks for a sudden rise in the part of the signal above a cutoff frequency, 4 kHz by default. An attack, such as a pick or a stick, puts broadband energy into that band, while a sustained note keeps little of it, so the band jumps at every attack, even over notes that are still ringing. The detector is a chain of Q blocks:
+
+1. A `{mono-spectral_flux}` takes the level above the cutoff, held over a millisecond.
+2. A `{mono-delta_gate}` compares that level with its own value about 10 ms ago, and opens when it has risen 22 dB.
+3. A floor, -45 dBFS, keeps quiet noise from counting.
+4. After firing, the detector ignores the input for 100 ms, so a strummed or rolled chord fires once.
+
+These are the defaults, tuned on guitar recordings (single notes, harmonics and strummed chords) through Cycfi's Nu Multi pickups. Each can be set at construction.
+
+The detector is implemented by a class named `transient_detector`.
+
+== Response
+
+image::transient_detector.svg[alt="Transient detector response", title="A pick on the low E string close up, and a strummed E chord", width="750px" align=center, link={imagesdir}/transient_detector.svg]
+
+Figure 1 shows the detector on two recordings. The data is from the class itself.
+
+* **Top two plots:** a pick on the low E string, close up. Before the pick leaves the string, the pick rubbing on it puts a little energy above 4 kHz, 30 to 50 dB below the attack, rising slowly over 50 ms. That is no sudden rise, so it does not fire. At the release the level jumps 30 dB within a millisecond, and the detector fires (red).
+* **Bottom:** a strummed E chord, all six strings. The detector fires once a strum, including the softer strums made while the chord is still ringing.
+
+NOTE: A synthetic tone with gaps of silence between pulses of energy above the cutoff, such as a clean sawtooth gated on and off, can fire on its pulses. The guitar recordings it was tuned on do not.
+
+== Include
+
+```c++
+#include <q/fx/transient_detector.hpp>
+```
+
+== Declaration
+
+```c++
+struct transient_detector
+{
+                  transient_detector(float sps);
+                  transient_detector(
+                     frequency cutoff
+                   , decibel rise
+                   , duration lookback
+                   , decibel floor
+                   , duration refractory
+                   , float sps
+                  );
+
+   bool           operator()(float s);
+   bool           operator()() const;
+
+   static constexpr duration window = duration{0.001};
+};
+```
+
+== Expressions
+
+=== Notation
+
+`td`, `a`, `b`    :: Objects of type `transient_detector`.
+`sps`             :: Floating point value for samples per second.
+`s`               :: Floating point value for the latest input sample.
+`f`               :: Object of type `frequency`: the cutoff.
+`r`               :: Object of type `decibel`: the rise that counts as a transient.
+`l`               :: Object of type `duration`: how far back the rise is measured from.
+`fl`              :: Object of type `decibel`: the floor, the lowest level that can fire.
+`rf`              :: Object of type `duration`: how long the detector ignores the input after firing.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                                | Semantics
+
+| `transient_detector(sps)`                 | Construct a `transient_detector` with the
+                                              defaults: 4 kHz cutoff, 22 dB rise over
+                                              about 10 ms, -45 dBFS floor, 100 ms
+                                              refractory period.
+| `transient_detector(f, r, l, fl, rf, sps)`| Construct a `transient_detector` given `f`
+                                              (cutoff), `r` (rise), `l` (lookback), `fl`
+                                              (floor), `rf` (refractory period) and `sps`
+                                              (samples per second).
+| `transient_detector(td)`                  | Copy construct from `transient_detector td`.
+| `a = b`                                   | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                                 | Return Type
+
+| `td(s)`           | Process the input sample `s`. Return true
+                      for one sample at a transient.            | `bool`
+| `td()`            | Get the latest result.                    | `bool`
+|===
+
+=== Misc
+
+[cols="1,1,1"]
+|===
+| Expression                      | Semantics                         | Return Type
+
+| `transient_detector::window`    | Get how long the level above the
+                                    cutoff is held, 1 ms.            | `duration`
+|===
+
+=== Example
+
+An attack-triggered auto-wah: every attack sweeps a resonant low pass from 3 kHz down to 300 Hz over about a quarter of a second, the classic envelope-filter quack, and the sweep starts again at the next attack:
+
+```c++
+#include <q/fx/transient_detector.hpp>
+#include <q/fx/biquad.hpp>              // For lowpass
+#include <q/support/literals.hpp>
+#include <cmath>
+#include <span>
+...
+namespace q = cycfi::q;
+using namespace q::literals;
+
+float sps;                       // samples per second
+std::span<float> in;             // the input samples
+...
+auto detect = q::transient_detector{sps};                    <1>
+auto wah = q::lowpass{300_Hz, sps, 6.0};
+auto const decay = std::exp(-1.0f / (0.25f * sps));
+auto sweep = 0.0f;
+
+for (auto& s : in)
+{
+   if (detect(s))                                            <2>
+      sweep = 1.0f;
+   sweep *= decay;                                           <3>
+   wah.config(300_Hz + sweep * 2700_Hz, sps, 6.0);
+   s = wah(s);
+}
+```
+
+<1> Construct a transient detector with the defaults.
+<2> At an attack, start the sweep at the top.
+<3> Let the sweep fall, and move the filter's cutoff with it.

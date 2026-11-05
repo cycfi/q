@@ -1,0 +1,199 @@
+= EQ Matcher
+
+include::../../common.adoc[]
+
+== Overview
+
+The EQ matcher gives a sound the spectral envelope of another: a Stratocaster the body and pickup tone of a Les Paul, a direct recording the tone of a reference. From the source's spectral envelope `A` and the target's `B`, it applies `B(f) / A(f)`: the source's shape comes out, the target's goes in, and the notes stay as they are. It runs on the audio thread, sample by sample, with no latency.
+
+Both spectral envelopes are all-pole models, each a few reflection coefficients and a level: a `{spectral_learner}` learns each one from playing, and an `{lpc_fit}` models it. The amount blends from no change at 0 to the full match at 1. Either model may change at any sample, so the match can follow a control; `{formant_preservation}` is a match whose source follows the pitch shift.
+
+The EQ matcher is implemented by a class named `eq_matcher`.
+
+== Include
+
+```c++
+#include <q/fx/eq_matcher.hpp>
+```
+
+== Declaration
+
+```c++
+class eq_matcher
+{
+public:
+
+   explicit             eq_matcher(std::size_t order = 32);
+
+   float                operator()(float s);
+
+   void                 source(std::span<float const> k, float level);
+   void                 target(std::span<float const> k, float level);
+   void                 amount(float a);
+   float                amount() const;
+   std::size_t          order() const;
+   void                 reset();
+};
+```
+
+== Expressions
+
+=== Notation
+
+`m`, `a`, `b`     :: Objects of type `eq_matcher`.
+`n`               :: Unsigned integer value for the models' order.
+`s`               :: Floating point value for the latest sample.
+`k`               :: Object of type `std::span<float const>`, `m.order()` long: a model's reflection coefficients.
+`v`               :: Floating point value for a model's level.
+`x`               :: Floating point value for an amount, 0 to 1.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression              | Semantics
+
+| `eq_matcher()`          | Construct an `eq_matcher` for models of order 32.
+| `eq_matcher(n)`         | Construct an `eq_matcher` for models of order `n`. It
+                            allocates here, and nowhere else.
+| `eq_matcher(m)`         | Copy construct from `eq_matcher m`.
+| `a = b`                 | Assign `b` to `a`.
+|===
+
+Until a source and a target are given, both are flat, and the output is the input.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression     | Semantics                                     | Return Type
+
+| `m(s)`         | Match the sample `s` and return it. At an
+                   amount of 0, the output is `s` itself.        | `float`
+|===
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                                | Return Type
+
+| `m.source(k, v)`    | Set the source's model: the spectral
+                        envelope to take out.                    | `void`
+| `m.target(k, v)`    | Set the target's model: the spectral
+                        envelope to put in.                      | `void`
+| `m.amount(x)`       | Set how much of the match to apply, from
+                        0 (none) to 1 (all of it), clamped. The
+                        default is 1.                            | `void`
+|===
+
+Each may be called at any sample, on the audio thread.
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression       | Semantics                                   | Return Type
+
+| `m.amount()`     | Get the amount.                             | `float`
+| `m.order()`      | Get the models' order.                      | `std::size_t`
+|===
+
+=== Operation
+
+[cols="1,1,1"]
+|===
+| Expression       | Semantics                                   | Return Type
+
+| `m.reset()`      | Clear the filters' history.                 | `void`
+|===
+
+=== Example
+
+Match a guitar to a reference recording. Off the audio thread, learn both and model them; on it, match each sample:
+
+```c++
+#include <q/fx/eq_matcher.hpp>
+#include <q/fft/lpc_fit.hpp>             // For lpc_fit
+#include <q/fft/spectral_learner.hpp>    // For spectral_learner
+#include <cmath>
+#include <span>
+#include <vector>
+...
+namespace q = cycfi::q;
+
+float sps;                                // samples per second
+std::vector<float> guitar, reference;     // recordings of each
+...
+// A recording's model: its reflection coefficients and level
+struct model
+{
+   std::vector<float> k = std::vector<float>(32);
+   float level;
+};
+
+model learn(std::vector<float> const& recording)
+{
+   q::spectral_learner learner{sps};
+   learner(recording);                                       <1>
+   std::vector<float> db(learner.bins());
+   learner.spectral_envelope(db);
+   q::lpc_fit fit{learner.bins()};
+   model m;
+   m.level = float(std::sqrt(fit(db, m.k)));                 <2>
+   return m;
+}
+
+q::eq_matcher match;
+
+void setup()
+{
+   auto const a = learn(guitar);
+   auto const b = learn(reference);
+   match.source(a.k, a.level);                               <3>
+   match.target(b.k, b.level);
+}
+
+// The audio thread
+void process(std::span<float> io)
+{
+   for (auto& s : io)
+      s = match(s);                                          <4>
+}
+```
+
+<1> Learn the recording's spectral envelope.
+<2> Model it, at the matcher's order, 32.
+<3> Take the guitar's spectral envelope out, and put the reference's in.
+<4> Match each sample, with no latency.
+
+== Implementation Details
+
+NOTE: Implementation details are subject to change without notice. Rely only on the expressions above.
+
+The matcher runs the two filters of the models in lattice form (`q::lattice_fir` and `q::lattice_iir`, in `<q/fx/lattice.hpp>`): the FIR with the source's reflection coefficients flattens the source's spectral envelope, the IIR with the target's colours it, and the ratio of their levels scales the result. A lattice with every coefficient under 1 in magnitude is stable at any coefficients, so they can change freely. The amount blends the FIR's coefficients from the target's (a flat match) to the source's, and the level with them, in dB. At an amount of 0 the filters rest; they start again from rest, where the match is nearly flat.
+
+=== Performance
+
+NOTE: {performance_note}
+
+Measured matching a strummed chord, with the source set every 32 samples:
+
+[cols="2,2,2", options="header"]
+|===
+| | Apple M2 | STM32H723
+
+| A sample, on average
+| 52 ns (0.25%)
+| 1.7 µs (8%)
+
+| Worst block of 32 samples
+| 2.4 µs (0.4%)
+| 53 µs (8%)
+
+| A sample at order 24
+| 37 ns (0.2%)
+| 1.3 µs (6%)
+|===
+
+The worst block holds a change of the source. The matcher holds about 0.6 KB at order 32.

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="246"
+     viewBox="0 0 750 246"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+
+  <rect x="262.562" y="14" width="290.828" height="114" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="407.977" y="44" text-anchor="middle" fill="#1a1a1a">formant_corrector</text>
+
+  <rect x="85.375" y="64" width="139.188" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="154.969" y="90.9" text-anchor="middle" fill="#1a1a1a">bacf_pitch_shifter</text>
+
+  <rect x="282.562" y="64" width="108.844" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="336.984" y="90.9" text-anchor="middle" fill="#1a1a1a">remove F(f/r)</text>
+
+  <rect x="449.406" y="64" width="83.9844" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="491.398" y="90.9" text-anchor="middle" fill="#1a1a1a">restore F</text>
+
+  <rect x="344.594" y="188" width="126.766" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="407.977" y="214.9" text-anchor="middle" fill="#1a1a1a">formant_learner</text>
+
+  <line x1="51.375" y1="86" x2="85.375" y2="86" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="224.562" y1="86" x2="282.562" y2="86" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="391.406" y1="86" x2="449.406" y2="86" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="533.391" y1="86" x2="567.391" y2="86" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 65.38 86 L 65.38 202 Q 65.38 210 73.38 210 L 344.59 210" fill="none" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="407.977" y1="188" x2="407.977" y2="128" stroke="#43a047" stroke-width="1.4"/>
+  <circle cx="65.375" cy="86" r="3.5" fill="#1565c0"/>
+
+  <text x="45.375" y="90.9" text-anchor="end" fill="#1a1a1a">input</text>
+  <text x="573.391" y="90.9" fill="#1a1a1a">output</text>
+  <text x="417.977" y="162.9" fill="#1a1a1a">formant_table</text>
+
+  <polygon points="85.375,86 76.375,90 76.375,82" fill="#1565c0"/>
+  <polygon points="282.562,86 273.562,90 273.562,82" fill="#1565c0"/>
+  <polygon points="449.406,86 440.406,90 440.406,82" fill="#1565c0"/>
+  <polygon points="567.391,86 558.391,90 558.391,82" fill="#1565c0"/>
+  <polygon points="344.594,210 335.594,214 335.594,206" fill="#43a047"/>
+  <polygon points="407.977,128 411.977,137 403.977,137" fill="#43a047"/>
+</svg>

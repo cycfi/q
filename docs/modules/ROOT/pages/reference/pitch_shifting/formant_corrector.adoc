@@ -1,0 +1,144 @@
+= Formant Corrector
+
+include::../../common.adoc[]
+
+== Overview
+
+The formant corrector restores the spectral envelope a pitch shifter moved. After a shift by a ratio `r` it applies `F(f) / F(f/r)`, from a `{formant_table}`: it removes the moved formants and restores the instrument's own. It runs on the audio thread, after the shifter, and adds no latency. See `{formant_preservation}` for how it works and an example.
+
+The correction is a pair of lattice filters, built from the all-pole models of the spectral envelope that `{lpc_fit}` fits. An FIR with the moved spectral envelope `F(f/r)` flattens it, cancelling the moved formants; an IIR with `F` then colours the result with the instrument's own. The ratio of the two models' levels scales the output. The corrector is an `{eq_matcher}`, matching `F(f/r)` to `F`; see the matcher's xref:reference/spectral/eq_matcher.adoc#_implementation_details[Implementation Details] for the filters.
+
+The formant corrector is implemented by a class named `formant_corrector`.
+
+== Include
+
+```c++
+#include <q/fx/formant_corrector.hpp>
+```
+
+== Declaration
+
+```c++
+class formant_corrector
+{
+public:
+
+   using table_type = formant_table;
+
+   explicit             formant_corrector(std::size_t order = 32);
+
+   float                operator()(float s, float ratio);
+
+   void                 table(table_type const* table);
+   void                 amount(float a);
+   float                amount() const;
+   std::size_t          order() const;
+   void                 reset();
+};
+```
+
+== Expressions
+
+=== Notation
+
+`fc`, `a`, `b`    :: Objects of type `formant_corrector`.
+`n`               :: Unsigned integer value for the model's order.
+`p`               :: Pointer to a `formant_table const` of the corrector's order, or `nullptr`.
+`s`               :: Floating point value for the latest shifted sample.
+`r`               :: Floating point value for the ratio the sample was shifted by.
+`x`               :: Floating point value for an amount, 0 to 1.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                    | Semantics
+
+| `formant_corrector()`         | Construct a `formant_corrector` for tables of order
+                                  32, with no table yet: it passes its input
+                                  through.
+| `formant_corrector(n)`        | Construct a `formant_corrector` for tables of order
+                                  `n`. It allocates here, and nowhere else.
+| `formant_corrector(fc)`       | Copy construct from `formant_corrector fc`.
+| `a = b`                       | Assign `b` to `a`.
+|===
+
+The table must outlive its use.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression     | Semantics                                     | Return Type
+
+| `fc(s, r)`     | Correct the sample `s`, shifted by the ratio
+                   `r`, and return it. With no table, at a ratio
+                   of 1, or at an amount of 0, the output is `s`
+                   itself.                                       | `float`
+|===
+
+The correction follows the ratio every 32 samples. While the output is `s` itself the filters rest; near a ratio of 1 the correction is nearly flat, so they start again without a seam.
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression       | Semantics                                   | Return Type
+
+| `fc.table(p)`    | Use the table `p`; `nullptr` passes the input
+                     through.                                    | `void`
+| `fc.amount(x)`   | Set how much of the correction to apply, from
+                     0 (none: the plain shift) to 1 (all of it),
+                     clamped. The default is 1.                  | `void`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression       | Semantics                                   | Return Type
+
+| `fc.amount()`    | Get the amount.                             | `float`
+| `fc.order()`     | Get the model's order.                      | `std::size_t`
+|===
+
+=== Operation
+
+[cols="1,1,1"]
+|===
+| Expression       | Semantics                                   | Return Type
+
+| `fc.reset()`     | Clear the filters' history.                 | `void`
+|===
+
+
+== Implementation Details
+
+NOTE: Implementation details are subject to change without notice. Rely only on the expressions above.
+
+The corrector is an `{eq_matcher}` whose target is the table's unshifted row, `F`, and whose source is the row for the ratio, `F(f/r)`, interpolated between the grid's rows every 32 samples. The `amount` is the matcher's.
+
+=== Performance
+
+NOTE: {performance_note}
+
+The corrector runs two lattices of the table's order a sample, and every 32 samples it reads the table and interpolates the coefficients for the current ratio. Measured filtering a strummed chord, with the ratio swept from 0.5 to 2:
+
+[cols="2,2,2", options="header"]
+|===
+| | Apple M2 | STM32H723
+
+| A sample, on average
+| 53 ns (0.25%)
+| 1.7 µs (8%)
+
+| Worst block of 32 samples
+| 2 µs (0.3%)
+| 63 µs (9%)
+
+| A sample at order 24
+| 40 ns (0.2%)
+| 1.3 µs (6%)
+|===
+
+The worst block holds a table read. At a ratio of 1 or an amount of 0 the filters rest and the input passes through, at almost no cost; when the ratio moves they start again from rest, where the correction is nearly flat. The corrector itself holds two filter states, as long as its order; the table it reads is shared.

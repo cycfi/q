@@ -1,0 +1,158 @@
+= Convolver
+
+include::../../common.adoc[]
+
+== Overview
+
+The convolver convolves a signal with an impulse response (IR): a guitar cabinet and its microphone after an amp, a room, an acoustic guitar's body. It runs sample by sample on the audio thread, with no latency: the first output sample already carries the IR's first tap.
+
+The IR is cut into partitions of `block` samples. The first is applied directly; the rest in the frequency domain, where a long IR is cheap. A larger block costs more per sample in the first partition and less in the rest: 64 suits IRs of tens of milliseconds, typical of cabinets. The convolver keeps its own copy of the IR, transformed, so the IR need not outlive it.
+
+The convolver is implemented by a class named `convolver`.
+
+== Include
+
+```c++
+#include <q/fft/convolver.hpp>
+```
+
+== Declaration
+
+```c++
+class convolver
+{
+public:
+
+                        convolver(
+                           std::span<float const> ir
+                         , std::size_t block = 64
+                        );
+
+   float                operator()(float s);
+
+   std::size_t          block() const;
+   std::size_t          length() const;
+   void                 reset();
+};
+```
+
+== Expressions
+
+=== Notation
+
+`c`, `a`, `b`     :: Objects of type `convolver`.
+`ir`              :: Object of type `std::span<float const>`: an impulse response, not empty.
+`n`               :: Unsigned integer value for the block: a power of 2, at least 2.
+`s`               :: Floating point value for the latest sample.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression              | Semantics
+
+| `convolver(ir)`         | Construct a `convolver` for the impulse response `ir`, in
+                            blocks of 64.
+| `convolver(ir, n)`      | Construct a `convolver` for the impulse response `ir`, in
+                            blocks of `n`. It allocates here, and nowhere else.
+| `convolver(c)`          | Copy construct from `convolver c`.
+| `a = b`                 | Assign `b` to `a`.
+|===
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression     | Semantics                                     | Return Type
+
+| `c(s)`         | Convolve the sample `s` and return the
+                   output sample.                                | `float`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression       | Semantics                                   | Return Type
+
+| `c.block()`      | Get the block.                              | `std::size_t`
+| `c.length()`     | Get the impulse response's length, in
+                     samples.                                    | `std::size_t`
+|===
+
+=== Operation
+
+[cols="1,1,1"]
+|===
+| Expression       | Semantics                                   | Return Type
+
+| `c.reset()`      | Clear the input's history.                  | `void`
+|===
+
+=== Example
+
+A cabinet after an amp model, its IR read from a mono WAV file at the session's sample rate:
+
+```c++
+#include <q/fft/convolver.hpp>
+#include <q_io/audio_file.hpp>           // For wav_reader
+#include <span>
+#include <vector>
+...
+namespace q = cycfi::q;
+...
+std::vector<float> load(char const* path)
+{
+   q::wav_reader wav{path};
+   std::vector<float> ir(wav.length());
+   wav.read(ir);
+   return ir;
+}
+
+q::convolver cabinet{load("cabinet.wav"), 64};               <1>
+
+// The audio thread, after the amp model
+void process(std::span<float> io)
+{
+   for (auto& s : io)
+      s = cabinet(s);                                        <2>
+}
+```
+
+<1> Load the IR and build the convolver, off the audio thread: this is where it allocates.
+<2> Convolve each sample, with no latency.
+
+== Implementation Details
+
+NOTE: Implementation details are subject to change without notice. Rely only on the expressions above.
+
+The first partition runs as a direct FIR of `block` taps. The rest are convolved by overlap-save with FFTs of twice the block, each partition's spectrum against the spectrum of the matching past input block, kept in a frequency-domain delay line. The partitions that use input older than the last block are summed a few each sample, so the cost stays nearly flat: the end of a block is left with one forward FFT, one partition's product and one inverse FFT.
+
+=== Performance
+
+NOTE: {performance_note}
+
+Measured convolving a strummed chord with decaying noise IRs, with a convolver block of 64:
+
+[cols="2,2,2", options="header"]
+|===
+| | Apple M2 | STM32H723
+
+| A sample, 1024 taps (21 ms)
+| 25 ns (0.1%)
+| 1.6 µs (7.5%)
+
+| Worst block, 1024 taps
+| 1.3 µs (0.2%)
+| 59 µs (9%)
+
+| A sample, 4096 taps (85 ms)
+| 44 ns (0.2%)
+| 3.5 µs (17%)
+
+| Worst block, 4096 taps
+| 2.2 µs (0.3%)
+| 136 µs (20%)
+|===
+
+The worst block holds the end of a convolver block, which runs its FFTs: on the H723, 40 µs in one sample, two sample periods, so a processor called a sample at a time runs late there; a block of 32 absorbs it. With a convolver block of 32, the H723 takes 1.9 µs a sample at 1024 taps and 5.9 µs (28%) at 4096, with a worst block of 63 and 194 µs (9 and 29%). The convolver holds about 16 bytes a tap: about 16 KB for 1024 taps and 65 KB for 4096.

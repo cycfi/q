@@ -1,0 +1,46 @@
+= Pitch Shifting
+
+include::../common.adoc[]
+
+== Overview
+
+Q shifts the pitch of a sound in real time, chords included, in the time domain. One use is a whammy: a bar or a pedal bending the whole sound up and down, with no latency at all while it rests. The API is documented on the member pages:
+
+* The `{bacf_pitch_shifter}` shifts the pitch by a ratio that may change every sample, by reading the input faster or slower and splicing a period at a time.
+* `{formant_preservation}` puts back what a shift moves with the pitch: the fixed resonances of the source, such as a guitar's pickup and body or a singer's vocal tract, which a shift up turns into a chipmunk's.
+
+Both build on blocks with pages of their own: the `{varispeed_tap}` that does the reading, the `{transient_detector}` that finds the attacks, and the `{bacf_lag_tracker}` that finds where the sound repeats.
+
+IMPORTANT: Pitch shifting works best on a clean signal, direct from the source. Put the shifter first in the chain, and any amplification, distortion or effects after it. Noise, hum and processing all degrade the shift; see the shifter's xref:reference/pitch_shifting/bacf_pitch_shifter.adoc#_input[Input].
+
+== Methods
+
+There are two broad ways to shift pitch:
+
+* **Frequency domain**
+** **Phase vocoder.** Slices the signal into overlapping FFT frames, moves each frequency bin to its new pitch, and keeps each bin's phase advancing smoothly. It handles chords well, but each frame costs latency and CPU: tens of milliseconds even in the best designs.
+** **Sinusoidal modeling.** Tracks each partial as its own sine wave and resynthesizes it with oscillators at the new pitch. Very flexible, but frame-based like the phase vocoder, more expensive, and it smears transients.
+* **Time domain**
+** **Granular, or rotating delay taps.** Reads a delay line faster or slower than it is written, like a Doppler shift, and crossfades between two taps as the read point wraps around. Simple, with low latency, but the blind crossfades warble.
+** **SOLA** (Synchronized Overlap-Add). The same idea, but each splice lands where the waveform matches itself, found by correlation. It works on chords, with low latency.
+** **PSOLA** (Pitch-Synchronous Overlap-Add). Splices one pitch period at a time, at detected pitch marks. Excellent on single notes and voice, but it needs a single pitch, so it is monophonic only.
+
+Q's shifter is a SOLA shifter.
+
+== Background
+
+=== The Rotating Head
+
+The video below shows how pitch was shifted in the 1950s, with a rotating head. In place of a single stationary playback head, several playback heads are mounted on a rotating drum. When the drum turns in the same direction as the tape, the tape passes the heads more slowly, so the pitch drops without changing the duration. When the drum turns against the tape, the pitch rises, also without changing the duration. The speed of the drum relative to the tape sets the amount of the shift.
+
+video::https://media.cycfi.com/q/bacf-pitch-shifter/rotating_head.mp4[width=750, opts="autoplay,loop,muted"]
+
+The drawback is the jump from one playback head to the next, which causes an audible warble. It shows in the waveform at the bottom of the video.
+
+=== The Ring Buffer
+
+image:bacf_pitch_shifter_ring_buffer.svg[alt="A ring buffer with a write head and a read head", width=340, role=right]Early digital pitch shifters emulated the rotating head with a ring buffer that has separate write and read heads: pointers, in code. In Q, the ring buffer is a `{varispeed_tap}`. When the read head moves faster than the write head, the pitch rises. Eventually the read head catches up with the write head and passes it. The slot just past the write head still holds the oldest sample in the ring, so the read jumps back in time by the whole length of the buffer, and the waveform breaks there. When the read head moves slower than the write head, the pitch drops. The write head then catches up with the read head and passes it, so the read jumps forward in time by the whole buffer, from the oldest sample to the newest, and the waveform breaks again.
+
+image:bacf_pitch_shifter_two_heads.svg[alt="A ring buffer with two read heads, half a buffer apart", width=340, role=right]The discontinuity where one head overtakes the other is an audible click. A second read head half a buffer away hides it: the output crossfades to the second head before the first reaches the write head.
+
+This has the same problem as the rotating head it emulates: the audio warbles. The two read heads are a fixed distance apart, so the crossfade blends two parts of the waveform that are out of phase. They line up only when that distance happens to be a whole number of periods of the audio. With the distance set to a whole number of periods, the warble is gone, and that is what the `{bacf_pitch_shifter}` does.

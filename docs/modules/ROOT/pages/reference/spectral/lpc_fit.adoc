@@ -1,0 +1,222 @@
+= LPC Fit
+
+include::../../common.adoc[]
+
+== Overview
+
+The LPC fit turns a spectral envelope into an all-pole model: a filter of a few poles, 32 by default, whose spectrum follows the spectral envelope. This is linear prediction (LPC). A spectral envelope of thousands of bins becomes a few numbers that a filter can apply at no latency: the reflection coefficients `k` that an `{eq_matcher}` takes, and a level.
+
+It takes the spectral envelope in dB on the bins of a spectrum, DC to Nyquist, as a `{spectral_learner}` draws it. It returns the model's prediction error `e`; the model's spectral envelope is then `e / |A(f)|^2`, up to the spectrum's scale, so `sqrt(e)` is the model's level. `response()` gives `|A(f)|^2`, and `polynomial()` gives `A(z)` itself.
+
+A higher order follows a spectral envelope more closely, and costs a filter that applies it more: 32 resolves a guitar's pickup resonance and body; 24 is close, and a quarter cheaper.
+
+The LPC fit is implemented by a class template named `basic_lpc_fit`, on how it computes `|A(f)|^2`; `lpc_fit` takes the default.
+
+== Include
+
+```c++
+#include <q/fft/lpc_fit.hpp>
+```
+
+== Declaration
+
+```c++
+template <typename Response = /* lpc_clenshaw or lpc_fft */>
+class basic_lpc_fit
+{
+public:
+
+   using response_type = Response;
+
+   explicit             basic_lpc_fit(
+                           std::size_t bins
+                         , std::size_t order = 32
+                        );
+
+   double               operator()(
+                           std::span<float const> db
+                         , std::span<float> k
+                        );
+
+   double               response(std::size_t bin) const;
+   void                 response(std::span<float> mag2) const;
+   std::span<double const> polynomial() const;
+   std::size_t          bins() const;
+   std::size_t          order() const;
+};
+```
+
+== Template Instantiations
+
+`lpc_fit` is the template instantiation with the default response, chosen for the processor:
+
+`lpc_fit`:: `basic_lpc_fit<lpc_fft>` on a computer; `basic_lpc_fit<lpc_clenshaw>` on a microcontroller (an Arm Cortex-M), where memory is short and double arithmetic slow.
+
+```c++
+using lpc_fit = basic_lpc_fit<>;
+```
+
+== Response Policies
+
+`Response` computes `|A(f)|^2` after each fit:
+
+`lpc_clenshaw`:: At each bin asked for, by Clenshaw's recurrence, with no memory beyond the fit's.
+`lpc_fft`:: At every bin at once, by one FFT after each fit, for a spectrum's worth of memory and the FFT's.
+
+On the H723, a fit and a full response take 4.8 ms with `lpc_clenshaw` and 3.1 ms with `lpc_fft`; on the M2, 76 µs and 32 µs. See <<_performance,Performance>>.
+
+=== lpc_clenshaw
+
+```c++
+class lpc_clenshaw
+{
+public:
+
+                        lpc_clenshaw(std::size_t bins, std::size_t order);
+
+   void                 prepare(
+                           std::span<double const> a
+                         , std::span<float const> cos
+                        );
+   double               operator()(std::size_t bin) const;
+};
+```
+
+=== lpc_fft
+
+```c++
+class lpc_fft
+{
+public:
+
+                        lpc_fft(std::size_t bins, std::size_t order);
+
+   void                 prepare(
+                           std::span<double const> a
+                         , std::span<float const> cos
+                        );
+   double               operator()(std::size_t bin) const;
+};
+```
+
+A policy of one's own has the same three members: it is constructed with the bins and the order, `prepare` is given `A(z)` and the cosine table `cos(2 pi i / n)`, `i` from 0 to `n - 1` (n the spectrum's size), after each fit, and the function call gives `|A(f)|^2` at a bin.
+
+== Expressions
+
+=== Notation
+
+`F`               :: A `basic_lpc_fit` type.
+`f`               :: Object of type `F`.
+`n`               :: Unsigned integer value for the spectrum's bins, DC to Nyquist: half a power of 2, plus 1.
+`m`               :: Unsigned integer value for the model's order.
+`i`               :: Unsigned integer value for a bin, 0 to `n - 1`.
+`db`              :: Object of type `std::span<float const>`, `f.bins()` long: a spectral envelope in dB.
+`k`               :: Object of type `std::span<float>`, `f.order()` long.
+`mag2`            :: Object of type `std::span<float>`, `f.bins()` long.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression      | Semantics
+
+| `F(n)`          | Construct an LPC fit for spectra of `n` bins, of order 32.
+| `F(n, m)`       | Construct an LPC fit for spectra of `n` bins, of order `m`.
+                    It allocates here, and nowhere else.
+|===
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression     | Semantics                                     | Return Type
+
+| `f(db, k)`     | Fit the spectral envelope `db`: its model's
+                   reflection coefficients into `k`, and its
+                   prediction error returned. Not real-time:
+                   call it from a worker thread or a
+                   low-priority loop.                            | `double`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                                | Return Type
+
+| `f.response(i)`     | Get `\|A(f)\|^2` at the bin `i`, from the
+                        last fit.                                | `double`
+| `f.response(mag2)`  | Get `\|A(f)\|^2` at every bin into
+                        `mag2`, from the last fit.               | `void`
+| `f.polynomial()`    | Get `A(z)` from the last fit, its
+                        `f.order() + 1` coefficients, the first
+                        1.                                       | `std::span<double const>`
+| `f.bins()`          | Get the number of bins.                  | `std::size_t`
+| `f.order()`         | Get the model's order.                   | `std::size_t`
+|===
+
+=== Example
+
+Fit a learned spectral envelope, for an `{eq_matcher}` to apply:
+
+```c++
+#include <q/fft/lpc_fit.hpp>
+#include <q/fft/spectral_learner.hpp>    // For spectral_learner
+#include <cmath>
+#include <vector>
+...
+namespace q = cycfi::q;
+
+extern q::spectral_learner learner;      // has heard the guitar
+...
+q::lpc_fit fit{learner.bins()};
+std::vector<float> db(learner.bins()), k(fit.order());
+float level;
+
+// Off the audio thread
+void model()
+{
+   learner.spectral_envelope(db);                            <1>
+   level = float(std::sqrt(fit(db, k)));                     <2>
+}
+```
+
+<1> The learned spectral envelope, in dB at each bin.
+<2> Fit it: its model's reflection coefficients into `k`, and its level.
+
+== Implementation Details
+
+NOTE: Implementation details are subject to change without notice. Rely only on the expressions above.
+
+The spectral envelope's power, transformed back, gives its autocorrelation at the first `order + 1` lags, and the Levinson-Durbin recursion (`q::levinson`, in `<q/utility/levinson.hpp>`) gives the model. White noise 60 dB under the power keeps a model of a spectral envelope with deep notches well conditioned. The lags are summed one at a time, each in four interleaved sums over a cosine table, which suits both an in-order core (no memory traffic) and an out-of-order one (no single chain of dependent additions).
+
+`lpc_clenshaw` sums `|A(f)|^2 = c[0] + 2 sum c[l] cos(l w)`, `c` the autocorrelation of `A`'s coefficients, as a Chebyshev series in `cos(w)` by Clenshaw's recurrence, in double: in float, the levels a `{formant_table}` derives from it move by up to 0.16 dB.
+
+=== Performance
+
+NOTE: {performance_note}
+
+Measured fitting a guitar's learned spectral envelope at order 32, on 2049 bins:
+
+[cols="2,2,2", options="header"]
+|===
+| | Apple M2 | STM32H723
+
+| A fit, `lpc_clenshaw`
+| 28 µs
+| 2.3 ms
+
+| `response(mag2)`, `lpc_clenshaw`
+| 48 µs
+| 2.5 ms
+
+| A fit, `lpc_fft`
+| 32 µs
+| 3.0 ms
+
+| `response(mag2)`, `lpc_fft`
+| under 1 µs
+| 50 µs
+|===
+
+With `lpc_fft`, the fit includes the FFT and the response only reads it. The fit allocates about 25 KB with `lpc_clenshaw`; `lpc_fft` adds about 15 KB with PFFFT, and about 40 KB with Q's own FFT.

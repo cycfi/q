@@ -1,0 +1,91 @@
+= Formant Table
+
+include::../../common.adoc[]
+
+== Overview
+
+The formant table holds the spectral envelope `F` and the moved spectral envelope `F(f/r)` for every ratio on a grid: `steps` a semitone, from `lo` to `hi` semitones. Each row is an all-pole model of the spectral envelope. A table is plain data, about 50 KB at order 32: allocate it, have a `{formant_learner}` fit it, and hand it to a `{formant_corrector}`.
+
+Each row is an all-pole model of the spectral envelope: its reflection coefficients, as many as the model's order, which the corrector's lattice filters take as they are, and its level. See `{formant_preservation}` for how the rows are learned and used.
+
+The order is given at construction, 32 by default. On a smaller core 24 costs the corrector about a quarter less, and on four guitars its correction stayed within 3 dB of the order-32 one; both sound good, 32 is the more accurate. The learner and the corrector are constructed with the order too, and take only tables of it.
+
+The formant table is implemented by a class named `formant_table`.
+
+== Include
+
+```c++
+#include <q/fx/formant_corrector.hpp>
+```
+
+== Declaration
+
+```c++
+class formant_table
+{
+public:
+
+   static constexpr int          lo = -24;
+   static constexpr int          hi = 24;
+   static constexpr int          steps = 8;
+   static constexpr std::size_t  num_rows = (hi - lo) * steps + 1;
+
+   explicit                formant_table(std::size_t order = 32);
+
+   std::size_t             order() const;
+
+   std::span<float>        k(std::size_t row);
+   std::span<float const>  k(std::size_t row) const;
+   float&                  level(std::size_t row);
+   float                   level(std::size_t row) const;
+   std::size_t             unshifted() const;
+   void                    at(
+                              float ratio
+                            , std::span<float> k
+                            , float& level
+                           ) const;
+};
+```
+
+
+== Expressions
+
+=== Notation
+
+`t`               :: Object of type `formant_table`.
+`n`               :: Unsigned integer value for the model's order.
+`i`               :: Unsigned integer value for a row, 0 to `num_rows - 1`.
+`r`               :: Floating point value for a ratio: 2 is an octave up.
+`k`               :: Object of type `std::span<float>`, `t.order()` long.
+`v`               :: Floating point value for a level.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression              | Semantics
+
+| `formant_table()`       | Construct a `formant_table` of order 32, every row
+                            flat: no correction.
+| `formant_table(n)`      | Construct a `formant_table` of order `n`. It
+                            allocates here, and nowhere else.
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                                   | Return Type
+
+| `t.order()`           | Get the model's order.                      | `std::size_t`
+| `t.k(i)`              | Get or set the row `i`'s reflection
+                          coefficients. Rows run from `lo` semitones
+                          up in `1 / steps` of a semitone.            | `std::span<float>`
+| `t.level(i)`          | Get or set the row `i`'s level.             | `float&`
+| `t.unshifted()`       | Get the row for a ratio of 1: the spectral
+                          envelope `F` itself.                        | `std::size_t`
+| `t.at(r, k, v)`       | Get the model at the ratio `r` into `k` and
+                          `v`, interpolated between the two grid rows
+                          around it. Ratios beyond the grid take its
+                          ends.                                       | `void`
+|===

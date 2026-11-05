@@ -15,6 +15,8 @@ Produces, in docs/modules/ROOT/images/ (or the directory given):
    handoff_implementation.svg -- inside a handoff: the object one way, the record back
    tasks.svg                 -- tasks: posted on one thread, polled on another
    tasks_implementation.svg  -- inside tasks: held in a ring_allocator
+   formant_chain.svg         -- formant preservation: shift, remove the moved
+                                formants, restore the learned ones
 
 Usage: python3 docs/scripts/gen_block_figures.py [out_dir]
 """
@@ -276,19 +278,23 @@ def grain_freeze():
 
 
 def pitch_detection():
-    f = Figure()
-    x = 14 + text_width('samples') + 6 + 34
-    zcc = Block('zero_crossing_collector')
-    acf = Block('bitstream_acf')
-    bacf = Block('bacf_period_detector')
-    pd = Block('pitch_detector')
-    f.row([zcc, acf], y=f.margin, x=x)
-    f.row([bacf, pd], y=zcc.bottom + 60, x=x)
-    f.source('samples', zcc)
-    f.arrow(zcc, acf)
-    f.arrow(acf, bacf)
-    f.arrow(bacf, pd)
-    f.sink(pd, 'frequency')
+    names = ['zero_crossing_collector', 'bitstream_acf',
+             'bacf_period_detector', 'bacf_pitch_detector']
+    width = max(text_width(n) for n in names) + 2 * PAD
+    f = Figure(width=width + 2 * 14 + 40)
+    x = (f.width - width) / 2
+    y = f.margin + 46
+    blocks = []
+    for n in names:
+        b = f.place(Block(n, width=width), x, y)
+        blocks.append(b)
+        y = b.bottom + 28
+    f.source('samples', blocks[0], side='top', length=34)
+    for a, b in zip(blocks, blocks[1:]):
+        f.arrow(a, b)
+    last = blocks[-1]
+    f.path([(last.cx, last.bottom), (last.cx, last.bottom + 34)])
+    f.label('frequency', last.cx, last.bottom + 34 + 18, 'middle')
     return f.write(os.path.join(OUT, 'pitch_detection_flow.svg'))
 
 
@@ -948,6 +954,35 @@ def tasks_implementation():
             (ring.cx, ring.bottom)], 'control')
     return f.write(os.path.join(OUT, 'tasks_implementation.svg'))
 
+def formant_chain():
+    f = Figure()
+    x = 14 + text_width('input') + 6 + 34
+    shift = Block('bacf_pitch_shifter')
+    remove = Block('remove F(f/r)')
+    restore = Block('restore F')
+    f.row([shift, remove, restore], y=f.margin + 30 + 20, x=x,
+          gap=GAP + 20)
+    corrector = f.container('formant_corrector', [remove, restore])
+    f.source('input', shift)
+    f.arrow(shift, remove)
+    f.arrow(remove, restore)
+    f.sink(restore, 'output')
+
+    # The learner listens to the input, off the audio thread, and hands
+    # the corrector its table.
+    learner = Block('formant_learner')
+    f.place(learner, corrector.cx - learner.w / 2, corrector.bottom + 60)
+    tap = shift.left - 20
+    f.dot(tap, shift.cy)
+    f.path([(tap, shift.cy), (tap, learner.cy), (learner.left, learner.cy)],
+           'control')
+    f.path([(learner.cx, learner.top), (learner.cx, corrector.bottom)],
+           'control')
+    f.label('formant_table', learner.cx + 10, (learner.top
+            + corrector.bottom) / 2 + 0.35 * FONT)
+    return f.write(os.path.join(OUT, 'formant_chain.svg'))
+
+
 FIGURES = [square_synth, poly_synth, va_synth, fm_synth, midi_monitor,
            list_devices, delay, grain_freeze, pitch_detection, sustain_hold,
            signal_conditioner, fm_algorithm, fm_operator, fm_voice, ladder,
@@ -955,7 +990,8 @@ FIGURES = [square_synth, poly_synth, va_synth, fm_synth, midi_monitor,
            translation_gathering, translation_substitutes,
            midi_processor_overloads, ci_responder_chain, q_layers, q_io_stack,
            q_io_flow, handoff,
-           handoff_implementation, tasks, tasks_implementation]
+           handoff_implementation, tasks, tasks_implementation,
+           formant_chain]
 
 if __name__ == '__main__':
     for make in FIGURES:

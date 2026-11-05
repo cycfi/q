@@ -91,6 +91,11 @@ namespace cycfi::q
    // After XOR, the number of bits (set to 1) is counted. The lower the
    // count, the higher the periodicity. A count of zero gives perfect
    // correlation: there is no mismatch.
+   //
+   // The window is half the bits, from the start. The three-argument call
+   // takes any window: `words` words from word `start`, against the same
+   // bits `pos` later, for a stream that keeps its bits in the bitset as
+   // they slide.
    ////////////////////////////////////////////////////////////////////////////
    template <typename T = natural_uint>
    struct bitstream_acf
@@ -107,20 +112,23 @@ namespace cycfi::q
 
       std::size_t operator()(std::size_t pos) const
       {
+         return (*this)(pos, 0, _mid_array);
+      }
+
+      std::size_t operator()(
+         std::size_t pos, std::size_t start, std::size_t words) const
+      {
          auto const shift = pos % value_size;
-         auto const* p1 = _bits.data();
-         auto const* p2 = _bits.data() + pos / value_size;
+         auto const* p1 = _bits.data() + start;
+         auto const* p2 = _bits.data() + start + pos / value_size;
 
          // Each word of the shifted bits is loaded once, carried to the
          // next word's high half.
          if (shift == 0)
-         {
-            return detail::count_xor(
-               _mid_array, [&]{ return *p1++ ^ *p2++; });
-         }
+            return detail::count_xor(words, [&]{ return *p1++ ^ *p2++; });
          auto const shift2 = value_size - shift;
          auto cur = *p2++;
-         return detail::count_xor(_mid_array, [&]
+         return detail::count_xor(words, [&]
          {
             auto const next = *p2++;
             auto const v = (cur >> shift) | (next << shift2);

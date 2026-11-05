@@ -1,18 +1,21 @@
 = Zero Crossing Collector
 
 include::../../common.adoc[]
+:xrefstyle: short
 
 == Overview
 
-The zero crossing collector is the front end of the pitch detectors. It detects the zero crossings of the signal and records each pulse: the {bacf_period_detector} takes candidate periods from the pulse edges, and sets the bits of the bitstream that the {bitstream_acf} correlates. The collector is implemented by a class named `zero_crossing_collector`.
+The zero crossing collector is the front end of the pitch detectors. It finds the zero crossings of the signal and records each pulse between them. The {bacf_period_detector} takes its candidate periods from pairs of leading edges, and sets the bits of its bitstream from the pulses, for the {bitstream_acf} to correlate. The collector is implemented by a class named `zero_crossing_collector`.
 
-A crossing is detected with *hysteresis*: the state goes high when the signal rises above half the `hysteresis` level, and low when it falls below minus half of it, so noise riding on a slow waveform does not produce spurious edges. Each pulse is saved as an `info` record holding the peak height of the waveform it bounds, the pulse width, the leading and trailing edge frame positions, and the two samples straddling the leading edge (for sub-sample timing).
+A crossing is detected with *hysteresis*: the state goes high when the signal rises above half the `hysteresis` level, and low when it falls below minus half of it, so noise riding on a slow waveform does not trip spurious edges. Each pulse is saved in a ring buffer of `info` records (<<fig-zc-pulse>>): the peak height of the waveform it bounds, the frame positions of its leading and trailing edges, its width, and the two samples on either side of the leading crossing, `P1` below zero and `P2` above. The width runs from the leading edge to the first sample below 0.3 of the peak. `similar` compares the widths and peak heights of two pulses.
 
-image::zero_crossing_event.svg[alt="A zero-crossing pulse with sub-sample interpolation", width=720px, align=center, title="One positive pulse: the leading (rising) and trailing (falling) crossings bound the pulse, and the crossing is located to sub-sample precision by interpolating between the two samples P1 and P2 that straddle it", link={imagesdir}/zero_crossing_event.svg]
+[#fig-zc-pulse]
+image::zero_crossing_event.svg[alt="A zero-crossing pulse with sub-sample interpolation", width=720px, align=center, title="One pulse, from its leading crossing to its trailing one, with its peak height and width. The leading crossing is interpolated between P1 and P2, the samples on either side of zero", link={imagesdir}/zero_crossing_event.svg]
 
-Only the most recent pulses are kept, bounded by a sliding `window` measured in samples. `is_ready()` becomes true every half window, when the window holds at least two edges: the cadence at which the period analysis runs. As the window advances, edge frame positions are shifted by `-window/2` so an edge keeps a consistent coordinate from one window to the next, and a pulse straddling the boundary is kept as long as its trailing edge is still within the window.
+`P1` and `P2` make the timing precise. The dashed line from `P1` to `P2` in <<fig-zc-pulse>> crosses zero between the two samples, and the crossing is placed there. A period measured between interpolated crossings is accurate to a fraction of a sample.
 
-The collected edges serve two purposes: pairs of edges propose candidate periods (the lag between two like edges), and the pulses define where the bitstream bits are set.
+Only the latest pulses are kept, in a sliding `window` measured in samples. `is_ready()` becomes true every half window, when the window holds at least two edges: the cadence of the period analysis. As the window advances, edge positions shift by `-window/2`, so an edge keeps a consistent coordinate from one window to the next, and a pulse straddling the boundary stays as long as its trailing edge is still in the window.
+
 
 == Include
 

@@ -1,0 +1,21 @@
+= Frequency Domain
+
+include::../common.adoc[]
+
+== Overview
+
+Blocks that work on a signal's spectrum: transforming it, analysing it and shaping a signal by it.
+
+image::frequency_domain_waterfall.svg[alt="A strummed Stratocaster: its waveform, and its spectrum frame after frame", width=750px, align=center, title="A strummed Stratocaster, in time and in frequency"]
+
+Above, the waveform of an open E chord, strummed six times and left to ring. Below, the same seven seconds as spectra, one every 190 ms, the earliest in front: each strum is a ridge across the band, and the strings' harmonics are the lines running back as the chord rings, the high ones fading first. Every spectrum is one `{fft}` of a 4096-sample frame.
+
+The API is documented on the member pages:
+
+* The `{fft}` transforms a block of samples to its spectrum and back, complex or real, in place, at a size given at construction.
+* The `{spectral_learner}` learns a sound's long-term spectrum from its playing, and draws its spectral envelope.
+* The `{lpc_fit}` models a spectral envelope as a filter of a few poles.
+* The `{eq_matcher}` gives a sound another's spectral envelope, from two such models.
+* The `{convolver}` convolves a signal with an impulse response, a cabinet or a room, with no latency.
+
+`{formant_preservation}` builds on the learner, the fit and the matcher.

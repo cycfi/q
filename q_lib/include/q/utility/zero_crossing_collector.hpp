@@ -53,6 +53,17 @@ namespace cycfi::q
    // latest edge to have a trailing edge that goes past the right side of
    // the window. If for example, with the same window size 100, there can be
    // an edge with a leading edge at 95 and trailing edge at 120.
+   //
+   // delay(index) gives an edge's zero crossing as a delay: how many
+   // samples (sub-sample, from the two samples around the crossing) before
+   // the newest sample it was. Delays, unlike frame positions, do not
+   // shift with the window, so they read the edges in the samples a delay
+   // line holds.
+   //
+   // The hysteresis may be given per sample, as a linear level, so it can
+   // follow the signal's envelope; the constructor's is the initial one.
+   // The capacity (how many edges are kept) defaults to window/2, the most
+   // a window can hold; a smaller one drops the oldest edges first.
    ////////////////////////////////////////////////////////////////////////////
    class zero_crossing_collector
    {
@@ -81,6 +92,11 @@ namespace cycfi::q
 
                            zero_crossing_collector(decibel hysteresis, duration window, float sps);
                            zero_crossing_collector(decibel hysteresis, std::uint32_t window);
+                           zero_crossing_collector(
+                              decibel hysteresis
+                            , std::uint32_t window
+                            , std::size_t capacity
+                           );
                            zero_crossing_collector(zero_crossing_collector const& rhs) = default;
                            zero_crossing_collector(zero_crossing_collector&& rhs) = default;
       self_type&           operator=(zero_crossing_collector const& rhs) = default;
@@ -95,9 +111,11 @@ namespace cycfi::q
       bool                 is_reset() const;
 
       bool                 operator()(float s);
+      bool                 operator()(float s, float hysteresis);
       bool                 operator()() const;
       info const&          operator[](std::size_t index) const;
       info&                operator[](std::size_t index);
+      float                delay(std::size_t index) const;
 
    private:
 
@@ -140,6 +158,13 @@ namespace cycfi::q
     : _hysteresis(-lin_float(hysteresis))
     , _window_size(detail::adjust_window_size(window) * bitset<>::value_size)
     , _info(_window_size / 2)
+   {}
+
+   inline zero_crossing_collector::zero_crossing_collector(
+      decibel hysteresis, std::uint32_t window, std::size_t capacity)
+    : _hysteresis(-lin_float(hysteresis))
+    , _window_size(detail::adjust_window_size(window) * bitset<>::value_size)
+    , _info(capacity)
    {}
 
    inline void zero_crossing_collector::info::update_peak(float s, std::size_t frame)
@@ -234,16 +259,14 @@ namespace cycfi::q
          _peak_update = 0.0f;
       }
 
-      if (num_edges() >= capacity())
-         reset();
-
       if (s > 0.0f)
       {
          if (!_state)
          {
-            CYCFI_ASSERT(_num_edges < _info.size(), "Bad _size");
+            // At capacity the push overwrites the oldest edge.
             _info.push({ { _prev, s }, s, int(_frame) });
-            ++_num_edges;
+            if (_num_edges < _info.size())
+               ++_num_edges;
             _state = 1;
          }
          else
@@ -273,9 +296,6 @@ namespace cycfi::q
       // centered on the actual zero.
       s += _hysteresis / 2;
 
-      if (num_edges() >= capacity())
-         reset();
-
       if ((_frame == _window_size/2) && num_edges() == 0)
          reset();
 
@@ -296,6 +316,12 @@ namespace cycfi::q
       return _state;
    };
 
+   inline bool zero_crossing_collector::operator()(float s, float hysteresis)
+   {
+      _hysteresis = -hysteresis;
+      return (*this)(s);
+   }
+
    inline bool zero_crossing_collector::operator()() const
    {
       return _state;
@@ -311,6 +337,21 @@ namespace cycfi::q
    zero_crossing_collector::operator[](std::size_t index)
    {
       return _info[(_num_edges-1)-index];
+   }
+
+   inline float zero_crossing_collector::delay(std::size_t index) const
+   {
+      auto const& e = (*this)[index];
+      auto const prev = e._crossing.first;
+      auto const curr = e._crossing.second;
+      auto const dx = curr != prev ? -prev / (curr - prev) : 0.0f;
+
+      // When the window has just moved, the frame has but the edges have
+      // not yet (that waits for the next sample).
+      auto newest = double(_frame) - 1;
+      if (_ready)
+         newest += double(_window_size / 2);
+      return float(newest - (double(e._leading_edge) - 1 + dx));
    }
 
    inline void zero_crossing_collector::shift(std::size_t n)

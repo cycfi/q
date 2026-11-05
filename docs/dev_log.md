@@ -11,6 +11,22 @@ commits; the feature branches they first cited were squash-merged and no
 longer resolve. The full text before the trim: `git show
 308ddccb:docs/dev_log.md`.
 
+## 2026-11-04
+
+On `sola-shift`: `630627d6`, `pitch_detector` renamed `bacf_pitch_detector`
+after its algorithm, beside `bacf_period_detector`; the old name stays as a
+deprecated alias in `<q/pitch/pitch_detector.hpp>`. `sola_pitch_shifter`
+renamed `bacf_pitch_shifter`, with no alias (it was never released).
+
+`b1b130a2`: the pitch detection and pitch shifting docs rewritten from
+Joel's blog posts, with figures from the guitar test samples. New BACF Lag
+Tracker page. Pitch Shifting now opens with the methods and their history
+(rotating head, ring buffer); the shifter page explains splicing by the
+period, finding it, overlap-add and picks; the PSOLA against SOLA formant
+explanation moved to Formant Preservation. Measured for the record: the
+BACF pitch detector costs about 4 to 5 ns a sample on an M2 (18 single
+notes and 2 phrases), the same as the lag tracker.
+
 ## 2026-11-03
 
 `6bc20be6`, `7a76878e`: `decibel` is a float unit, and `basic_decibel<T>`
@@ -38,6 +54,20 @@ the suites pass as they were, 124 of 124 on ARM and x86. The anna examples read 
 `sin_cos_gen` as float. Docs: the template forms, `sin_cos_gen`'s
 precision, and the mirror length.
 
+On `sola-shift`: `a9a0bf65`, the SOLA shifter's engaged latency, after
+Katja's low-latency splice (takes 51 and 52, KB `e_whammy/renders`).
+Going down it splices forward by as many periods as fit, to just behind
+the input; going up the read keeps only the headroom the next fade
+needs. Each period splice refines the tracked lag to the full band
+within 4 samples; the lag is smoothed as the period detectors do (set
+outright on a lock or a jump, else a median of 3 and an EMA), which
+keeps the tracker's one-edge outliers out of the splices; fades run
+from 2 ms. Mean read delay, single notes and lines: 2 to 11 ms down
+(was 31 to 39), 2 to 8 ms up (was 4 to 9); chords 12 to 20 ms, bound by
+their 24 ms period. F446 at 48 kHz: 720 to 820 cycles a sample, worst
+block 450 us (68%), from about 4k multiply-adds a splice. New test: a
+change comes out within 10 ms at 0.5 to 2.
+
 `84780898`: `basic_sin_cos_gen<T>`, `basic_hann_gen<T>` and the basic Hann
 ramps, with the old names as their double forms. The oscillator's state
 is now T as well (it was float under a double coefficient, which bought
@@ -51,6 +81,32 @@ stay contiguous at that many extra elements instead of a doubled store.
 The default mirror is the size, the old behavior; reads now wrap their
 start with one compare. A 4-point interpolated read wants a mirror of 3.
 
+On `sola-shift`: `88a755a7`, `varispeed_tap` fades with a float Hann ramp,
+which runs at most a fade from a reset; the shifter's output moves by
+-138 dB at most. On the F446 the per-sample software double is gone: the
+worst block drops from about 55k to 39k cycles (306 to 216 us), the mean
+at +12 from 790 to 640 cycles a sample.
+
+On `sola-shift`: `7e95b08c`, `varispeed_tap` takes its delay line as a
+`Buffer` policy, by default a `mirrored_ring_buffer` with a mirror of 3,
+and `history()` is gone. The SOLA shifter's delay line halves, 92 to
+46 KB at 48 kHz, so two fit an F446; its output is bit-identical, and on
+the F446 its cost is unchanged (660 to 800 cycles a sample, worst block
+about 55k cycles).
+
+On `sola-shift`: `9f7e9e9e`, the SOLA shifter finds its lag with
+`bacf_lag_tracker` (the input through a 1 kHz low-pass) and splices at
+it, fraction included, with no float refine at the read; at a transient
+the lock drops and the last lag stands in until a new one. Its output
+equals take 50's approved `__bacf_lite` exactly with 32-bit words (the
+H723's). On the H723 it costs 0.64 to 0.68 us a sample (3%), worst block
+33 to 35 us (5%), against 2.6 us and 276 to 325 us before. `lag_search`,
+`lag_tracker` and `lag_bank` are no longer used by it. `3dd5b847` (on
+`bacf-lag-tracker`): the tracker rounds its lag range to whole samples.
+`a27ff833`: `lag_search`, `lag_tracker`, `lag_bank` and their kernels
+(`q/detail/lag_kernels.hpp`) removed, and `best_lag` back to develop's
+plain search (`sustain_hold` uses it); the SOLA shifter stays in q.
+
 `1f60b3b2`: `bitstream_acf` counts its mismatches with Harley-Seal where
 the target has no hardware popcount (a Cortex-M, baseline x86-64):
 carry-save adders sum eight XORed words bitwise and one count serves the
@@ -61,6 +117,20 @@ cueing runs 1.5x faster at a 45 ms window (G's worst detection 3.1 to
 the one-a-word count. The counts are unchanged.
 
 ## 2026-11-02
+
+On `bacf-lag-tracker`: `2f3be574`, `bitstream_acf` correlates any window
+of its bits (a start word and a length). `188b92e7`, `bacf_lag_tracker`:
+a lag tracked by bitstream autocorrelation, one correlation per zero
+crossing, leading and trailing: the locked lag swept two samples either
+side over an 11.6 ms window, a parabola for the fraction, twice the lag
+tried on a miss (a chord's common period), the last good lag held through
+a loss; acquisition from the latest similar pulses. Octaves are left
+unsettled, which a splice does not mind. On the guitar single notes it
+holds the period from 0.2 s after the pick, locked on it 99 to 100% of the
+time. As the SOLA shifter's lag source (scratch, take 50, splices at its
+lag with no float refine) the shifter costs 0.65 us a sample on the H723,
+worst block 43 us (6%), against 2.6 us and 280 us with lag_search and
+lag_tracker; Joel on the renders: "It's perfect!"
 
 `aca757e1`, `63c12d05`, `83e2ceae`: the phase vocoder's per-bin math for
 small cores, where a float compare and its flag transfer cost far more than
@@ -83,6 +153,102 @@ On the M2 the native path is faster too (2048: 6.3 to 3.9 us), and float
 stays on PFFFT there. `b5ebb0be`: the FFT page's Performance section (M2
 and H723, Q native against PFFFT) and the standard performance NOTE in
 common.adoc; Q native named as the microcontroller's choice.
+
+On `sola-shift`, later the same day. `2c723db1`: the SOLA shifter's lag
+range reaches 45 ms, so an open G chord (repeating every 41 ms) locks
+instead of warbling. `61d6fd85`: its acquisition costs a flat amount a
+sample. Timed in 32-sample blocks on the H723, the worst block ran 840 us
+of its 667 (126%) about 0.1 s after a pick: a new lock's seeding summed
+long double chains, the search did a whole window a sample, and the
+tracker walked a window for its entering lag most samples. Now
+`lag_search` budgets multiply-adds (256 a sample, a lag spanning calls),
+seeding takes 32 positions a sample, the tracker moves at most once every
+8 samples, and the scalar kernels (the MCU's) sum stretches of 32 in
+float, in registers, into double: 8.4 cycles a sample for a correlation
+against 14, 4.2 for a product against 10. NEON and SSE2 gained dedicated
+product and square kernels in the same order, so their results hold.
+Worst block 280 us (42%), none late; mean 2.6 us a sample. Renders in KB
+`e_whammy/renders/49_sola_flat`, awaiting Joel's ear.
+
+Formant preservation and the cores under it. `ff39e169`: `levinson` on
+spans, its polynomial in place, and `lattice_fir`/`lattice_iir` at a
+runtime order. `000b40e6`: `spectral_learner` (the long-term spectrum and
+its spectral envelope), `lpc_fit` (an all-pole model; |A|^2 by Clenshaw
+on a Cortex-M or by FFT elsewhere, a policy; the lags summed four ways)
+and `eq_matcher` (B/A at no latency). `1186ef92`: `convolver`, partitioned
+overlap-save behind a direct first block, the older partitions summed a
+few a sample: 3.5 us a sample at 4096 taps on the H723, worst block 20%.
+`b3890665`: `formant_learner` (a spectral learner fitting a
+`formant_table` over +-24 semitones) and `formant_corrector` (an
+eq_matcher client, its output bit-identical through that refactor); the
+order is a runtime parameter, 32 by default. Joel on his four guitars
+(take 47): "All of them sound really good"; on order 24 against 32 (take
+48): both good, 32 more accurate. `7c205043`: the Pitch Shifting and
+Frequency Domain reference groups, and the performance NOTE (48 kHz,
+blocks of 32 samples, mean and worst block, M2 and H723).
+
+## 2026-11-02 (earlier)
+
+On `sola-shift`, to be squashed into develop. `sola_pitch_shifter`
+(`0ad2b6c6`, rebuilt in `1b49e36b`): a time-domain pitch shifter with no
+pitch detection, for the e-Whammy. A `varispeed_tap` reads the input at
+the ratio; going up it splices back by a period, going down forward by
+one, with Hann crossfades of half a period and no lag under 1.25
+crossfades. The period is a `best_lag` match held by a `lag_tracker`
+(`cd380682`): the correlation at seven adjacent lags as moving sums, so a
+splice costs no search. Searches run through
+`lag_search` (`a5fbcf5f`), best_lag's cued and coarse-to-fine searches
+spread over samples within a budget (4096 multiply-adds a sample), cued by
+the gaps between zero crossings whose hysteresis follows the envelope
+(`9e7cab22`, a per-sample hysteresis and a capacity for
+`zero_crossing_collector`; `222aed67`, an edge's delay). A
+`transient_detector` (`a9247762`: spectral_flux into delta_gate, within
+0.3 ms of a pick's release) restarts the read at the pick's own start:
+going down at once, going up when its period is acquired, 13 to 18 ms on
+single notes, 20 ms at the latest. `varispeed_tap` gained its splice and
+reads at any delay (`af9211e3`), `best_lag` the coarse and cued forms
+(`f4b7a9cd`). On the seven test samples at +-12 semitones: 0.23 to 0.37%
+of an M2 core, no sample over 42 us, against 1 to 3% with 3 ms bursts
+before the tracker. Joel auditioned the renders (KB
+`e_whammy/renders/26_sola_streaming`). The doubles in the correlation sums
+stay: the H723 target has a hardware double FPU.
+
+`981d7fa1` `basic_lag_bank<Term>`: a sum at seven adjacent lags as eight
+double lanes over a mirrored history, updated in one vector pass, with
+seed and recentre; terms `lag_terms::product` and
+`lag_terms::difference_square`, kernels for NEON, SSE2 and scalar in
+`q/detail/lag_kernels.hpp`. It is the general core of a correlator
+bank, so a difference-function bank can be its client. `66b90577` puts
+the tap's delay line in a `mirrored_ring_buffer` (`history()`), whose
+windows are contiguous spans; `f31ab195` runs best_lag's window sums on
+the kernel when the buffer has spans; `3e4f04e6` rebuilds `lag_tracker`
+on two banks and evaluates its similarities once a sample, which was its
+real cost. Timed the same way before and after (each sample's minimum
+over five runs), the shifter went from 84 to 100 ns a sample on an M2 to
+27 to 39, its worst sample from 19 to 27 us to 6 to 7. Products are now
+formed in float, which moves a few splices; Joel auditioned the renders
+(KB `e_whammy/renders/28_sola_lag_bank`).
+
+Sized for an MCU, after a bench on a NUCLEO-H723ZG and a NUCLEO-F446RE
+(DWT cycles a sample) showed the M2-sized search budget and one-sample
+walks. `adf5875c`: a `lag_tracker` restart seeds the new lock's sums over
+the samples that follow, 64 positions a sample, exact (the window as it
+stood at the restart), with `lag_bank`'s `restart` and `seed_part`.
+`eeb9db27`: the shifter acquires its lag only when a strong pulse ends,
+cued by the gaps from that edge to up to 16 before it, one correlation a
+sample; a near miss (0.6 to 0.85) is probed 3 and 6% either side; no
+coarse scan; a lock is searched again only once its match falls under
+0.85, at most once a period; a forward splice's five-lag refine runs one
+correlation a sample. H723 in double: mean 11.5% of the core (16%
+before), worst sample 52 us (0.34 ms). M2: 24 to 39 ns a sample, worst
+0.5 to 1.1 us. Renders KB `e_whammy/renders/33_sola_edge_acquisition`,
+`34_sola_amortized`.
+
+`73a87ca3`: unity bypass. The shifter starts at delay 0, and at ratio 1
+the next pick returns the read to the input (a 1 ms crossfade), as does
+silence, so with the bar at rest the output is the input, with no
+latency; a pull-up splices from there. Renders KB
+`e_whammy/renders/35_sola_unity_bypass`.
 
 ## 2026-10-31 (later)
 

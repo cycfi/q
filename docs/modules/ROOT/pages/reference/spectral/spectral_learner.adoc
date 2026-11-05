@@ -1,0 +1,198 @@
+= Spectral Learner
+
+include::../../common.adoc[]
+
+== Overview
+
+The spectral learner learns a sound's long-term spectrum from its playing, and draws its spectral envelope: the shape that stays when the notes change, such as an electric guitar's pickup, electronics and body. Two learned spectral envelopes are what an `{eq_matcher}` matches; one learned spectral envelope is what `{formant_preservation}` restores.
+
+It averages frames of 50 ms, every 25 ms, and only those above -50 dBFS. Each frame counts at the same power, so loud notes do not outweigh soft ones. The average is cumulative: each new frame counts 1/N of it, so the longer one plays the steadier the spectral envelope gets. Past 10 minutes the weight stops falling, so the spectral envelope can still follow slow changes, such as strings ageing.
+
+Two readings tell when to stop or start again. `coverage()` is the part of the band, 80 Hz to 8 kHz, where harmonics have been seen: a learning phase can end once it nears 1. `drift()` is how far the last few seconds sit from what was learned, in dB: a large one means another instrument, or a pickup change, and a cue to learn again.
+
+The spectral learner runs off the audio thread, on a worker or an MCU's low-priority loop. It allocates only at construction.
+
+The spectral learner is implemented by a class named `spectral_learner`.
+
+== Include
+
+```c++
+#include <q/fft/spectral_learner.hpp>
+```
+
+== Declaration
+
+```c++
+class spectral_learner
+{
+public:
+
+   explicit             spectral_learner(float sps);
+
+   void                 operator()(std::span<float const> block);
+
+   void                 learn();
+   void                 freeze(bool f);
+   bool                 frozen() const;
+   double               frames() const;
+   float                coverage() const;
+   float                drift() const;
+
+   std::size_t          bins() const;
+   float                sps() const;
+   std::span<float const> spectrum() const;
+   void                 spectral_envelope(std::span<float> db) const;
+
+   static constexpr float        gate_db = -50.0f;
+   static constexpr double       max_frames = 24000;
+   static constexpr std::size_t  cells = 40;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`l`               :: Object of type `spectral_learner`.
+`sps`             :: Floating point value for samples per second.
+`b`               :: Object of type `std::span<float const>`: a block of input samples.
+`f`               :: Boolean value.
+`db`              :: Object of type `std::span<float>`, `l.bins()` long.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression                 | Semantics
+
+| `spectral_learner(sps)`    | Construct a `spectral_learner` given `sps` (samples per
+                               second). It allocates here, and nowhere else.
+|===
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression     | Semantics                                     | Return Type
+
+| `l(b)`         | Learn from the block of samples `b`, of any
+                   length. Not real-time: call it from a worker
+                   thread or a low-priority loop.               | `void`
+|===
+
+=== Operation
+
+[cols="1,1,1"]
+|===
+| Expression     | Semantics                                     | Return Type
+
+| `l.learn()`    | Forget what has been learned and start over.  | `void`
+| `l.freeze(f)`  | Stop learning when `f` is true, start again
+                   when it is false.                             | `void`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression                 | Semantics                         | Return Type
+
+| `l.frozen()`               | Get whether learning is stopped.  | `bool`
+| `l.frames()`               | Get how many frames have been
+                               learned (up to `max_frames`).     | `double`
+| `l.coverage()`             | Get the part of the band, 0 to 1,
+                               where harmonics have been seen.   | `float`
+| `l.drift()`                | Get how far the last few seconds
+                               sit from what was learned, in dB. | `float`
+| `l.bins()`                 | Get the number of the spectrum's
+                               bins, DC to Nyquist.              | `std::size_t`
+| `l.sps()`                  | Get the samples per second.       | `float`
+| `l.spectrum()`             | Get the learned spectrum: the
+                               average power at each bin, each
+                               frame at unit power.              | `std::span<float const>`
+| `l.spectral_envelope(db)`  | Get the learned spectral envelope
+                               into `db`, in dB at each bin.     | `void`
+|===
+
+=== Constants
+
+[cols="1,1,1"]
+|===
+| Expression                         | Semantics                         | Type
+
+| `spectral_learner::gate_db`        | The level, in dBFS, below which a
+                                       frame is not learned.             | `float`
+| `spectral_learner::max_frames`     | The count past which a frame's
+                                       weight stops falling (10 minutes). | `double`
+| `spectral_learner::cells`          | The number of sixth-octave cells
+                                       `coverage()` counts.              | `std::size_t`
+|===
+
+=== Example
+
+A learn button: from the press, learn on a worker thread from the input the audio thread passes on, and take the spectral envelope once the band is covered:
+
+```c++
+#include <q/fft/spectral_learner.hpp>
+#include <span>
+#include <vector>
+...
+namespace q = cycfi::q;
+
+float sps;                                // samples per second
+...
+q::spectral_learner learner{sps};
+std::vector<float> envelope(learner.bins());
+bool learned = false;
+
+void learn_button()
+{
+   learner.learn();                                          <1>
+   learned = false;
+}
+
+// The worker thread, given the input in blocks
+void learn(std::span<float const> block)
+{
+   learner(block);                                           <2>
+   if (!learned && learner.coverage() > 0.9f)                <3>
+   {
+      learner.spectral_envelope(envelope);                   <4>
+      learned = true;
+   }
+}
+```
+
+<1> Start over: a new instrument, or a pickup change.
+<2> Learn from the input, off the audio thread.
+<3> Harmonics seen across nine tenths of the band. An open E chord strummed a few times covered 77 to 98% on four guitars; more notes cover more.
+<4> The spectral envelope in dB at each bin, ready for an `{lpc_fit}`.
+
+== Implementation Details
+
+NOTE: Implementation details are subject to change without notice. Rely only on the expressions above.
+
+=== The Spectral Envelope
+
+The spectral envelope is drawn through the peaks of the average spectrum: local maxima 3 dB over their neighbourhood and within 70 dB of the strongest, above 40 Hz. An instrument's average is a line spectrum, seen only at its harmonics, so the spectral envelope is linear in dB between them, flat below the first and above the last (nothing is seen there), then averaged over a third of an octave.
+
+=== Performance
+
+NOTE: {performance_note}
+
+Measured learning from a strummed chord:
+
+[cols="2,2,2", options="header"]
+|===
+| | Apple M2 | STM32H723
+
+| A sample, on average
+| 10 ns (0.05%)
+| 960 ns (5%)
+
+| Worst block of 32 samples
+| 20 µs (3%)
+| 1.3 ms (195%)
+|===
+
+The worst block is the one where a frame completes and its spectrum is analysed, every 25 ms. On the H723 it takes twice a block's time, which is why the learner runs off the audio thread, and on a microcontroller in a task below the audio interrupt. The learner allocates about 100 KB at 44.1 or 48 kHz on the M2, with PFFFT, and about 120 KB on the H723, with Q's own FFT.

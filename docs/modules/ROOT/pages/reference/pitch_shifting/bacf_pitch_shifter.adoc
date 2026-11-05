@@ -1,0 +1,239 @@
+= BACF Pitch Shifter
+
+include::../../common.adoc[]
+:xrefstyle: short
+
+== Overview
+
+The BACF pitch shifter raises or lowers the pitch of a sound as it plays, by a ratio that may change every sample. It works on single notes and chords alike: an instrument, a voice, a synthesizer. A whammy pedal is one use. At a ratio of 1 the output is the input itself, with no latency.
+
+The BACF pitch shifter is a SOLA (Synchronized Overlap-Add) shifter, one of the methods surveyed in {pitch_shifting}. The correlation that places its splices is bitstream autocorrelation (BACF), the same that underlies Q's pitch detectors.
+
+The shifter is implemented by a class named `bacf_pitch_shifter`.
+
+== How It Works
+
+=== Splicing by the Period
+
+A ring buffer read faster or slower than it is written shifts the pitch, and its read must jump as it catches up with the write or falls behind it (see {pitch_shifting}). A crossfade from one read head to a second, a fixed distance away, hides the click but warbles: it blends two parts of the waveform that are out of phase. They line up only when that distance happens to be a whole number of periods of the audio. With the distance set to a whole number of periods, the warble is gone (<<fig-sola-jump>>).
+
+[#fig-sola-jump]
+image::bacf_pitch_shifter_jump.svg[alt="A fixed jump against a jump of one period", title="One splice on a tone shifted down a fourth", width="750px" align=center, link={imagesdir}/bacf_pitch_shifter_jump.svg]
+
+Going up, the read plays a cycle twice; going down, it skips one; in between, it reads each cycle faster or slower (<<fig-sola-cycles>>). Pitch shifting is whole periods added or taken away, and the rest resampled.
+
+[#fig-sola-cycles]
+image::bacf_pitch_shifter_cycles.svg[alt="Where each output cycle comes from", title="Each cycle painted by the input period it is read from", width="750px" align=center, link={imagesdir}/bacf_pitch_shifter_cycles.svg]
+
+[#fig-sola-splices]
+image::bacf_pitch_shifter_splices.svg[alt="BACF pitch shifter splices", title="Splices going up and going down, on a wave with a period of 5 samples", width="750px" align=center, link={imagesdir}/bacf_pitch_shifter_splices.svg]
+
+<<fig-sola-splices>> shows the two kinds of splice, on a delay line holding a wave that repeats every 5 samples:
+
+* **Pitch up:** the read moves faster than the write and catches up with it. Before it reaches the newest sample, it jumps back one period, to the same point in the cycle, and carries on from there. Each jump replays a period, which is how a sound gets higher without getting shorter. The read stays only as far behind the write as the next crossfade needs, since a crossfade going up gains on the write.
+* **Pitch down:** the read moves slower than the write and falls behind. Once it is a whole period behind, it jumps forward, by as many periods as fit, to just behind the newest sample. Each jump skips periods, which is how a sound gets lower without getting longer. The crossfade then reads the newest samples, and falls behind them, so it never runs out.
+
+The splice forward to just behind the input, going down, comes from Katja Vetter's `[solad~]` (Synchronized Overlap Add Delayline), a SOLA pitch shifter for Pure Data. Her articles describe it: https://www.katjaas.nl/pitchshift/pitchshift.html[Pitch Shifting] and https://www.katjaas.nl/pitchshiftlowlatency/pitchshiftlowlatency.html[Low-Latency Pitch Shifting].
+
+=== Finding the Period
+
+Where the waveform repeats is found by autocorrelation, here by the `{bacf_lag_tracker}`. Bitstream autocorrelation, BACF, is a 1-bit autocorrelator: each sample becomes a single bit, 1 above zero and 0 below (see `{bitstream_acf}`). The video below shows the mechanism. The latest bits (blue) are laid over the bits from a moment earlier (orange), and every bit where they differ is marked (red). As the lag slides back, the red shows how much the two differ: less red, closer match.
+
+video::https://media.cycfi.com/q/bacf-pitch-shifter/chord_strobe.mp4[width=750, opts="autoplay,loop,muted"]
+
+The green curve plots the share of bits that differ at each lag. Where the waveform best matches itself, the two line up and the red almost vanishes. That lag is where the waveform repeats. Here, an E chord lines up at 24.3 ms, its common period.
+
+The read heads are spaced by that lag, updated continuously as the music changes, so they stay in step with the waveform's own period. For a single note, the distance is the note's period, or a multiple of it; any multiple splices as well, so octave errors do no harm. For a chord, it is the chord's common period, which for the open E chord in the video is twice the period of the low E. In that time, the six strings complete 2, 3, 4, 5, 6 and 8 cycles of E2, B2, E3, G#3, B3 and E4. Periods from 2.5 to 45 ms are found: enough for the lowest guitar note (12 ms), for the common period of an open E chord (24 ms), and for an open G (41 ms): its G, B and D stand at about 4:5:6, so the chord repeats only every four periods of its low G.
+
+The period is tracked continuously, one bitstream comparison at each zero crossing of the signal through a 1 kHz low pass, so a splice needs no search, only a refine: the jump moves by up to 4 samples, to where the full signal matches best. The tracked period is smoothed as Q's period detectors smooth theirs: a new lock, or a jump to another period, is taken at once; anything else passes through a median of 3, which keeps a one-off misreading out of the splices, and an average.
+
+=== Overlap-Add
+
+BACF and the two read heads make the _synchronized_ part of SOLA. The overlap-add part is the smooth crossfade between the two read heads (<<fig-sola-overlap-add>>). It hides any small differences left between the two segments spliced together. Each splice crossfades over half a period, between 2 and 8 ms. No jump is shorter than 1.25 crossfades, so a very short period is spliced two or more periods at a time.
+
+[#fig-sola-overlap-add]
+image::bacf_pitch_shifter_overlap_add.svg[alt="Overlap-add of two reads one period apart", title="A splice: the read now, fading out, and the read shifted back by one period, fading in", width="750px" align=center, link={imagesdir}/bacf_pitch_shifter_overlap_add.svg]
+
+=== Attacks
+
+The attack of a note is not periodic: the burst at its start, such as a pick leaving a string, a stick striking or a bow catching, happens once. A splice through it would repeat or cut it. So at each attack, found by a `{transient_detector}`, the shifter starts the read again at the attack's own start, a millisecond before the detection:
+
+* **Going down**, at once. The read only falls behind, so the attack plays from its start, slowed.
+* **Going up**, as soon as the new note's period is found, and after the maximum latency (20 ms by default) at the latest. Until then, the previous note keeps playing.
+
+So going up, an attack comes out up to the maximum latency late. That is the latency the shifter reports (see <<Latency>>).
+
+At an attack the shifter also drops the old period and looks for the new note's, on material from after the attack only: a new note has a new period, and splicing it by the old one would mismatch. With only material after the last attack tracked, a splice back never repeats the attack (a flam), and a splice forward never jumps over it.
+
+=== At Rest
+
+At a ratio of exactly 1, the next attack, or silence, returns the read to the input itself: from then on the output is the input, sample for sample, with no latency. Bending away from rest starts from there with no seam. A pull-up splices back from the newest sample; a dive simply lets the read fall behind.
+
+=== Formants
+
+SOLA reads the audio faster or slower by the pitch ratio, which moves the formants, the fixed resonances that color a sound, along with the pitch. Shifted up far enough, a sound takes on the chipmunk effect. `{formant_preservation}` restores the formants after the shifter (<<fig-sola-flow>>).
+
+[#fig-sola-flow]
+image::bacf_pitch_shifter_flow.svg[alt="BACF pitch shifter with formant correction", title="The BACF pitch shifter with formant correction", width="750px" align=center, link={imagesdir}/bacf_pitch_shifter_flow.svg]
+
+== Latency
+
+* **At rest:** none. The output is the input itself.
+* **Going down:** an attack comes out a millisecond behind the input, the pre-roll. Between attacks the read falls behind by at most a period and a crossfade, before a splice forward brings it back to the input: on average 2 to 11 ms behind on single notes and lines of notes, and 14 to 20 ms on chords, which splice on the period their notes have in common.
+* **Going up:** between attacks the read stays the next crossfade's headroom and up to a period behind: on average 2 to 8 ms on single notes and lines, 12 to 16 ms on chords. An attack in a line of notes comes out about 6 to 10 ms late; a note out of silence, with no period to go on, at most `latency()` late: the maximum latency (20 ms by default) and the millisecond of pre-roll.
+* **Wide chords going up:** a chord that repeats only every 41 ms, such as an open G chord on a guitar, cannot be matched until that much of it, and the match window, has been heard. Its attack still comes out on time, at its own pitch, and is shifted from about 50 ms on.
+
+== Input
+
+The shifter does best on a clean signal, direct from the source: for a guitar, straight from the instrument. Put it first in the chain, and any amplification, distortion or effects after it. Noise and processing get in the way of the matches it splices on:
+
+* **Noise and hum.** As a note decays, a noise floor or mains hum close to its level spoils the match, and the splices land on mismatched material: a warble in the tail.
+* **Distortion and heavy processing.** Distortion keeps the highs flickering the way an attack does, so the transient detector finds attacks that are not there, and each one restarts the read (see <<Attacks>>): a warble through the sustain.
+* **A microphone.** It adds the room's noise, and on a miked amplifier the amplifier's own noise and break-up on a loud chord.
+
+== Include
+
+```c++
+#include <q/fx/bacf_pitch_shifter.hpp>
+```
+
+== Declaration
+
+```c++
+class bacf_pitch_shifter
+{
+public:
+
+                        bacf_pitch_shifter(
+                           float sps
+                         , duration max_latency = duration{0.020}
+                        );
+
+   float                operator()(float s, float ratio);
+   std::size_t          latency() const;
+   void                 reset();
+};
+```
+
+== Expressions
+
+=== Notation
+
+`ps`, `a`, `b`    :: Objects of type `bacf_pitch_shifter`.
+`sps`             :: Floating point value for samples per second.
+`l`               :: Object of type `duration`: the maximum latency.
+`s`               :: Floating point value for the latest input sample.
+`r`               :: Floating point value for the ratio: 1 leaves the pitch alone, 0.5 is an octave down, 2 an octave up.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                        | Semantics
+
+| `bacf_pitch_shifter(sps [, l])`   | Construct a `bacf_pitch_shifter` given `sps`
+                                      (samples per second) and `l` (the maximum
+                                      latency, 20 ms if not given).
+| `bacf_pitch_shifter(ps)`          | Copy construct from `bacf_pitch_shifter ps`.
+| `a = b`                           | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+With a maximum latency of 0, an attack going up plays at once, at its own pitch, until its period is found, and is shifted from then on.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                                 | Return Type
+
+| `ps(s, r)`        | Process the input sample `s` and return
+                      the output, shifted by the ratio `r`.     | `float`
+|===
+
+The ratio may change every sample. For a smooth bend, smooth it, as the example below does.
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                                 | Return Type
+
+| `ps.latency()`    | Get the most an attack going up can come out
+                      late, in samples: the maximum latency
+                      plus a millisecond.                       | `std::size_t`
+|===
+
+=== Operation
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                                 | Return Type
+
+| `ps.reset()`      | Clear the history and start afresh.       | `void`
+|===
+
+=== Example
+
+An octave-up whammy pedal: an expression pedal goes from the heel, the dry input, to the toe, an octave up. The pedal is read once a block and smoothed, so the bend glides between readings:
+
+```c++
+#include <q/fx/bacf_pitch_shifter.hpp>
+#include <q/fx/lowpass.hpp>             // For one_pole_lowpass
+#include <q/support/literals.hpp>
+#include <cmath>
+#include <span>
+...
+namespace q = cycfi::q;
+using namespace q::literals;
+
+float sps;                       // samples per second
+std::span<float> in;             // the input samples
+float pedal;                     // the pedal, 0 (heel) to 1 (toe), read once a block
+...
+auto shift = q::bacf_pitch_shifter{sps};                     <1>
+auto smooth = q::one_pole_lowpass{100_Hz, sps};              <2>
+...
+for (auto& s : in)
+{
+   auto const semitones = smooth(12.0f * pedal);             <3>
+   s = shift(s, std::exp2(semitones / 12.0f));               <4>
+}
+```
+
+<1> Construct the shifter, with the default 20 ms maximum latency.
+<2> A low pass to smooth the pedal, so the bend has no steps.
+<3> The pedal in semitones: 0 at the heel, 12 at the toe.
+<4> Shift by the ratio for those semitones. Back at the heel, the smoothed value settles to a ratio of exactly 1 within about 30 ms, and the shifter passes the input through.
+
+See `example/whammy` in the Q repository for a complete program: it plays guitar recordings through the shifter, driven by the pitch bend of an e-Whammy recorded as MIDI.
+
+== Implementation Details
+
+NOTE: Implementation details are subject to change without notice. Rely only on the expressions above.
+
+=== Transient Detection
+
+The `{transient_detector}` finds the attacks by listening above 4 kHz, where an attack puts a burst of energy and a sustained note keeps little. A distorted signal keeps that band busy all the time, which is why distortion before the shifter makes it find false picks.
+
+=== Performance
+
+NOTE: {performance_note}
+
+Measured shifting an E chord by -12, -5 and +12 semitones, with the default 20 ms maximum latency:
+
+[cols="2,2,2", options="header"]
+|===
+| | Apple M2 | STM32H723
+
+| A sample, on average
+| 14 to 17 ns (0.07 to 0.08%)
+| 0.71 to 0.84 µs (3.4 to 4%)
+
+| Worst block of 32 samples
+| 13 to 40 µs (2 to 6%)
+| 96 to 102 µs (14 to 15%)
+|===
+
+The worst blocks come at a splice: its refine compares the two sides of the jump at 9 offsets, about 4,000 multiply-adds at once. On the M2 they are mostly the operating system's scheduling, not the shifter. The shifter allocates about 56 KB at 48 kHz, most of it the 45 ms history.

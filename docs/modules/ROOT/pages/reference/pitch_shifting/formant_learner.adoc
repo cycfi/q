@@ -1,0 +1,141 @@
+= Formant Learner
+
+include::../../common.adoc[]
+
+== Overview
+
+The formant learner learns an instrument's fixed spectral envelope from its playing, and fits the `{formant_table}` that the `{formant_corrector}` uses. It runs off the audio thread, a worker or an MCU's low-priority loop, and allocates only at construction. See `{formant_preservation}` for what it learns, the learning phase and an example.
+
+The fit computes the model's response one of two ways, chosen by a template parameter: `lpc_clenshaw`, a recurrence at each frequency, with no extra memory, or `lpc_fft`, one FFT per row, faster but needing more memory. The default is `lpc_clenshaw` on a microcontroller and `lpc_fft` elsewhere.
+
+The formant learner is implemented by a class template named `basic_formant_learner`; `formant_learner` takes the default.
+
+== Include
+
+```c++
+#include <q/fft/formant_learner.hpp>
+```
+
+== Declaration
+
+```c++
+template <typename Response = /* lpc_clenshaw or lpc_fft */>
+class basic_formant_learner : public spectral_learner
+{
+public:
+
+   using table_type = formant_table;
+   using response_type = Response;
+
+   explicit             basic_formant_learner(
+                           float sps
+                         , std::size_t order = 32
+                        );
+
+   bool                 fit(table_type& table) const;
+   std::size_t          order() const;
+
+   static constexpr float        boost_cap_db = 9.0f;
+};
+
+using formant_learner = basic_formant_learner<>;
+```
+
+== Template Instantiations
+
+`formant_learner` is the template instantiation with `{lpc_fit}`'s default response: `lpc_fft` on a computer, `lpc_clenshaw` on a microcontroller.
+
+```c++
+using formant_learner = basic_formant_learner<>;
+```
+
+== Expressions
+
+As a subclass of `{spectral_learner}`, `formant_learner` inherits all the publicly accessible member functions, member variables, and types of its base class: it learns as a spectral learner does. In addition to valid expressions for `{spectral_learner}`, `formant_learner` allows these expressions.
+
+=== Notation
+
+`l`               :: Object of type `formant_learner`.
+`sps`             :: Floating point value for samples per second.
+`n`               :: Unsigned integer value for the model's order.
+`t`               :: Object of type `formant_table`.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression                 | Semantics
+
+| `formant_learner(sps)`     | Construct a `formant_learner` given `sps` (samples per
+                               second), for tables of order 32.
+| `formant_learner(sps, n)`  | Construct a `formant_learner` for tables of order `n`.
+                               It allocates here, and nowhere else.
+|===
+
+=== Operation
+
+[cols="1,1,1"]
+|===
+| Expression     | Semantics                                     | Return Type
+
+| `l.fit(t)`     | Fit the table `t`, of the learner's order,
+                   from what has been learned; false (and `t`
+                   untouched) if nothing has. Not real-time:
+                   call it from a worker thread or a
+                   low-priority loop.                            | `bool`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression       | Semantics                                   | Return Type
+
+| `l.order()`      | Get the model's order.                      | `std::size_t`
+|===
+
+=== Constants
+
+[cols="1,1,1"]
+|===
+| Expression                         | Semantics                         | Type
+
+| `formant_learner::boost_cap_db`    | The most the correction lifts any
+                                       frequency, in dB.                 | `float`
+|===
+
+
+== Implementation Details
+
+NOTE: Implementation details are subject to change without notice. Rely only on the expressions above.
+
+=== The Model
+
+The spectral envelope is the `{spectral_learner}`'s, held flat beyond the harmonics seen (a slope there would turn into a correction). Each table row is its `{lpc_fit}` model: the row for a ratio r is fitted to the spectral envelope as the shift leaves it, `F(f/r)`, held at its top value past Nyquist going down, and no more than the boost cap under `F`. The row's level keeps the learned material's average power through the correction, as the shift leaves it.
+
+=== Performance
+
+NOTE: {performance_note}
+
+Measured learning from a strummed chord:
+
+[cols="2,2,2", options="header"]
+|===
+| | Apple M2 | STM32H723
+
+| A sample, on average
+| 10 ns (0.05%)
+| 960 ns (5%)
+
+| Worst block of 32 samples
+| 20 µs (3%)
+| 1.3 ms (195%)
+
+| `fit()`
+| 14 ms
+| 1.9 s
+|===
+
+The worst block is the one where a frame completes and its spectrum is analysed, every 25 ms; on the H723 it takes twice a block's time. Both the bursts and the fit are why the learner runs off the audio thread; on a microcontroller, in a task below the audio interrupt, with refits far apart.
+
+Each core runs its default: `lpc_fft` on the M2, `lpc_clenshaw` on the H723, where `lpc_fft` would fit in 1.4 s. The learner allocates about 170 KB at 44.1 or 48 kHz (about 40 KB more with `lpc_fft` on the H723), and a `{formant_table}` takes about 50 KB.

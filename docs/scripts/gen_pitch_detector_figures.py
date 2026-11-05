@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Generate the q::pitch_detector reference figure.
+Generate the q::bacf_pitch_detector reference figure.
 
 Produces, in docs/modules/ROOT/images/:
 
-   pitch_detector_bias.svg -- why pitch_detector needs the bias section. As a
+   pitch_detector_bias.svg -- why bacf_pitch_detector needs the bias section. As a
                             note rings, the 2nd harmonic strengthens and its
                             periodicity overtakes the fundamental's. Top: the
                             two candidate periodicities crossing over. Bottom:

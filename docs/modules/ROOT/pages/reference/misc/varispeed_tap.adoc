@@ -1,0 +1,247 @@
+= Varispeed Tap
+
+include::../../common.adoc[]
+
+== Overview
+
+A varispeed tap is a delay line read at a varying speed, the way a tape machine replays faster or slower than it recorded. A write head puts each new sample into the delay line, one sample per sample. A read head plays the delay line back, moving at a speed given by a ratio. The distance between the two heads is the delay.
+
+image::varispeed_tap_heads.svg[alt="Varispeed tap read and write heads", title="The delay line now and four samples later, at ratios 1, 0.5 and 2. The shaded samples are the delay.", width="750px" align=center, link={imagesdir}/varispeed_tap_heads.svg]
+
+Figure 1 shows the delay line as a row of samples, oldest on the left and newest on the right, now and four samples later. In those four samples the write head moves four samples along:
+
+* **Ratio 1:** the read head also moves four samples. It keeps pace with the write, the delay holds, and the pitch is unchanged.
+* **Ratio 0.5:** the read head moves only two samples and falls behind. The delay grows, and since the read plays the samples back at half speed, the pitch drops an octave.
+* **Ratio 2:** the read head moves eight samples and catches up. The delay shrinks, and the pitch rises an octave. Here the read has reached the write: the delay is 0, and the read can go no further.
+
+The output's pitch is the input's times the ratio. At a delay of 0 the read plays the newest sample, the input itself, so a tap that starts there continues the dry signal without a seam, and adds no latency until the ratio drops below 1.
+
+Reads between samples are interpolated with one of the `{sample_interpolation}` types. The `hermite` type is the default: its smooth first derivative suits a read that is always moving. Below a delay of 1, where a 4-point type has no newer sample to read, the read is linear.
+
+The varispeed tap is implemented by a class template named `basic_varispeed_tap`, on an interpolation type and a delay-line type, and `varispeed_tap` is its Hermite instantiation. The default delay line is a `{mirrored_ring_buffer}` that mirrors only 3 samples: an interpolated read takes 4 samples in a row, so the memory is about what the delay needs.
+
+== Delay Bounds
+
+The delay changes by `1 - ratio` every sample, so a shifted pitch cannot last. Going up, the read reaches the newest sample (delay 0), as in the last row of Figure 1. Going down, it falls behind until it reaches the oldest sample the delay line keeps, the maximum delay. At either end the read is held, it moves with the write, and the pitch goes back to the input's.
+
+For example, with a 300 ms maximum delay, an octave down falls behind by half a sample every sample and reaches the end after 600 ms. Back at a ratio of 1, the delay stays where it is, so the output plays 300 ms late. An octave up from there catches up by a sample every sample and reaches delay 0 after 300 ms.
+
+So a varispeed tap alone transposes only for as long as its delay range lasts. It suits effects that move the ratio around 1, such as vibrato, chorus and doppler, and effects that end, such as a tape stop. A sustained transposition needs the read to jump back, or forward, before it reaches an end. That is a splice.
+
+== Splicing
+
+To keep a pitch shifted, the read has to jump before it reaches an end of the delay line: back to older material when the pitch is up, forward to newer material when it is down. A plain jump would click, because the waveform at the new place is usually at a different point in its cycle. `splice` avoids the click with a crossfade: for a short while the tap reads at both places, fading the old read out while fading the new one in. The two fades always add up to full level.
+
+image::varispeed_tap_splice.svg[alt="Varispeed tap splice", title="A splice on a 200 Hz tone with two harmonics, 10 ms crossfade: a jump of one period, and a jump of half a period", width="750px" align=center, link={imagesdir}/varispeed_tap_splice.svg]
+
+A crossfade is only clean when the two reads look alike. A pitched sound repeats itself every period, so the material exactly one period away looks just like the material at the read. A chord, or any sound source with harmonic content, also repeats itself, at the period its notes have in common, which can be longer than any one note's. Figure 2 shows a splice on a 200 Hz tone with two harmonics, with the crossfade shaded:
+
+* **Top:** the read jumps back one period. The old read (light blue) and the new read (red, dotted) are the same wave, so the output (black) runs through the crossfade unchanged.
+* **Bottom:** the read jumps back half a period, to the other half of the cycle, and the two reads differ. Mixed, they partly cancel: through the crossfade the output takes neither shape and loses level, its deepest dips at half the depth of the wave. Only once the new read takes over does the wave come back.
+
+So a splice should jump by a whole number of periods. Finding the period of what the tap holds is up to the caller: the `{bacf_pitch_shifter}` tracks it with a `{bacf_lag_tracker}`. To compare the material at two delays, `tap[d]` reads it at any delay.
+
+== Include
+
+```c++
+#include <q/fx/varispeed_tap.hpp>
+```
+
+== Declaration
+
+```c++
+template <
+   typename Interpolation
+ , typename Buffer = mirrored_ring_buffer<float>
+>
+class basic_varispeed_tap
+{
+public:
+
+   using interpolation_type = Interpolation;
+   using buffer_type = Buffer;
+
+   explicit             basic_varispeed_tap(std::size_t max_delay);
+
+   float                operator()(float s, float ratio);
+
+   float                delay() const;
+   void                 delay(float d);
+   std::size_t          max_delay() const;
+   void                 reset();
+
+   void                 splice(float to, std::size_t fade);
+   bool                 splicing() const;
+   float                target() const;
+
+   float                operator[](float delay) const;
+   float                operator[](std::size_t delay) const;
+};
+
+using varispeed_tap = basic_varispeed_tap<sample_interpolation::hermite>;
+```
+
+`Interpolation` is one of the `{sample_interpolation}` types. `Buffer` is the delay line: a `{mirrored_ring_buffer}` of `float`, or a type with its interface. The tap builds it with `max_delay + 4` elements and a mirror of 3. Delays are in samples.
+
+== Expressions
+
+=== Notation
+
+`X`               :: One of the `{sample_interpolation}` types.
+`B`               :: A delay-line type: a `{mirrored_ring_buffer}` of `float`, or one with its interface.
+`tap_type`        :: A `basic_varispeed_tap<X, B>` type.
+`tap`, `a`, `b`   :: Objects of type `tap_type`.
+`n`               :: `std::size_t` value for the maximum delay, in samples.
+`s`               :: Floating point value for the latest input sample.
+`r`               :: Floating point value for the ratio, the speed of the read: 1 holds the pitch, 0.5 is an octave down, 2 an octave up.
+`d`, `to`         :: Floating point values for a delay, in samples, from 0 to `n`.
+`i`               :: `std::size_t` value for a delay, in whole samples, from 0 to `n`.
+`fade`            :: `std::size_t` value for the length of a crossfade, in samples.
+
+=== Type Construction
+
+[cols="1,1"]
+|===
+| Expression                  | Semantics
+
+| `basic_varispeed_tap<X [, B]>` | Instantiate a `basic_varispeed_tap` type given
+                                `X`, its interpolation type, and optionally `B`,
+                                its delay line.
+| `varispeed_tap`             | Pre declared varispeed tap type, with Hermite
+                                interpolation.
+|===
+
+==== Examples:
+
+```c++
+using linear_tap = q::basic_varispeed_tap<q::sample_interpolation::linear>;
+using tap = q::varispeed_tap;
+```
+
+=== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression                      | Semantics                     | Type
+
+| `tap_type::interpolation_type`  | Get the interpolation type.   | `X`
+| `tap_type::buffer_type`         | Get the delay line type.      | `B`
+|===
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                  | Semantics
+
+| `tap_type(n)`               | Construct a `basic_varispeed_tap` given `n`
+                                (the maximum delay, in samples). The delay
+                                starts at 0.
+| `tap_type(tap)`             | Copy construct from `basic_varispeed_tap tap`.
+| `a = b`                     | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                                 | Return Type
+
+| `tap(s, r)`       | Push the input sample `s`, return the read
+                      at the delay, then move the read by `r`:
+                      the delay changes by `1 - r`, held
+                      between 0 and `n`.                        | `float`
+|===
+
+The ratio may change every sample. The output of a call is read at the delay before the move, so the first call after `tap.delay(d)` reads at `d`.
+
+=== Indexing
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                                 | Return Type
+
+| `tap[d]`          | Get the material at delay `d`,
+                      interpolated, `d` held between 0 and `n`. | `float`
+| `tap[i]`          | Get the sample `i` samples back, `i`
+                      held to at most `n`.                      | `float`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                               | Return Type
+
+| `tap.delay()`       | Get the delay, in samples.              | `float`
+| `tap.max_delay()`   | Get the maximum delay, `n`.             | `std::size_t`
+| `tap.splicing()`    | Get whether a splice is in progress.    | `bool`
+| `tap.target()`      | Get the delay a splice in progress
+                        lands on, or the delay when there is
+                        none.                                   | `float`
+|===
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                               | Return Type
+
+| `tap.delay(d)`      | Set the delay to `d`, held between 0
+                        and `n`, ending any splice in progress. | `void`
+|===
+
+=== Operation
+
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                             | Return Type
+
+| `tap.splice(to, fade)`| Start a splice: crossfade the read at
+                          the delay into a read at `to` over
+                          `fade` samples, both moving at the
+                          ratio.                                | `void`
+| `tap.reset()`         | Clear the history and set the delay
+                          to 0.                                 | `void`
+|===
+
+A splice called while another is in progress finishes the first at once: the read lands where it was going, and the new crossfade starts from there. When the crossfade is over, the delay is the one the second read reached.
+
+=== Example
+
+A tape stop: while the footswitch is down, the tape slows from full speed to a halt over a second, the pitch sliding down to nothing. A tape's playback level falls with its speed, so the output fades with it. Releasing the switch splices straight back to the live signal:
+
+```c++
+#include <q/fx/varispeed_tap.hpp>
+#include <algorithm>
+#include <span>
+...
+namespace q = cycfi::q;
+
+float sps;                       // samples per second
+std::span<float> in;             // the input samples
+bool stop;                       // the footswitch, read once a block
+...
+auto tap = q::varispeed_tap{std::size_t(sps)};               <1>
+auto const fade = std::size_t(0.01 * sps);
+auto speed = 1.0f;
+...
+for (auto& s : in)
+{
+   if (stop)
+      speed = std::max(speed - 1.0f / sps, 0.0f);            <2>
+   else if (speed < 1.0f)
+   {
+      speed = 1.0f;
+      tap.splice(0.0f, fade);                                <3>
+   }
+   s = speed * tap(s, speed);                                <4>
+}
+```
+
+<1> Construct a varispeed tap with a one second maximum delay. The slow-down alone falls half a second behind, and the halt adds a second per second, so the tap stays inside its delay line for half a second after the halt; from then on the output is silent anyway.
+<2> Slow down: a second from full speed to a halt.
+<3> Released: back to full speed, and splice to delay 0, the live signal, over 10 ms.
+<4> Read at the tape's speed, at a level that follows it.

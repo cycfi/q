@@ -1,27 +1,48 @@
 = BACF Period Detector
 
 include::../../common.adoc[]
+:xrefstyle: short
 
 == Overview
 
-The BACF period detector estimates the period of a monophonic signal in real time. It combines the {zero_crossing_collector}, which records the zero-crossing pulses of the signal, with the {bitstream_acf}, which scores candidate periods, and it is the basis of the {pitch_detector}. The detector is implemented by a class named `bacf_period_detector`.
+The BACF period detector finds the period of a monophonic signal as it plays. It is the core of the {bacf_pitch_detector}. It pairs the {zero_crossing_collector}, which records the pulses between zero crossings, with the {bitstream_acf}, which scores how well the signal matches itself one candidate period later. The detector is implemented by a class named `bacf_period_detector`.
 
-The detector processes one sample at a time. The {zero_crossing_collector} becomes ready (`is_ready()`) every half window. On a ready window, `bacf_period_detector`:
+The detector takes one sample at a time. Every half window the collector is ready (`is_ready()`), and the detector:
 
-. builds a bitstream from the collected zero-crossing pulses,
-. proposes candidate periods from pairs of edges,
+. builds the bitset from the collected pulses (see <<_bitset>>),
+. proposes candidate periods from pairs of leading edges,
 . scores each candidate with one {bitstream_acf} pass, and
-. reconciles harmonics and sub-harmonics to settle on the fundamental.
+. settles harmonics and sub-harmonics on the fundamental (see <<_sub_collector>>).
 
-The BACF score selects the pair of zero-crossing edges that bounds the cycle. The period is the distance between those edges, interpolated to sub-sample precision. The interpolated edges give a more accurate period than the whole-sample lag of the BACF minimum.
+The result, `fundamental()`, holds the `_period` in samples and the `_periodicity` from 0 to 1, where 1 is perfectly periodic. `harmonic(index)` gives the periodicity at the period of harmonic `index`, to follow the harmonics of a note as it evolves, in the time domain. For lower latency, `predict_period()` gives a period from the similarity of the zero-crossing edges alone, before an analysis completes.
 
-The detector finds the period even when the fundamental is weak or missing: the composite waveform still repeats at the fundamental period, and the BACF minimum falls there.
+`bacf_period_detector` reports period and periodicity. The {bacf_pitch_detector} turns them into a stable frequency, with bias, smoothing and note-shift detection.
 
-image::bacf_missing_fundamental.svg[alt="Period found despite a missing fundamental", width=720px, align=center, title="A signal made only of the 2nd, 3rd and 4th harmonics (top) still repeats at the fundamental period, and the bitstream correlation's deepest notch (bottom) lands on that period", link={imagesdir}/bacf_missing_fundamental.svg]
+== Bitset
 
-The result, `fundamental()`, holds the `_period` in samples and the `_periodicity` in [0, 1], where 1 is perfectly periodic. `harmonic(index)` gives the periodicity at the period of a harmonic. For lower latency, `predict_period()` gives a sub-sample period from the similarity of the zero-crossing edges alone, available before the autocorrelation completes.
+The analysis window spans two periods of the lowest frequency of interest, so that a cycle can be correlated with the next. Every half window, the detector transfers the pulses of the window to a `bitset`, which stores the bits in integers of the platform's native size, 32 or 64 bits.
 
-`bacf_period_detector` reports period and periodicity. The {pitch_detector} converts them to a stable frequency, with bias, smoothing and note-shift detection.
+Only significant pulses go in: those whose peak is at least `pulse_threshold` (60%) of the highest pulse in the window. Dropping the spurious low-level pulses improves detection. In the graphs of {pitch_detection}, the grey trace is every zero crossing and the blue one the bitset.
+
+== Sub-Collector
+
+Standard autocorrelation shifts the signal window lag by lag, and correlates each shift against the unshifted signal. BACF correlates only at the lags between zero-crossing edges, a handful a window: a further speedup.
+
+The candidate periods are the distances between the leading edges of the significant pulses, up to half the window and no shorter than `minimum_period()`. For each candidate, the detector computes the BACF and collects the most significant results. Longer periods typically, but not always, score better, with more samples to resolve them. A longer period may also be a sub-harmonic of a shorter one, a multiple of it, and the sub-collector detects that from the ratio of their durations.
+
+The sub-collector returns the period of the edge pair with the best periodicity, divided by its multiple of the shortest edge pair with a good enough periodicity: within `harmonic_periodicity_factor` (16) mismatched bits. The BACF score is used only as a hint, to choose the edges that bound the cycle. The period computed from the interpolated zero crossings of those edges is more accurate than the lag of the BACF peak.
+
+[#fig-pd-sub-collector]
+image::pitch_bacf_sub_collector.svg[alt="Candidate periods from pairs of edges", width=760px, align=center, title="A guitar low E (top), its bitset with the candidate periods p1, p2 and p3 between the first leading edges (middle), and the periodicity of each analysis (bottom), with each candidate's lag marked in the first", link={imagesdir}/pitch_bacf_sub_collector.svg]
+
+<<fig-pd-sub-collector>> is the detector at work on a guitar's low E, a second after the pick, from the test suite. The first two leading edges of the first analysis give three candidate periods: p1, 224 samples; p2, 540; and p3, 316. Their lags are dashed on the analysis's BACF. p1 and p3 are fractions of the cycle, with periodicities of 0.61 and 0.66. p2 spans a whole cycle, at the peak, with a periodicity of 0.98. It is the best candidate, and the detector returns its period, from its interpolated edges, with the periodicity.
+
+Higher notes have more peaks within the window: an octave above the lowest frequency, two; two octaves above, four. The detector uses the multiples for precision: a longer span holds more samples, so its period, divided by its multiple, is more precise. With the interpolated zero crossings, precision holds from the lowest frequency to the highest (see the Results in {pitch_detection}).
+
+[#fig-pd-multiple-peaks]
+image::pitch_bacf_multiple_peaks.svg[alt="Multiple peaks from a high note", width=760px, align=center, title="The low E string at the 24th fret, two octaves up, in the window of the open string: five peaks per analysis, at 134, 268, 402, 535 and 669 samples", link={imagesdir}/pitch_bacf_multiple_peaks.svg]
+
+<<fig-pd-multiple-peaks>> is the low E string at the 24th fret, two octaves up, with the range of the open string, 66 to 412 Hz. Half the window holds five cycles, so each analysis has five peaks, at 134, 268, 402, 535 and 669 samples, with periodicities of 0.994 to 0.999.
 
 == Include
 

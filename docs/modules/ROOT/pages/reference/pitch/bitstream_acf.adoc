@@ -1,27 +1,31 @@
 = Bitstream Autocorrelation
 
 include::../../common.adoc[]
+:xrefstyle: short
 
 == Overview
 
-Bitstream autocorrelation measures how well a signal matches a delayed copy of itself, the classic basis of time-domain pitch detection, on a *bitstream* of one bit per sample in place of floating-point samples. It is the periodicity measure of the {bacf_period_detector}. Bitstream autocorrelation is implemented by a class named `bitstream_acf`.
+Bitstream autocorrelation measures how well a signal matches a delayed copy of itself, the classic basis of time-domain pitch detection, on a *bitstream* of one bit a sample in place of floating-point samples. It is the periodicity measure of the {bacf_period_detector}. Bitstream autocorrelation is implemented by a class named `bitstream_acf`.
 
-Standard autocorrelation (ACF) multiplies the signal by a copy of itself shifted by `pos` samples and sums the products: the higher the sum, the stronger the periodicity at that lag. It is accurate but costly, O(N) multiply-accumulates per lag.
+Standard autocorrelation (ACF) multiplies the signal by a copy of itself shifted by `pos` samples and sums the products: the higher the sum, the stronger the periodicity at that lag. It is accurate, and costly: a multiply-accumulate for every sample of the window, at every lag.
 
-Bitstream autocorrelation replaces the multiply-accumulate with an *XOR and a bit count*. The signal is first reduced to a bitstream: one bit per sample, set inside each zero-crossing pulse. The caller sets the bits; `bitstream_acf` reads them as they are. A single XOR processes a whole machine word at once, so each word compares `value_size` samples (64 on a 64-bit machine) in one integer instruction. XOR yields a `1` only where the two bitstreams disagree:
+Bitstream autocorrelation replaces the multiply-accumulate with an *XOR and a bit count*. First the signal becomes a bitstream, one bit a sample, set inside each zero-crossing pulse. The caller sets the bits, and `bitstream_acf` reads them as they are. Take each bit as a stand-in for +1 or -1: their product is +1 when the two agree and -1 when they differ, an XNOR. Its complement, XOR, gives a `1` for each mismatch:
 
 [cols="1,1,1,1",frame=none,grid=none]
 |===
 | `0 ^ 0 = 0` | `0 ^ 1 = 1` | `1 ^ 0 = 1` | `1 ^ 1 = 0`
 |===
 
-After the XOR, the set bits are counted (population count). The *lower* the count, the better the match: a count of zero is perfect correlation, with no mismatch at all. `bitstream_acf` returns this mismatch count. Its minimum marks the period, where a classic ACF has its peak.
+After the XOR, the set bits are counted. Modern CPUs count the bits of an integer in one instruction, exposed by C++ compilers as built-in functions (`__builtin_popcountll`, for instance). The *lower* the count, the better the match, and a count of zero is a perfect match. `bitstream_acf` returns this mismatch count. Its minimum marks the period, where a classic ACF has its peak. The count and the window size give a normalized periodicity from 0 to 1 (see <<_function_call>>).
 
-One XOR does the work of `value_size` multiplies, and integer bit operations are cheaper than floating-point multiplication. The correlation compares about the first half of the bitset with the bitstream shifted by `pos`, so a lag can reach half the bitset size.
+A single XOR works on a whole machine word, comparing `value_size` samples, 64 on a 64-bit machine, in one integer instruction: a speedup of the word size over the standard ACF, on integer operations that are cheaper than floating-point multiplication. The correlation compares about the first half of the bitset with the bitstream shifted by `pos`, so a lag can reach half the bitset size.
 
-image::bitstream_acf_count.svg[alt="Signal, bitstream, and BACF mismatch count", width=720px, align=center, title="A harmonically rich signal (top), its one-bit-per-sample bitstream (middle), and the XOR mismatch count vs lag (bottom): the count falls to its deepest notch of 0 at the true period, and to a shallower notch at twice the period", link={imagesdir}/bitstream_acf_count.svg]
+[#fig-bacf-count]
+image::pitch_bacf_low_e.svg[alt="BACF of a guitar low E", width=760px, align=center, title="A guitar low E, a second after the pick (top), its bitset (middle), and the periodicity of each analysis, one after another (bottom): each peaks at the period, 535 to 537 samples", link={imagesdir}/pitch_bacf_low_e.svg]
 
-`bitstream_acf` scores one lag per call. The {bacf_period_detector} proposes the candidate lags, from zero-crossing edges, and chooses the best. For a general lag search, independent of pitch, see {best_lag}.
+<<fig-bacf-count>> is the output of the test suite on a guitar's low E. The {bacf_period_detector} runs an analysis every 672 samples, over a 1344-bit bitset. The bottom trace is each analysis's periodicity, `1 - count * 2 / bits.size()`, at every lag from 0 to 672, one analysis after another. Each starts with a blank, the lags below the shortest period, and peaks at the period. {pitch_detection} has more graphs in the same layout.
+
+`bitstream_acf` scores one lag per call, over the first half of the bitset or over any window of it. The {bacf_period_detector} proposes the candidate lags, from zero-crossing edges, and chooses the best; the {bacf_lag_tracker} scores the latest window of a longer bitstream at the lag it tracks. For a general lag search, independent of pitch, see {best_lag}.
 
 == Include
 
@@ -40,6 +44,11 @@ struct bitstream_acf
                   bitstream_acf(bitset<T> const& bits);
 
    std::size_t    operator()(std::size_t pos) const;
+   std::size_t    operator()(
+                     std::size_t pos
+                   , std::size_t start
+                   , std::size_t words
+                  ) const;
 };
 ```
 
@@ -51,6 +60,8 @@ struct bitstream_acf
 `bits`         :: Object of type `bitset<T>`: the bitstream, one bit per sample.
 `ac`           :: Object of type `bitstream_acf<T>`.
 `pos`          :: Object of type `std::size_t`: a lag, in samples.
+`start`        :: Object of type `std::size_t`: the first word of a window.
+`words`        :: Object of type `std::size_t`: the length of a window, in words.
 
 === Constructors
 
@@ -75,11 +86,14 @@ NOTE: C++ brace initialization may also be used.
 | `ac(pos)`    | Get the number of mismatched bits between
                  the bitstream and itself shifted by `pos`
                  samples.                                      | `std::size_t`
+| `ac(pos, start, words)` | Get the same count over a window:
+                 the `words` words from word `start`, against
+                 the bits `pos` samples later.                 | `std::size_t`
 |===
 
 NOTE: The count is 0 for a perfect match and grows as the periodicity at `pos` weakens. The periodicity in [0, 1] is `1 - count * 2 / bits.size()`; the {bacf_period_detector} reports it as `_periodicity`.
 
-WARNING: `bits` must outlive `ac`, which holds a reference to it. `pos` must not exceed half the bitset size, `bits.size() / 2`.
+WARNING: `bits` must outlive `ac`, which holds a reference to it. `pos` must not exceed half the bitset size, `bits.size() / 2`. For a window, the bits it compares, through `start + words` words and `pos` samples beyond, must lie inside the bitset.
 
 === Access
 
