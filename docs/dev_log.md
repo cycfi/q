@@ -27,6 +27,13 @@ mean of the two rates, so a vibrato across the center stays even, then
 down and up to their depths. `example/whammy` uses it. First step of the
 Q Bender plugin.
 
+`80687b2e`: `example/whammy` puts the formants back after the shift, a
+`formant_corrector` with a table learned from all three samples before
+anything plays (`f` toggles it; Joel, on offline renders: on is better).
+New Whammy Bar tutorial, in a Pitch Shifting group, covering the bar, the
+shifter, and learning, offline here and from the live input in a real-time
+program.
+
 ## 2026-11-04
 
 On `sola-shift`: `630627d6`, `pitch_detector` renamed `bacf_pitch_detector`
