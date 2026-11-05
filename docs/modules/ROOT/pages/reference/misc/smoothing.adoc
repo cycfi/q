@@ -120,7 +120,6 @@ struct smoothed
 `delta`        :: Floating point value, the distance from the target within which the output snaps to the target. It is in the units of the smoothed value.
 `target`       :: Floating point value for the target.
 `v`            :: Floating point value for a state.
-`C`            :: Arbitrary smoothing filter implementation
 
 ==== Requirements on `Smoother`
 
@@ -130,11 +129,11 @@ struct smoothed
 |===
 | Expression                      | Semantics
 
-| `C(frequency, float)`           | Construct an object with cutoff frequency 
+| `Smoother(frequency, float)`    | Construct an object with cutoff frequency 
                                     of type `frequency` and sample rate.
-| `operator()(float)`             | Per-sample processing function that returns the current state.
-| `operator()() const`            | Return the current state of the filter.
-| `operator=(float)`              | Reset the filter state to a given value.
+| `s(x)`                          | Per-sample processing function that returns the current state.
+| `s()`                           | Return the current state of the filter.
+| `s = v`                         | Reset the filter state to a given value.
 |===
 
 ==== Constructors and Assignment
@@ -210,7 +209,7 @@ for (auto& s : in)
 
 if (smooth.settled())                                          <3>
 {
-   // Do something, eg. reporting backing to the UI.
+   // Do something, eg. reporting back to the UI.
 }
 ```
 

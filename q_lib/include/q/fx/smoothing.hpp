@@ -55,13 +55,13 @@ namespace cycfi::q
       {
          auto val = _snap(_smoother(target), target);
          if (_snap.settled())
-            _smoother = val = target;
+            _smoother = target;
          return val;
       }
 
       float operator()() const { return _smoother(); }
 
-      smoothed &operator=(float v)
+      smoothed& operator=(float v)
       {
          _smoother = v;
          return *this;
