@@ -159,6 +159,15 @@
   </li>
 </ul>
   </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_pitch_shifting">Pitch Shifting</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/whammy.html">Whammy Bar</a>
+  </li>
+</ul>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -608,6 +617,9 @@
     <a class="nav-link" href="../midi/notes.html">MIDI Notes</a>
   </li>
   <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../midi/bend_range.html">Bend Range</a>
+  </li>
+  <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../midi/midi2_messages.html">MIDI 2.0 Messages</a>
   </li>
   <li class="nav-item" data-depth="4">
@@ -868,13 +880,13 @@ This API is new and unstable: it may change in any release, without a deprecatio
 </div>
 <div class="videoblock">
 <div class="content">
-<video src="https://media.cycfi.com/q/bacf-lag-tracker/bacf_lag_tracker_strobe.mp4" width="750" poster="../../_images/bacf_lag_tracker_strobe.svg" autoplay muted controls loop>
+<video src="https://media.cycfi.com/q/bacf-pitch-shifter/chord_strobe_v2.mp4" width="750" autoplay muted controls loop>
 Your browser does not support the video tag.
 </video>
 </div>
 </div>
 <div class="paragraph">
-<p>The video shows an E chord, ringing, as the lag slides from 1 to 30 ms. The signal, low-passed at 1 kHz, becomes one bit a sample, a bitstream, and the XOR of the two windows' bits marks each sample where they disagree (see <code><a href="bitstream_acf.html" class="xref page">Bitstream Autocorrelation</a></code>). Most lags leave about half the bits mismatched, the level of chance; where the windows are out of phase, more (78% at 18 ms). At 24.3 ms, the period the chord&#8217;s notes share, only 2% differ: the pattern freezes. The low E&#8217;s own period, 12.1 ms, leaves 21% differing, since the other strings stand elsewhere in their cycles.</p>
+<p>The video shows an E chord, ringing, as the lag slides from 1 to 30 ms. The signal, low-passed at 1 kHz, becomes one bit a sample, a bitstream, and the XOR of the two windows' bits marks each sample where they disagree (see <code><a href="bitstream_acf.html" class="xref page">Bitstream Autocorrelation</a></code>). Most lags leave about half the bits mismatched, the level of chance; where the windows are out of phase, more (89% near 3.6 ms). At 24.3 ms, the period the chord&#8217;s notes share, only 8% differ: the pattern freezes. The low E&#8217;s own period, 12.1 ms, leaves 42% differing, since the other strings stand elsewhere in their cycles.</p>
 </div>
 <div class="paragraph">
 <p>Sliding the lag across the whole range is a search, and the tracker searches only to find a lock. After that it keeps the pattern frozen: at each zero crossing, leading and trailing, it scores the lag it holds and two samples either side, moves to the best, and takes the fraction of a sample from a parabola through the scores. A crossing is where the waveform&#8217;s timing can change, so the tracker scores there, and does nothing between crossings.</p>
