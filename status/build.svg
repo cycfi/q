@@ -7,9 +7,9 @@
 <text x="156.0" y="12.333333333333334" font-size="10.0" text-anchor="end">Q Ubuntu Latest GCC</text>
 <text x="180.0" y="12.333333333333334" font-size="10.0">fail</text>
 <rect x="0" y="19.0" width="162.0" height="18.0" fill="#555"/>
-<rect x="162.0" y="19.0" width="36.0" height="18.0" fill="#e05d44"/>
+<rect x="162.0" y="19.0" width="36.0" height="18.0" fill="#4c1"/>
 <text x="156.0" y="31.333333333333332" font-size="10.0" text-anchor="end">Q Windows Latest MSVC</text>
-<text x="180.0" y="31.333333333333332" font-size="10.0">fail</text>
+<text x="180.0" y="31.333333333333332" font-size="10.0">pass</text>
 <rect x="0" y="38.0" width="162.0" height="18.0" fill="#555"/>
 <rect x="162.0" y="38.0" width="36.0" height="18.0" fill="#4c1"/>
 <text x="156.0" y="50.333333333333336" font-size="10.0" text-anchor="end">Q macOS Latest Clang</text>
