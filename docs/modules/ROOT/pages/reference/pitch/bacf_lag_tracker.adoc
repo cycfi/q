@@ -10,9 +10,9 @@ The BACF lag tracker follows the lag at which a signal repeats: its period, or a
 
 A strobe tuner shows pitch with a pattern lit in time with the note: off pitch, the pattern drifts; on pitch, it stands still. The tracker works the same way, with the signal against itself. It compares the latest window of the signal with the window one lag earlier. Slide the lag, and the two windows drift past each other; at the period they line up, and the pattern freezes.
 
-video::https://media.cycfi.com/q/bacf-lag-tracker/bacf_lag_tracker_strobe.mp4[poster=bacf_lag_tracker_strobe.svg, width=750, opts="autoplay,loop,muted"]
+video::https://media.cycfi.com/q/bacf-pitch-shifter/chord_strobe_v2.mp4[width=750, opts="autoplay,loop,muted"]
 
-The video shows an E chord, ringing, as the lag slides from 1 to 30 ms. The signal, low-passed at 1 kHz, becomes one bit a sample, a bitstream, and the XOR of the two windows' bits marks each sample where they disagree (see `{bitstream_acf}`). Most lags leave about half the bits mismatched, the level of chance; where the windows are out of phase, more (78% at 18 ms). At 24.3 ms, the period the chord's notes share, only 2% differ: the pattern freezes. The low E's own period, 12.1 ms, leaves 21% differing, since the other strings stand elsewhere in their cycles.
+The video shows an E chord, ringing, as the lag slides from 1 to 30 ms. The signal, low-passed at 1 kHz, becomes one bit a sample, a bitstream, and the XOR of the two windows' bits marks each sample where they disagree (see `{bitstream_acf}`). Most lags leave about half the bits mismatched, the level of chance; where the windows are out of phase, more (89% near 3.6 ms). At 24.3 ms, the period the chord's notes share, only 8% differ: the pattern freezes. The low E's own period, 12.1 ms, leaves 42% differing, since the other strings stand elsewhere in their cycles.
 
 Sliding the lag across the whole range is a search, and the tracker searches only to find a lock. After that it keeps the pattern frozen: at each zero crossing, leading and trailing, it scores the lag it holds and two samples either side, moves to the best, and takes the fraction of a sample from a parabola through the scores. A crossing is where the waveform's timing can change, so the tracker scores there, and does nothing between crossings.
 

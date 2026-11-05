@@ -33,7 +33,7 @@ Q's shifter is a SOLA shifter.
 
 The video below shows how pitch was shifted in the 1950s, with a rotating head. In place of a single stationary playback head, several playback heads are mounted on a rotating drum. When the drum turns in the same direction as the tape, the tape passes the heads more slowly, so the pitch drops without changing the duration. When the drum turns against the tape, the pitch rises, also without changing the duration. The speed of the drum relative to the tape sets the amount of the shift.
 
-video::https://media.cycfi.com/q/bacf-pitch-shifter/rotating_head.mp4[width=750, opts="autoplay,loop,muted"]
+video::https://media.cycfi.com/q/bacf-pitch-shifter/rotating_head_v2.mp4[width=750, opts="autoplay,loop,muted"]
 
 The drawback is the jump from one playback head to the next, which causes an audible warble. It shows in the waveform at the bottom of the video.
 
