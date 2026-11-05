@@ -155,6 +155,7 @@
 **** xref:reference/midi/messages.adoc[MIDI 1.0 Messages]
 **** xref:reference/midi/controller_numbers.adoc[MIDI Controller Numbers]
 **** xref:reference/midi/notes.adoc[MIDI Notes]
+**** xref:reference/midi/bend_range.adoc[Bend Range]
 **** xref:reference/midi/midi2_messages.adoc[MIDI 2.0 Messages]
 **** xref:reference/midi/processor.adoc[MIDI Processor]
 **** xref:reference/midi/readers.adoc[MIDI Readers]

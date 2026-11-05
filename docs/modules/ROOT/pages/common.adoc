@@ -132,6 +132,7 @@
 :midi2_messages: xref:reference/midi/midi2_messages.adoc[MIDI 2.0 Messages]
 :midi_cc: xref:reference/midi/controller_numbers.adoc[MIDI Controller Numbers]
 :midi_notes: xref:reference/midi/notes.adoc[MIDI Notes]
+:midi_bend_range: xref:reference/midi/bend_range.adoc[Bend Range]
 :midi_readers: xref:reference/midi/readers.adoc[MIDI Readers]
 :midi_translation: xref:reference/midi/translation.adoc[MIDI Translation]
 :midi_stages: xref:reference/midi/stages.adoc[MIDI Stages]

@@ -149,6 +149,7 @@ NOTE: Order matters where two stages read the same controllers. See {midi_stages
 | `q/midi/messages.hpp`         | The MIDI 1.0 messages, `raw_message` and the status bytes. | {midi_messages}
 | `q/midi/cc.hpp`               | The controller numbers, `cc`, shared by both protocols. | {midi_cc}
 | `q/midi/note.hpp`             | The note numbers and `note_frequency`, shared by both protocols. | {midi_notes}
+| `q/midi/bend_range.hpp`       | `bend_range`, a pitch bend as semitones or a ratio, for both protocols. | {midi_bend_range}
 | `q/midi/processor.hpp`        | The MIDI 1.0 `processor`, the `Processor` concept and `dispatch`. | {midi_processor}
 | `q/midi/byte_reader.hpp`      | `byte_reader` and `sysex_view`. | {midi_readers}
 | `q/midi/file_reader.hpp`      | `file_reader`, a standard MIDI file read from bytes in memory. | xref:reference/q_io/midi_file.adoc#_file_reader[MIDI File]

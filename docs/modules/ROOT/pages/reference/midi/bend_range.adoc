@@ -1,0 +1,139 @@
+= Bend Range
+
+include::../../common.adoc[]
+
+CAUTION: {unstable}
+
+== Overview
+
+A bend range turns a pitch bend into the pitch offset it plays: semitones, or the frequency ratio a pitch shifter or an oscillator takes. The depth below the center and the depth above it are set apart, since a bar or a pedal may dive farther than it pulls up, while a wheel bends the same both ways.
+
+The center is exact: a bend at the center plays 0 semitones, a ratio of exactly 1. Each end reaches its full depth: the lowest bend plays the whole depth down, and the highest the whole depth up. A pitch bend has one step more below its center than above it (8192 and 8191 for MIDI 1.0's 14 bits), so each side is scaled by its own span.
+
+It reads both protocols' pitch bend, MIDI 1.0's 14 bits and MIDI 2.0's 32, and the two agree. The default depth, 2 semitones both ways, is the default pitch bend sensitivity of both specifications.
+
+The bend range is implemented by a class named `bend_range`.
+
+== Three Segments
+
+With two depths, the two sides move at two rates: the same travel covers 12 semitones down and 7 up. A vibrato rocks the bar across the center, and if the rates differed there, it would go deeper down than up, and its pitch would sag. So the bend is three straight segments: down, middle and up. The middle spans `linear` semitones either side of the center (1 by default) at one rate, the mean of the two, so a vibrato is as deep down as up. The down and up segments carry on from the middle's ends, each straight to its own depth.
+
+image::bend_range.svg[alt="Bend range", title="A bend range of 12 semitones down, 7 up, and a middle of 1 semitone either way", width=750px, align=center, link={imagesdir}/bend_range.svg]
+
+The figure plots `bend_range{12, 7, 1}` over every MIDI 1.0 bend value. The middle (green) runs through the center (magenta) at 9.5 semitones a half, the mean of 12 and 7, and takes as much of the travel as its share of the semitones. From its ends, the down segment runs straight to -12 and the up segment to 7. `linear` is at most the smaller depth, so a side of depth 0 leaves no middle, and the other side is one straight line.
+
+== Include
+
+```c++
+#include <q/midi/bend_range.hpp>
+```
+
+== Declaration
+
+```c++
+namespace cycfi::q::midi
+{
+   struct bend_range
+   {
+      constexpr            bend_range(float depth = 2.0f);
+      constexpr            bend_range(
+                              float down, float up, float linear = 1.0f);
+
+      constexpr float      semitones(midi_1_0::pitch_bend msg) const;
+      constexpr float      semitones(midi_2_0::pitch_bend msg) const;
+      float                ratio(midi_1_0::pitch_bend msg) const;
+      float                ratio(midi_2_0::pitch_bend msg) const;
+
+      float                down;
+      float                up;
+      float                linear;
+   };
+}
+```
+
+== Expressions
+
+=== Notation
+
+`br`, `a`, `b`    :: Objects of type `bend_range`.
+`d`, `dn`, `up`   :: Floating point values for depths in semitones, 0 or more.
+`lin`             :: Floating point value for the middle segment, in semitones either side of the center, 0 or more.
+`m`               :: Object of type `midi_1_0::pitch_bend` or `midi_2_0::pitch_bend`.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression              | Semantics
+
+| `bend_range()`          | Construct a `bend_range` of 2 semitones both ways.
+| `bend_range(d)`         | Construct a `bend_range` of `d` semitones both ways.
+| `bend_range(dn, up)`    | Construct a `bend_range` of `dn` semitones down and
+                            `up` semitones up, with a middle of 1 semitone
+                            either way.
+| `bend_range(dn, up, lin)` | Construct a `bend_range` of `dn` semitones down
+                            and `up` semitones up, with a middle of `lin`
+                            semitones either way.
+| `bend_range(br)`        | Copy construct from `bend_range br`.
+| `a = b`                 | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                                 | Return Type
+
+| `br.ratio(m)`       | Get the frequency ratio `m` plays: 1 at
+                        the center, `2^(-dn/12)` at the lowest
+                        bend, `2^(up/12)` at the highest.         | `float`
+| `br.semitones(m)`   | Get the pitch offset `m` plays, in
+                        semitones: 0 at the center, `-dn` at the
+                        lowest bend, `up` at the highest.         | `float`
+|===
+
+=== Accessors and Mutators
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                                 | Return Type
+
+| `br.down`           | Get the depth down, in semitones.         | `float`
+| `br.up`             | Get the depth up, in semitones.           | `float`
+| `br.linear`         | Get the middle, in semitones either way.  | `float`
+| `br.down = dn`      | Set the depth down, in semitones.         | `float&`
+| `br.up = up`        | Set the depth up, in semitones.           | `float&`
+| `br.linear = lin`   | Set the middle, in semitones either way.  | `float&`
+|===
+
+== Example
+
+A whammy bar on MIDI pitch bend: an octave down, a fifth up. The processor keeps the latest bend's ratio, and a pitch shifter plays it:
+
+```c++
+#include <q/midi/bend_range.hpp>
+#include <q/midi/processor.hpp>
+...
+namespace q = cycfi::q;
+namespace midi = q::midi_1_0;
+
+struct bar : q::midi::processor
+{
+   using q::midi::processor::operator();
+
+   void operator()(midi::pitch_bend msg, std::size_t time)
+   {
+      ratio = range.ratio(msg);                    <1>
+   }
+
+   q::midi::bend_range  range{12.0f, 7.0f};        <2>
+   float                ratio = 1.0f;
+};
+```
+
+<1> The bend's ratio: 0.5 at the bottom of the bar, about 1.5 at the top, 1 at rest.
+<2> 12 semitones down, 7 up, and a middle of 1 semitone either way, so a vibrato is as deep down as up.
+
+A bend jumps from one message to the next, so smooth the ratio, or the semitones, before it drives a shifter or an oscillator: a xref:reference/misc/one_pole_lowpass.adoc[One Pole Lowpass] of about 100 Hz turns the steps into a glide.

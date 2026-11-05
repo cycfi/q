@@ -41,6 +41,7 @@ set(APP_SOURCES
    midi/midi2_messages.cpp
    midi/midi2_builders.cpp
    midi/midi2_scaling.cpp
+   midi/midi_bend_range.cpp
    midi/midi2_translate.cpp
    midi/midi2_sysex.cpp
    midi/midi2_utility.cpp
@@ -261,6 +262,7 @@ add_test(NAME test_midi2_packet COMMAND test_midi2_packet)
 add_test(NAME test_midi2_messages COMMAND test_midi2_messages)
 add_test(NAME test_midi2_builders COMMAND test_midi2_builders)
 add_test(NAME test_midi2_scaling COMMAND test_midi2_scaling)
+add_test(NAME test_midi_bend_range COMMAND test_midi_bend_range)
 add_test(NAME test_midi2_translate COMMAND test_midi2_translate)
 add_test(NAME test_midi2_sysex COMMAND test_midi2_sysex)
 add_test(NAME test_midi2_utility COMMAND test_midi2_utility)

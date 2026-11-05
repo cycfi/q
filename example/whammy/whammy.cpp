@@ -5,6 +5,7 @@
 =============================================================================*/
 #include <q/fx/lowpass.hpp>
 #include <q/fx/bacf_pitch_shifter.hpp>
+#include <q/midi/bend_range.hpp>
 #include <q/midi/processor.hpp>
 #include <q/support/literals.hpp>
 #include <q/utility/sleep.hpp>
@@ -41,32 +42,28 @@ namespace fs = std::filesystem;
 
 namespace
 {
-   constexpr float bend_range = 12.0f;    // semitones either way
+   // The bar: 12 semitones either way.
+   constexpr q::midi::bend_range bar{12.0f};
 
-   // The pitch bends of a MIDI file, each at its sample time.
+   // The pitch bends of a MIDI file, each at its sample time, in
+   // semitones.
    struct bends : q::midi::processor
    {
       using q::midi::processor::operator();
 
       void operator()(q::midi_1_0::pitch_bend msg, std::size_t time)
       {
-         events.push_back({time, msg.value()});
+         events.push_back({time, bar.semitones(msg)});
       }
 
       struct event
       {
          std::size_t    time;
-         std::uint16_t  value;
+         float          semitones;
       };
 
       std::vector<event> events;
    };
-
-   float semitones(std::uint16_t value)
-   {
-      auto const d = float(value) - 8192.0f;
-      return bend_range * (d < 0 ? d / 8192.0f : d / 8191.0f);
-   }
 
    // The shifter under the bar: the latest bend, smoothed, as the ratio.
    struct whammy
@@ -80,7 +77,7 @@ namespace
       float operator()(float s)
       {
          while (_next != _events.size() && _events[_next].time <= _t)
-            _semis = semitones(_events[_next++].value);
+            _semis = _events[_next++].semitones;
          ++_t;
          return _shift(s, std::exp2(_smooth(_semis) / 12.0f));
       }

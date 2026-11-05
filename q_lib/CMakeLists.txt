@@ -56,6 +56,7 @@ set(Q_HEADERS
    ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/ump_messages.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/ump_processor.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/scaling.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/bend_range.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/translate.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/packet_reader.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/per_note.hpp
