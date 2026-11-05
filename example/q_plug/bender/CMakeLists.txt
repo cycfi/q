@@ -77,5 +77,6 @@ make_clapfirst_plugins(
 
 q_plug_separate_import_libs(q_plug-bender)
 q_plug_fix_auv2_plist(q_plug-bender)
-q_plug_add_resources(q_plug-bender)
+q_plug_add_resources(q_plug-bender
+   "${CMAKE_CURRENT_SOURCE_DIR}/factory_presets.json")
 q_plug_add_validation_tests(bender "Q Bender" aumf QBnd QPlg)

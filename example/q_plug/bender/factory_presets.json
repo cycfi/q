@@ -1,0 +1,398 @@
+{
+   "Octave ±12": {
+      "plugin": "com.qplug.bender",
+      "version": 1,
+      "params": [
+         {
+            "id": 1,
+            "name": "Dive",
+            "value": 12.0
+         },
+         {
+            "id": 2,
+            "name": "Pull-up",
+            "value": 12.0
+         },
+         {
+            "id": 3,
+            "name": "Middle",
+            "value": 1.0
+         },
+         {
+            "id": 4,
+            "name": "Formants",
+            "value": 1
+         },
+         {
+            "id": 5,
+            "name": "Formant Amount",
+            "value": 100.0
+         },
+         {
+            "id": 6,
+            "name": "Freeze",
+            "value": 0
+         }
+      ]
+   },
+   "Fifth ±7": {
+      "plugin": "com.qplug.bender",
+      "version": 1,
+      "params": [
+         {
+            "id": 1,
+            "name": "Dive",
+            "value": 7.0
+         },
+         {
+            "id": 2,
+            "name": "Pull-up",
+            "value": 7.0
+         },
+         {
+            "id": 3,
+            "name": "Middle",
+            "value": 1.0
+         },
+         {
+            "id": 4,
+            "name": "Formants",
+            "value": 1
+         },
+         {
+            "id": 5,
+            "name": "Formant Amount",
+            "value": 100.0
+         },
+         {
+            "id": 6,
+            "name": "Freeze",
+            "value": 0
+         }
+      ]
+   },
+   "Fourth ±5": {
+      "plugin": "com.qplug.bender",
+      "version": 1,
+      "params": [
+         {
+            "id": 1,
+            "name": "Dive",
+            "value": 5.0
+         },
+         {
+            "id": 2,
+            "name": "Pull-up",
+            "value": 5.0
+         },
+         {
+            "id": 3,
+            "name": "Middle",
+            "value": 1.0
+         },
+         {
+            "id": 4,
+            "name": "Formants",
+            "value": 1
+         },
+         {
+            "id": 5,
+            "name": "Formant Amount",
+            "value": 100.0
+         },
+         {
+            "id": 6,
+            "name": "Freeze",
+            "value": 0
+         }
+      ]
+   },
+   "Major Third ±4": {
+      "plugin": "com.qplug.bender",
+      "version": 1,
+      "params": [
+         {
+            "id": 1,
+            "name": "Dive",
+            "value": 4.0
+         },
+         {
+            "id": 2,
+            "name": "Pull-up",
+            "value": 4.0
+         },
+         {
+            "id": 3,
+            "name": "Middle",
+            "value": 1.0
+         },
+         {
+            "id": 4,
+            "name": "Formants",
+            "value": 1
+         },
+         {
+            "id": 5,
+            "name": "Formant Amount",
+            "value": 100.0
+         },
+         {
+            "id": 6,
+            "name": "Freeze",
+            "value": 0
+         }
+      ]
+   },
+   "Minor Third ±3": {
+      "plugin": "com.qplug.bender",
+      "version": 1,
+      "params": [
+         {
+            "id": 1,
+            "name": "Dive",
+            "value": 3.0
+         },
+         {
+            "id": 2,
+            "name": "Pull-up",
+            "value": 3.0
+         },
+         {
+            "id": 3,
+            "name": "Middle",
+            "value": 1.0
+         },
+         {
+            "id": 4,
+            "name": "Formants",
+            "value": 1
+         },
+         {
+            "id": 5,
+            "name": "Formant Amount",
+            "value": 100.0
+         },
+         {
+            "id": 6,
+            "name": "Freeze",
+            "value": 0
+         }
+      ]
+   },
+   "Whole Step ±2": {
+      "plugin": "com.qplug.bender",
+      "version": 1,
+      "params": [
+         {
+            "id": 1,
+            "name": "Dive",
+            "value": 2.0
+         },
+         {
+            "id": 2,
+            "name": "Pull-up",
+            "value": 2.0
+         },
+         {
+            "id": 3,
+            "name": "Middle",
+            "value": 1.0
+         },
+         {
+            "id": 4,
+            "name": "Formants",
+            "value": 1
+         },
+         {
+            "id": 5,
+            "name": "Formant Amount",
+            "value": 100.0
+         },
+         {
+            "id": 6,
+            "name": "Freeze",
+            "value": 0
+         }
+      ]
+   },
+   "Half Step ±1": {
+      "plugin": "com.qplug.bender",
+      "version": 1,
+      "params": [
+         {
+            "id": 1,
+            "name": "Dive",
+            "value": 1.0
+         },
+         {
+            "id": 2,
+            "name": "Pull-up",
+            "value": 1.0
+         },
+         {
+            "id": 3,
+            "name": "Middle",
+            "value": 1.0
+         },
+         {
+            "id": 4,
+            "name": "Formants",
+            "value": 1
+         },
+         {
+            "id": 5,
+            "name": "Formant Amount",
+            "value": 100.0
+         },
+         {
+            "id": 6,
+            "name": "Freeze",
+            "value": 0
+         }
+      ]
+   },
+   "Octave Down, Major Third Up": {
+      "plugin": "com.qplug.bender",
+      "version": 1,
+      "params": [
+         {
+            "id": 1,
+            "name": "Dive",
+            "value": 12.0
+         },
+         {
+            "id": 2,
+            "name": "Pull-up",
+            "value": 4.0
+         },
+         {
+            "id": 3,
+            "name": "Middle",
+            "value": 1.0
+         },
+         {
+            "id": 4,
+            "name": "Formants",
+            "value": 1
+         },
+         {
+            "id": 5,
+            "name": "Formant Amount",
+            "value": 100.0
+         },
+         {
+            "id": 6,
+            "name": "Freeze",
+            "value": 0
+         }
+      ]
+   },
+   "Octave Down, Whole Step Up": {
+      "plugin": "com.qplug.bender",
+      "version": 1,
+      "params": [
+         {
+            "id": 1,
+            "name": "Dive",
+            "value": 12.0
+         },
+         {
+            "id": 2,
+            "name": "Pull-up",
+            "value": 2.0
+         },
+         {
+            "id": 3,
+            "name": "Middle",
+            "value": 1.0
+         },
+         {
+            "id": 4,
+            "name": "Formants",
+            "value": 1
+         },
+         {
+            "id": 5,
+            "name": "Formant Amount",
+            "value": 100.0
+         },
+         {
+            "id": 6,
+            "name": "Freeze",
+            "value": 0
+         }
+      ]
+   },
+   "Fifth Down, Minor Third Up": {
+      "plugin": "com.qplug.bender",
+      "version": 1,
+      "params": [
+         {
+            "id": 1,
+            "name": "Dive",
+            "value": 7.0
+         },
+         {
+            "id": 2,
+            "name": "Pull-up",
+            "value": 3.0
+         },
+         {
+            "id": 3,
+            "name": "Middle",
+            "value": 1.0
+         },
+         {
+            "id": 4,
+            "name": "Formants",
+            "value": 1
+         },
+         {
+            "id": 5,
+            "name": "Formant Amount",
+            "value": 100.0
+         },
+         {
+            "id": 6,
+            "name": "Freeze",
+            "value": 0
+         }
+      ]
+   },
+   "Fourth Down, Whole Step Up": {
+      "plugin": "com.qplug.bender",
+      "version": 1,
+      "params": [
+         {
+            "id": 1,
+            "name": "Dive",
+            "value": 5.0
+         },
+         {
+            "id": 2,
+            "name": "Pull-up",
+            "value": 2.0
+         },
+         {
+            "id": 3,
+            "name": "Middle",
+            "value": 1.0
+         },
+         {
+            "id": 4,
+            "name": "Formants",
+            "value": 1
+         },
+         {
+            "id": 5,
+            "name": "Formant Amount",
+            "value": 100.0
+         },
+         {
+            "id": 6,
+            "name": "Freeze",
+            "value": 0
+         }
+      ]
+   }
+}
