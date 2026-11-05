@@ -84,4 +84,4 @@ build/example/sustain_hold/example_sustain_hold
 
 '''
 
-*Previous:* {tutorial-grain_freeze}
+*Previous:* {tutorial-grain_freeze} | *Next:* {tutorial-whammy}

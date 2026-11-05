@@ -212,5 +212,6 @@
 :tutorial-fm_synth: xref:tutorials/fm_synth.adoc[FM Synth]
 :tutorial-grain_freeze: xref:tutorials/grain_freeze.adoc[Grain Freeze]
 :tutorial-sustain_hold: xref:tutorials/sustain_hold.adoc[Sustain Hold]
+:tutorial-whammy: xref:tutorials/whammy.adoc[Whammy Bar]
 :media: https://media.cycfi.com/q/fm
 :va_media: https://media.cycfi.com/q/va

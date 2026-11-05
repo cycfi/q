@@ -1,0 +1,117 @@
+= Whammy Bar
+
+include::../common.adoc[]
+
+== Overview
+
+`example/whammy/whammy.cpp` bends recordings of a guitar up and down under a whammy bar: chords, a hammer-on and pull-off line, a harmonic. The bar is MIDI pitch bend, as a MIDI whammy controller such as the e-Whammy sends it, recorded beside each sample as a MIDI file and played back in time with the audio. The bar's center is unison, and its ends are an octave down and an octave up.
+
+The shifter is the `{bacf_pitch_shifter}`. At rest it passes the guitar through untouched, with no latency; bent, it splices the sound at its own period, so chords bend as cleanly as single notes. After it, a `{formant_corrector}` puts the guitar's own tone back: a shift moves the resonances that give an instrument its voice along with the pitch, and the correction moves them home. The formants are learned from the samples before anything plays.
+
+== How It Works
+
+=== The Bar
+
+The bends come out of the MIDI file in semitones, through a `{midi_bend_range}` of 12 either way:
+
+```c++
+constexpr q::midi::bend_range bar{12.0f};
+
+struct bends : q::midi::processor
+{
+   using q::midi::processor::operator();
+
+   void operator()(q::midi_1_0::pitch_bend msg, std::size_t time)
+   {
+      events.push_back({time, bar.semitones(msg)});   // <1>
+   }
+   ...
+};
+```
+
+<1> Each bend, at its sample time. `q::midi_file` reads the file against the sample rate, so `time` is a sample index into the audio.
+
+=== The Shifter
+
+Per sample, the latest bend is held, smoothed, and turned into the ratio that drives the shifter and the corrector:
+
+```c++
+float operator()(float s)
+{
+   while (_next != _events.size() && _events[_next].time <= _t)
+      _semis = _events[_next++].semitones;                  // <1>
+   ++_t;
+   auto const ratio = std::exp2(_smooth(_semis) / 12.0f);   // <2>
+   return _correct(_shift(s, ratio), ratio);                // <3>
+}
+```
+
+<1> Hold the latest bend until the next one.
+<2> A bend jumps from one message to the next; a xref:reference/misc/one_pole_lowpass.adoc[one pole lowpass] at 100 Hz turns the steps into a glide. Twelve semitones is a doubling.
+<3> Shift, then restore the formants. Both take the same ratio, and with the bar at rest, both pass the input through.
+
+=== The Formants
+
+Before anything plays, a `{formant_learner}` listens to every sample in `audio/` and fits the table the corrector reads:
+
+```c++
+bool learn(std::vector<fs::path> const& files, q::formant_table& table)
+{
+   constexpr std::size_t block = 256;
+   std::unique_ptr<q::formant_learner> learner;
+   for (auto const& f : files)
+   {
+      ...
+      for (std::size_t i = 0; i + block <= t.audio.size(); i += block)
+         (*learner)(std::span<float const>{t.audio.data() + i, block});   // <1>
+   }
+   return learner && learner->fit(table);                                 // <2>
+}
+```
+
+<1> The learner takes the audio in blocks, as a worker thread would get them.
+<2> Fit the table from all of it. The learner wants varied playing: one note alone would teach it that note.
+
+This example learns everything up front, since its samples are on disk. A real-time application learns from the incoming audio instead, as the player plays:
+
+* *From the input.* The learner listens to the dry input, before the shift, since the shifted sound has the moved formants the correction is there to undo.
+* *Off the audio thread.* The audio thread passes each input block on to a worker thread, which feeds the learner, so the audio thread never waits on the analysis.
+* *A new table every few seconds.* The worker refits the table now and then, every 512 blocks of 256 (about 3 seconds at 44.1 kHz) say, and hands it to the audio thread through a `{handoff}`, so neither side waits on the other. Until the first table arrives, the corrector passes its input through.
+* *Steadier as it goes.* The learner averages everything it has heard, so the longer one plays, the steadier the formants. Its `coverage()` says how much of the band, 80 Hz to 8 kHz, it has seen, and a learning phase can end once that nears 1. Its `drift()` says how far the last few seconds sit from what was learned: a cue to `learn()` again, after a pickup switch, say. `freeze(true)` stops learning and keeps what is there.
+
+See {formant_preservation} for the code, and for how the correction works.
+
+== Running
+
+```sh
+cmake -B build
+cmake --build build --target example_whammy
+build/example/whammy/example_whammy
+```
+
+The example offers the samples in `audio/`, each with the bend track of the same name in `midi/`, and plays the one you choose on the default output device. Type `f` to turn formant preservation off and on, and play the same sample again to hear the difference: the octave dives most of all.
+
+Given an audio file and a bend track, it learns from that file and plays it:
+
+```sh
+build/example/whammy/example_whammy my_take.wav my_bends.mid
+```
+
+== Components Used
+
+[cols="1,2", options="header"]
+|===
+| Component                | Role
+
+| {bacf_pitch_shifter}     | The pitch shift, chords included, with no latency at rest
+| {formant_corrector}      | Puts the guitar's formants back after the shift
+| {formant_learner}        | Learns the formants from the samples
+| {midi_bend_range}        | The bar's pitch bend, as semitones
+| {midi_file}              | Reads the bend tracks, timed against the audio
+| xref:reference/misc/one_pole_lowpass.adoc[One Pole Lowpass] | Smooths the bend into a glide
+| {audio_stream}           | The processing loop, default output device
+|===
+
+'''
+
+*Previous:* {tutorial-sustain_hold}

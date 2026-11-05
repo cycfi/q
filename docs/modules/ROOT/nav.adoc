@@ -24,6 +24,8 @@
 *** xref:tutorials/index.adoc#_granular[Granular]
 **** xref:tutorials/grain_freeze.adoc[Grain Freeze]
 **** xref:tutorials/sustain_hold.adoc[Sustain Hold]
+*** xref:tutorials/index.adoc#_pitch_shifting[Pitch Shifting]
+**** xref:tutorials/whammy.adoc[Whammy Bar]
 ** xref:q_plug:tutorials/index.adoc[QPlug]
 *** xref:q_plug:tutorials/gain.adoc[Your First Plugin: Gain]
 *** xref:q_plug:tutorials/sampler.adoc[Sampler: Handing Data to the Audio Thread]

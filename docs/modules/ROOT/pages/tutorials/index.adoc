@@ -110,3 +110,16 @@ musically useful.
 | Interactive infinite sustain by period-locked granular looping
 | {grain}, {best_lag}
 |===
+
+=== Pitch Shifting
+
+Bend a whole sound, chords included, under a MIDI whammy bar.
+
+[cols="1,2,2", options="header"]
+|===
+| Tutorial | What it demonstrates | Key components
+
+| {tutorial-whammy}
+| Guitar recordings bent by a recorded whammy bar, with formant preservation
+| {bacf_pitch_shifter}, {formant_corrector}, {midi_bend_range}
+|===
