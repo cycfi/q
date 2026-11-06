@@ -13,6 +13,22 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-11-06
 
+`3d8de1a3`: `formant_table` holds its coefficients in 16 bits (Q15) and
+its rows every quarter semitone, 193 of them: about 13 KB at order 32,
+from 51. Rows are read out with `row(i, k, level)` and written with
+`set(i, k, level)`, replacing the writable `k(row)` and `level(row)`; `at()`
+dequantizes as it interpolates (by a reciprocal: dividing cost the
+corrector 0.07 us a sample on the H723). `formant_learner::fit` fits on
+every other bin of the smooth spectral envelope, the level still summed
+on every bin of the learned spectrum (on the coarse grid it was 0.8 dB
+off). The fit, H723: 1.86 to 0.60 s; M2: 17 to 18 ms to 5 to 7. The
+corrector 1.54 to 1.56 us a sample. Renders of take 47's long-hold
+gesture on four sources stay within 0.17 dB per third-octave band of the
+old table over the holds. The pole form (F as roots, a biquad cascade per
+ratio, no table) was tried first and failed: within 1 dB only going up,
+and going down it cannot hold the band the shift emptied (KB
+`e_whammy/formant_filter_optimization.md`).
+
 `5ff1f94c`: `lattice_fir` and `lattice_iir` peel the last stage out of
 their loops (the only one that keeps no state, so no branch a stage) and
 run four stages at a time with each group's coefficients and states read
