@@ -157,3 +157,24 @@ TEST_CASE("formant_learner: at order 24", "[formant]")
    fc.table(table.get());
    CHECK(fc(0.5f, 2.0f) != 0.0f);
 }
+
+TEST_CASE("formant_learner: a restored learner fits the same table", "[formant]")
+{
+   q::formant_learner a{sps};
+   a(play(3000_Hz, 30));
+   q::spectral_learner::state s;
+   a.save(s);
+
+   q::formant_learner b{sps};
+   REQUIRE(b.restore(s));
+
+   auto ta = std::make_unique<table_type>();
+   auto tb = std::make_unique<table_type>();
+   REQUIRE(a.fit(*ta));
+   REQUIRE(b.fit(*tb));
+   for (std::size_t i = 0; i != table_type::num_rows; ++i)
+   {
+      CHECK(ta->level(i) == tb->level(i));
+      CHECK(std::equal(ta->k(i).begin(), ta->k(i).end(), tb->k(i).begin()));
+   }
+}

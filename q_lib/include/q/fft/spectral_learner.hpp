@@ -33,6 +33,11 @@ namespace cycfi::q
    // can end once it nears 1. drift() is how far the last few seconds sit
    // from what was learned, in dB: a cue to learn again.
    //
+   // save() and restore() carry what has been learned, state, across a
+   // session: the average, its frame count and the cells seen. A state
+   // saved at another sample rate is mapped onto this one's bins by
+   // frequency. Learning goes on from it as if it had not stopped.
+   //
    // spectral_envelope() draws the spectral envelope through the average's
    // peaks (an instrument's average is a line spectrum, seen only at its
    // harmonics), held flat beyond them and smoothed over a third of an
@@ -42,11 +47,21 @@ namespace cycfi::q
    {
    public:
 
+      struct state
+      {
+         float                sps = 0;
+         double               frames = 0;
+         std::vector<float>   spectrum;      // the average, a value a bin
+         std::vector<bool>    seen;          // the cells, 80 Hz up
+      };
+
       explicit             spectral_learner(float sps);
 
       void                 operator()(std::span<float const> block);
 
       void                 learn();
+      void                 save(state& s) const;
+      bool                 restore(state const& s);
       void                 freeze(bool f);
       bool                 frozen() const;
       double               frames() const;
@@ -216,6 +231,60 @@ namespace cycfi::q
       _count = 0;
       _recent_count = 0;
       _fill = 0;
+   }
+
+   inline void spectral_learner::save(state& s) const
+   {
+      s.sps = _sps;
+      s.frames = _count;
+      s.spectrum.assign(_mean.begin(), _mean.end());
+      s.seen.assign(_seen.begin(), _seen.end());
+   }
+
+   // At the same sample rate the average is taken as it is. At another,
+   // each bin reads the saved average at its own frequency, interpolated,
+   // and the result is brought back to the saved total power. The recent
+   // average starts over, so drift() reads 0 until it fills again.
+   inline bool spectral_learner::restore(state const& s)
+   {
+      auto const from = s.spectrum.size();
+      if (!(s.sps > 0) || from < 2 || s.seen.size() != cells || !(s.frames > 0))
+         return false;
+
+      if (s.sps == _sps && from == _mean.size())
+      {
+         std::copy(s.spectrum.begin(), s.spectrum.end(), _mean.begin());
+      }
+      else
+      {
+         auto const from_hz = s.sps / (2.0 * double(from - 1));
+         auto const bin_hz = double(_sps) / double(_n);
+         double saved = 0, mapped = 0;
+         for (auto p : s.spectrum)
+            saved += p;
+         for (std::size_t b = 0; b != _mean.size(); ++b)
+         {
+            auto const i = double(b) * bin_hz / from_hz;
+            auto const j = std::size_t(i);
+            float v = 0;
+            if (j + 1 < from)
+               v = s.spectrum[j] + float(i - double(j))
+                  * (s.spectrum[j + 1] - s.spectrum[j]);
+            else if (j + 1 == from)
+               v = s.spectrum[j];
+            _mean[b] = v;
+            mapped += v;
+         }
+         if (mapped > 0)
+            for (auto& v : _mean)
+               v = float(v * saved / mapped);
+      }
+
+      std::copy(s.seen.begin(), s.seen.end(), _seen.begin());
+      _count = std::min(s.frames, max_frames);
+      std::fill(_recent.begin(), _recent.end(), 0.0f);
+      _recent_count = 0;
+      return true;
    }
 
    inline void spectral_learner::freeze(bool f)
