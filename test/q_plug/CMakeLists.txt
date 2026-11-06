@@ -30,6 +30,7 @@ set(plugin_tests
    dexter_presets:q_plug_dexter
    dexter_chart:q_plug_dexter
    bender_audio:q_plug_bender
+   bender_state:q_plug_bender
 )
 
 foreach(source ${test_sources})
@@ -127,3 +128,7 @@ target_include_directories(test_dexter_presets PRIVATE
    ${q_SOURCE_DIR}/example/q_plug/dexter)
 target_include_directories(test_dexter_chart PRIVATE
    ${q_SOURCE_DIR}/example/q_plug/dexter)
+
+# Q Bender's state test drives the controller and its formant worker.
+target_include_directories(test_bender_state PRIVATE
+   ${q_SOURCE_DIR}/example/q_plug/bender)

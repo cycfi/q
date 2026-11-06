@@ -23,9 +23,16 @@ formant_worker::~formant_worker()
    stop();
 }
 
+// A new learner takes up what the last one learned, if nothing newer
+// was restored, so a restart, at any sample rate, keeps the learning.
 void formant_worker::start(float sps)
 {
    stop();
+   {
+      std::lock_guard<std::mutex> lock{_mutex};
+      if (!_restored)
+         _restored = _saved;
+   }
    _learner = std::make_unique<q::formant_learner>(sps);
    _learner->freeze(_frozen);
    _blocks = 0;
@@ -50,17 +57,17 @@ float formant_worker::coverage() const
    return _coverage;
 }
 
-std::optional<formant_worker::table_type> formant_worker::saved_table() const
+// A state restored and not yet taken up is still what there is to save.
+std::optional<formant_worker::state_type> formant_worker::saved() const
 {
    std::lock_guard<std::mutex> lock{_mutex};
-   return _latest;
+   return _restored ? _restored : _saved;
 }
 
-void formant_worker::restore(table_type const& t)
+void formant_worker::restore(state_type s)
 {
    std::lock_guard<std::mutex> lock{_mutex};
-   _restored = t;
-   _latest = t;
+   _restored = std::move(s);
 }
 
 // Fill blocks of block_size from the input and publish each one full. With
@@ -111,6 +118,7 @@ void formant_worker::run()
       {
          _learner->learn();
          _blocks = 0;
+         snapshot();
       }
 
       if (frozen != _frozen)
@@ -119,13 +127,15 @@ void formant_worker::run()
          _learner->freeze(frozen);
       }
 
+      std::optional<state_type> restored;
       {
          std::lock_guard<std::mutex> lock{_mutex};
-         if (_restored)
-         {
-            _tables.send(std::make_unique<table_type>(*_restored));
-            _restored.reset();
-         }
+         restored.swap(_restored);
+      }
+      if (restored && _learner->restore(*restored))
+      {
+         _blocks = 0;
+         fit();
       }
 
       _input.consume(
@@ -151,9 +161,16 @@ void formant_worker::fit()
    auto table = std::make_unique<table_type>(_learner->order());
    if (!_learner->fit(*table))
       return;
-   {
-      std::lock_guard<std::mutex> lock{_mutex};
-      _latest = *table;
-   }
    _tables.send(std::move(table));
+   snapshot();
+}
+
+// The learner's state, for saving. Copied here, on the worker, at each
+// fit, not while the main thread waits.
+void formant_worker::snapshot()
+{
+   state_type s;
+   _learner->save(s);
+   std::lock_guard<std::mutex> lock{_mutex};
+   _saved = std::move(s);
 }

@@ -23,47 +23,40 @@ parameter_list bender_controller::parameters() const
    return { params };
 }
 
-// The learned table, row by row: each row's reflection coefficients, then
-// its level.
+// What the learner has learned, so a session comes back with it and
+// learning goes on: the average spectrum, its frame count, the sample
+// rate it was learned at, and the cells seen.
 void bender_controller::save_extra(json& j) const
 {
-   auto t = worker.saved_table();
-   if (!t)
+   auto s = worker.saved();
+   if (!s)
       return;
 
-   auto rows = json::array();
-   for (std::size_t r = 0; r != t->num_rows; ++r)
-   {
-      auto row = json::array();
-      for (auto k : t->k(r))
-         row.push_back(k);
-      row.push_back(t->level(r));
-      rows.push_back(std::move(row));
-   }
-   j["formants"] = {{"order", t->order()}, {"rows", std::move(rows)}};
+   j["formants"] = {
+      {"sps", s->sps}
+    , {"frames", s->frames}
+    , {"spectrum", s->spectrum}
+    , {"seen", s->seen}
+   };
 }
 
+// A state that does not parse is left out: the learner starts afresh.
 void bender_controller::load_extra(json const& j, std::uint32_t /*version*/)
 {
    auto f = j.find("formants");
-   if (f == j.end())
+   if (f == j.end() || !f->is_object())
       return;
 
-   auto const order = f->value("order", std::size_t{0});
-   auto const& rows = f->at("rows");
-   if (order == 0 || rows.size() != q::formant_table::num_rows)
-      return;
-
-   q::formant_table t{order};
-   for (std::size_t r = 0; r != rows.size(); ++r)
+   try
    {
-      auto const& row = rows[r];
-      if (row.size() != order + 1)
-         return;
-      auto k = t.k(r);
-      for (std::size_t i = 0; i != order; ++i)
-         k[i] = row[i].get<float>();
-      t.level(r) = row[order].get<float>();
+      formant_worker::state_type s;
+      s.sps = f->at("sps").get<float>();
+      s.frames = f->at("frames").get<double>();
+      s.spectrum = f->at("spectrum").get<std::vector<float>>();
+      s.seen = f->at("seen").get<std::vector<bool>>();
+      worker.restore(std::move(s));
    }
-   worker.restore(t);
+   catch (json::exception const&)
+   {
+   }
 }

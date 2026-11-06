@@ -17,9 +17,9 @@ namespace q = cycfi::q;
 ///////////////////////////////////////////////////////////////////////////////
 // The controller declares the parameters and holds what the threads share:
 // the formant worker, and the scope, the bend in semitones a few hundred
-// times a second, from the audio thread to the editor. The learned table
-// rides in the plugin's state, so a session comes back with its
-// instrument's formants.
+// times a second, from the audio thread to the editor. What the learner
+// has learned rides in the plugin's state, so a session comes back with
+// its instrument's formants and goes on learning from them.
 ///////////////////////////////////////////////////////////////////////////////
 class bender_controller : public q_plug::controller
 {

@@ -27,9 +27,10 @@ namespace q = cycfi::q;
 // table every few seconds, unless frozen.
 //
 // start and stop are main thread, with the audio thread stopped: the
-// learner is made for the sample rate there. learn, the table to save,
-// and a table to restore are main thread too; feed, freeze and table are
-// the audio thread's. A restored table is sent at once, and learning goes
+// learner is made for the sample rate there, and takes what was learned
+// before it. learn, the learner's state to save, and a state to restore
+// are main thread too; feed, freeze and table are the audio thread's. A
+// restored state is fitted and its table sent at once, and learning goes
 // on from it.
 ///////////////////////////////////////////////////////////////////////////////
 class formant_worker
@@ -37,6 +38,7 @@ class formant_worker
 public:
 
    using table_type = q::formant_table;
+   using state_type = q::spectral_learner::state;
 
    static constexpr std::size_t block_size = 256;
 
@@ -48,8 +50,8 @@ public:
    void                 stop();
    void                 learn();
    float                coverage() const;
-   std::optional<table_type> saved_table() const;
-   void                 restore(table_type const& t);
+   std::optional<state_type> saved() const;
+   void                 restore(state_type s);
 
    // Audio thread.
    void                 feed(std::span<float const> in);
@@ -61,6 +63,7 @@ private:
    void                 run();
    void                 take(float const* p, std::size_t n);
    void                 fit();
+   void                 snapshot();
 
    // Audio thread to worker: the input, in blocks of block_size.
    q::ring_allocator    _input{1 << 18};
@@ -78,10 +81,11 @@ private:
    std::atomic<float>   _coverage = 0.0f;
    std::size_t          _blocks = 0;
 
-   // The latest table, for saving, and one restored, for sending.
+   // What was learned, as of the last fit, for saving; and a state
+   // restored, for the worker to take up.
    mutable std::mutex   _mutex;
-   std::optional<table_type> _latest;
-   std::optional<table_type> _restored;
+   std::optional<state_type> _saved;
+   std::optional<state_type> _restored;
 };
 
 #endif
