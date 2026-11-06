@@ -13,6 +13,18 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-11-06
 
+`77a303e5`: `bacf_pitch_shifter` no longer plays a pick twice when its
+read has already reached it. Near unity (a vibrato) the read sits about 1
+ms behind the input and plays a pick's onset before the pick is detected;
+going up, the shifter still waited for the pick's period, jumped the read
+back behind the pick and, after the 20 ms wait, restarted at its start,
+playing the onset again (Joel: double attacks in GStaccato, take 55). A
+read within the pre-roll and a fade of the pick's start now plays the pick
+where it is and, going up, holds at the headroom until the period locks;
+a ratio of 1 still restarts. In the vibrato, picks played twice 9 of 28
+to none, and the attack's latency worst 20.8 to 1.6 ms. New test: GStaccato
+at +0.3 st, 10 of 39 picks played twice before, none now. Take 56.
+
 `c1f11cc0`: the formant table, learner and corrector pages follow
 `3d8de1a3`: `row`, `set` (a new Mutators section), `steps = 4`, about 13
 KB, and their costs measured again on the M2 and the H723, the ratio
