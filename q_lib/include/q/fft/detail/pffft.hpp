@@ -29,7 +29,7 @@
 #  define CYCFI_Q_PFFFT_DEFINED_NEON
 # endif
 #elif defined(__x86_64__) || defined(_M_X64) || defined(__SSE__)
-# include <xmmintrin.h>
+# include <immintrin.h>
 #endif
 
 #define PFFFT_EXPORT static inline
