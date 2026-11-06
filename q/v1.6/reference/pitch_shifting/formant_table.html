@@ -877,10 +877,10 @@ This API is new and unstable: it may change in any release, without a deprecatio
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The formant table holds the spectral envelope <code>F</code> and the moved spectral envelope <code>F(f/r)</code> for every ratio on a grid: <code>steps</code> a semitone, from <code>lo</code> to <code>hi</code> semitones. Each row is an all-pole model of the spectral envelope. A table is plain data, about 50 KB at order 32: allocate it, have a <code><a href="formant_learner.html" class="xref page">Formant Learner</a></code> fit it, and hand it to a <code><a href="formant_corrector.html" class="xref page">Formant Corrector</a></code>.</p>
+<p>The formant table holds the spectral envelope <code>F</code> and the moved spectral envelope <code>F(f/r)</code> for every ratio on a grid: <code>steps</code> a semitone, from <code>lo</code> to <code>hi</code> semitones. Each row is an all-pole model of the spectral envelope. A table is plain data, about 13 KB at order 32: allocate it, have a <code><a href="formant_learner.html" class="xref page">Formant Learner</a></code> fit it, and hand it to a <code><a href="formant_corrector.html" class="xref page">Formant Corrector</a></code>.</p>
 </div>
 <div class="paragraph">
-<p>Each row is an all-pole model of the spectral envelope: its reflection coefficients, as many as the model&#8217;s order, which the corrector&#8217;s lattice filters take as they are, and its level. See <code><a href="formant_preservation.html" class="xref page">Formant Preservation</a></code> for how the rows are learned and used.</p>
+<p>Each row is an all-pole model of the spectral envelope: its reflection coefficients, as many as the model&#8217;s order, which the corrector&#8217;s lattice filters take, and its level. The coefficients are held in 16 bits, as a reflection coefficient is under 1 in magnitude, and the rows are a quarter of a semitone apart. Against 32-bit rows an eighth of a semitone apart, the correction stays within 0.2 dB in every third-octave band, on single notes and chords alike. See <code><a href="formant_preservation.html" class="xref page">Formant Preservation</a></code> for how the rows are learned and used.</p>
 </div>
 <div class="paragraph">
 <p>The order is given at construction, 32 by default. On a smaller core 24 costs the corrector about a quarter less, and on four guitars its correction stayed within 3 dB of the order-32 one; both sound good, 32 is the more accurate. The learner and the corrector are constructed with the order too, and take only tables of it.</p>
@@ -911,17 +911,24 @@ public:
 
    static constexpr int          lo = -24;
    static constexpr int          hi = 24;
-   static constexpr int          steps = 8;
+   static constexpr int          steps = 4;
    static constexpr std::size_t  num_rows = (hi - lo) * steps + 1;
 
    explicit                formant_table(std::size_t order = 32);
 
    std::size_t             order() const;
 
-   std::span&lt;float&gt;        k(std::size_t row);
-   std::span&lt;float const&gt;  k(std::size_t row) const;
-   float&amp;                  level(std::size_t row);
-   float                   level(std::size_t row) const;
+   void                    row(
+                              std::size_t i
+                            , std::span&lt;float&gt; k
+                            , float&amp; level
+                           ) const;
+   void                    set(
+                              std::size_t i
+                            , std::span&lt;float const&gt; k
+                            , float level
+                           );
+   float                   level(std::size_t i) const;
    std::size_t             unshifted() const;
    void                    at(
                               float ratio
@@ -960,9 +967,15 @@ public:
 <dd>
 <p>Object of type <code>std::span&lt;float&gt;</code>, <code>t.order()</code> long.</p>
 </dd>
+<dt class="hdlist1"><code>c</code>               </dt>
+<dd>
+<p>Object of type <code>std::span&lt;float const&gt;</code>, <code>t.order()</code>
+long.</p>
+</dd>
 <dt class="hdlist1"><code>v</code>               </dt>
 <dd>
-<p>Floating point value for a level.</p>
+<p>Floating point value for a level, or an lvalue of type
+<code>float</code> to receive one.</p>
 </dd>
 </dl>
 </div>
@@ -1016,16 +1029,17 @@ public:
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>t.k(i)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get or set the row <code>i&#8217;s reflection
-                          coefficients. Rows run from `lo</code> semitones
-                          up in <code>1 / steps</code> of a semitone.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::span&lt;float&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>t.row(i, k, v)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the row <code>i</code> into <code>k</code> and <code>v</code>: its
+                          reflection coefficients and its level. Rows
+                          run from <code>lo</code> semitones up in <code>1 / steps</code> of
+                          a semitone.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>t.level(i)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get or set the row `i&#8217;s level.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float&amp;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the level of the row <code>i</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>t.unshifted()</code></p></td>
@@ -1039,6 +1053,32 @@ public:
                           <code>v</code>, interpolated between the two grid rows
                           around it. Ratios beyond the grid take its
                           ends.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>t.set(i, c, v)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the row <code>i</code> to the reflection
+                          coefficients <code>c</code>, each rounded to 16 bits,
+                          and the level <code>v</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
 </tr>
 </tbody>

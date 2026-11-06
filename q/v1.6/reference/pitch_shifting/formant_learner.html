@@ -1138,8 +1138,8 @@ Measured at 48 kHz in blocks of 32 samples (0.67 ms), on an Apple M2 and on an S
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>fit()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">14 ms</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.9 s</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6 ms</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.6 s</p></td>
 </tr>
 </tbody>
 </table>
@@ -1147,7 +1147,7 @@ Measured at 48 kHz in blocks of 32 samples (0.67 ms), on an Apple M2 and on an S
 <p>The worst block is the one where a frame completes and its spectrum is analysed, every 25 ms; on the H723 it takes twice a block&#8217;s time. Both the bursts and the fit are why the learner runs off the audio thread; on a microcontroller, in a task below the audio interrupt, with refits far apart.</p>
 </div>
 <div class="paragraph">
-<p>Each core runs its default: <code>lpc_fft</code> on the M2, <code>lpc_clenshaw</code> on the H723, where <code>lpc_fft</code> would fit in 1.4 s. The learner allocates about 170 KB at 44.1 or 48 kHz (about 40 KB more with <code>lpc_fft</code> on the H723), and a <code><a href="formant_table.html" class="xref page">Formant Table</a></code> takes about 50 KB.</p>
+<p>Each core runs its default: <code>lpc_fft</code> on the M2, <code>lpc_clenshaw</code> on the H723, where <code>lpc_fft</code> would fit in 0.4 s. The learner allocates about 170 KB at 44.1 or 48 kHz (about 25 KB more with <code>lpc_fft</code>), and a <code><a href="formant_table.html" class="xref page">Formant Table</a></code> takes about 13 KB.</p>
 </div>
 </div>
 </div>
