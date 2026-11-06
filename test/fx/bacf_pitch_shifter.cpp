@@ -234,6 +234,88 @@ TEST_CASE("bacf_pitch_shifter: a pick restarts the read",
    REQUIRE(restart <= latency);
 }
 
+TEST_CASE("bacf_pitch_shifter: a pick plays once, near unity",
+   "[bacf_pitch_shifter]")
+{
+   // Going up a little (a vibrato near unity), the read sits about a
+   // millisecond behind the input, so it plays a pick's onset before the
+   // pick is detected; the shifter must not jump back and play it again.
+   // Where the read is, at each 0.5 ms after a pick, is the delay that
+   // best matches 1.5 ms of the output to the input. A pick played twice
+   // is one the read passes, then falls back behind, then passes again.
+   float sps;
+   auto x = load("GStaccato", sps);
+   auto const ratio = std::exp2(0.3f / 12.0f);
+   auto y = shift(x, ratio, sps);
+
+   q::transient_detector detector{sps};
+   std::vector<std::size_t> picks;
+   for (std::size_t t = 0; t != x.size(); ++t)
+   {
+      if (detector(x[t]))
+         picks.push_back(t);
+   }
+   REQUIRE(picks.size() > 30);
+
+   auto const w = std::size_t(0.0015 * sps);
+   auto const max_lag = std::size_t(0.050 * sps);
+   auto read_at = [&](std::size_t i) -> long
+   {
+      double ss = 0;
+      for (std::size_t j = 0; j != w; ++j)
+         ss += double(y[i + j]) * y[i + j];
+      if (ss < 1e-10)
+         return -1;
+      double best = -2;
+      std::size_t lag_at = 0;
+      for (std::size_t lag = 0; lag != max_lag; ++lag)
+      {
+         double xy = 0, xx = 0;
+         for (std::size_t j = 0; j != w; ++j)
+         {
+            auto const r = double(x[i - lag + j]);
+            xy += y[i + j] * r;
+            xx += r * r;
+         }
+         auto const c = xy / (std::sqrt(ss * xx) + 1e-12);
+         if (c > best)
+         {
+            best = c;
+            lag_at = lag;
+         }
+      }
+      return best > 0.9 ? long(i - lag_at) : -1;
+   };
+
+   auto const ms = [&](double v) { return long(v * 0.001 * sps); };
+   int twice = 0;
+   for (auto p : picks)
+   {
+      if (p < max_lag || p + std::size_t(ms(45)) >= y.size())
+         continue;
+      auto const onset = long(p) - ms(1);
+      int state = 0;    // before it, past it, back behind it
+      for (auto i = long(p) - ms(2); i < long(p) + ms(45); i += ms(0.5))
+      {
+         auto const r = read_at(std::size_t(i));
+         if (r < 0)
+            continue;
+         if (state == 0 && r >= onset + ms(0.5))
+            state = 1;
+         else if (state == 1 && r < onset - ms(1))
+            state = 2;
+         else if (state == 2 && r >= onset + ms(0.5))
+         {
+            INFO("played twice: the pick at " << p / double(sps) << " s");
+            CHECK(false);
+            ++twice;
+            break;
+         }
+      }
+   }
+   CHECK(twice == 0);
+}
+
 TEST_CASE("bacf_pitch_shifter: unshifted, the input itself",
    "[bacf_pitch_shifter]")
 {

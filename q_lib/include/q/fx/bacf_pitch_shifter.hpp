@@ -161,7 +161,15 @@ namespace cycfi::q
       auto const env = _env(s);
       ++_since;
       if (_transient(s))
+      {
          transient();
+         // A read within a fade of the pick's start plays the pick's onset
+         // before a jump could cross away from it, so a restart would play
+         // it twice: the pick plays where the read is. Going up, the read
+         // holds at the headroom until the pick's period locks.
+         if (ratio != 1.0f && _tap.delay() <= float(_preroll + fade()))
+            _pending = false;
+      }
 
       // A lock since the last transient gives the lag; without one, the
       // last stands in.
