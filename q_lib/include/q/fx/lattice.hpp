@@ -74,20 +74,40 @@ namespace cycfi::q
       auto const n = _b.size();
       assert(k.size() == n);
       auto* bs = _b.data();
+      auto const* kp = k.data();
       float f = s;
       float older = bs[0];
       bs[0] = s;
-      for (std::size_t m = 1; m <= n; ++m)
+
+      // Four stages at a time, each group's coefficients and states read
+      // before any is written: the same operations in the same order as
+      // one stage at a time, with nothing for the compiler to reload.
+      std::size_t m = 1;
+      for (; m + 3 < n; m += 4)
+      {
+         auto const k0 = kp[m - 1], k1 = kp[m], k2 = kp[m + 1], k3 = kp[m + 2];
+         auto const b0 = older;
+         auto const b1 = bs[m], b2 = bs[m + 1], b3 = bs[m + 2];
+         older = bs[m + 3];
+         auto const f1 = f + k0 * b0;
+         auto const f2 = f1 + k1 * b1;
+         auto const f3 = f2 + k2 * b2;
+         auto const f4 = f3 + k3 * b3;
+         bs[m] = b0 + k0 * f;
+         bs[m + 1] = b1 + k1 * f1;
+         bs[m + 2] = b2 + k2 * f2;
+         bs[m + 3] = b3 + k3 * f3;
+         f = f4;
+      }
+      for (; m < n; ++m)
       {
          auto const b = older;            // b[m-1], one sample earlier
-         if (m < n)
-            older = bs[m];
-         auto const next = f + k[m - 1] * b;
-         if (m < n)
-            bs[m] = b + k[m - 1] * f;
+         older = bs[m];
+         auto const next = f + kp[m - 1] * b;
+         bs[m] = b + kp[m - 1] * f;
          f = next;
       }
-      return f;
+      return f + kp[n - 1] * older;       // the last stage keeps no b
    }
 
    inline std::size_t lattice_fir::order() const
@@ -112,12 +132,29 @@ namespace cycfi::q
       auto const n = _b.size();
       assert(k.size() == n);
       auto* bs = _b.data();
-      float f = s;
-      for (std::size_t m = n; m >= 1; --m)
+      auto const* kp = k.data();
+      float f = s - kp[n - 1] * bs[n - 1]; // the last stage keeps no b
+
+      // Four stages at a time, as in lattice_fir.
+      std::size_t m = n - 1;
+      for (; m >= 4; m -= 4)
       {
-         f -= k[m - 1] * bs[m - 1];
-         if (m < n)
-            bs[m] = bs[m - 1] + k[m - 1] * f;
+         auto const k0 = kp[m - 1], k1 = kp[m - 2], k2 = kp[m - 3], k3 = kp[m - 4];
+         auto const b0 = bs[m - 1], b1 = bs[m - 2], b2 = bs[m - 3], b3 = bs[m - 4];
+         auto const f0 = f - k0 * b0;
+         auto const f1 = f0 - k1 * b1;
+         auto const f2 = f1 - k2 * b2;
+         auto const f3 = f2 - k3 * b3;
+         bs[m] = b0 + k0 * f0;
+         bs[m - 1] = b1 + k1 * f1;
+         bs[m - 2] = b2 + k2 * f2;
+         bs[m - 3] = b3 + k3 * f3;
+         f = f3;
+      }
+      for (; m >= 1; --m)
+      {
+         f -= kp[m - 1] * bs[m - 1];
+         bs[m] = bs[m - 1] + kp[m - 1] * f;
       }
       bs[0] = f;
       return f;

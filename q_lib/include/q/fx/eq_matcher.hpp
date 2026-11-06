@@ -128,7 +128,8 @@ namespace cycfi::q
    {
       for (std::size_t m = 0; m != _k.size(); ++m)
          _k[m] = _kb[m] + _amount * (_ka[m] - _kb[m]);
-      _gain = std::pow(_level_b / _level_a, _amount);
+      auto const ratio = _level_b / _level_a;
+      _gain = _amount == 1.0f ? ratio : std::pow(ratio, _amount);
    }
 }
 
