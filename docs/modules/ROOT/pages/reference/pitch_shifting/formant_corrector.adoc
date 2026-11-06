@@ -131,16 +131,16 @@ The corrector runs two lattices of the table's order a sample, and every 32 samp
 | | Apple M2 | STM32H723
 
 | A sample, on average
-| 53 ns (0.25%)
-| 1.7 µs (8%)
+| 40 ns (0.2%)
+| 1.4 µs (7%)
 
 | Worst block of 32 samples
 | 2 µs (0.3%)
-| 63 µs (9%)
+| 45 µs (7%)
 
 | A sample at order 24
-| 40 ns (0.2%)
-| 1.3 µs (6%)
+| 30 ns (0.1%)
+| 1.1 µs (5%)
 |===
 
 The worst block holds a table read. At a ratio of 1 or an amount of 0 the filters rest and the input passes through, at almost no cost; when the ratio moves they start again from rest, where the correction is nearly flat. The corrector itself holds two filter states, as long as its order; the table it reads is shared.
