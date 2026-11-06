@@ -13,22 +13,31 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-11-06
 
-`c69f197e`: `spectral_learner::state`, what a learner has learned (the
+`f9794ab5`: `spectral_learner::state`, what a learner has learned (the
 average spectrum, its frame count, the sample rate, the coverage cells),
 with `save` and `restore`; learning goes on from a restored state as if it
 had not stopped, and a state from another sample rate is mapped onto the
 bins by frequency. `formant_learner` inherits it.
 
-`dea517ba`: Q Bender saves the learner's state with the session, not the
+`b3ef0b67`: Q Bender saves the learner's state with the session, not the
 fitted table, so a reload keeps learning where it stopped (a table alone
 was replaced by the next fit, from a few seconds of new audio) and shows
 its true coverage. The worker fits a restored state at once, and a restart
 at any sample rate takes up what the last learner learned; before, a
 re-activation threw the learning away. `test_bender_state` covers both.
 
-`a2a08773`: the formants bypass is an icon button on the Formants title,
+`4709d5cc`: the formants bypass is an icon button on the Formants title,
 lit while bypassed, with Elements' new `icons::bypass`; the Elements pin
 moves to `19586d01` for it.
+
+`badb364e`: Q Bender's bend readout moves from the plot's corner to the
+Bend title, where the curve cannot cross it (it did with Pull-up near
++12, seen in the E Chord demo video). `50edb94b`: the worker sets
+coverage before it sends a restored table, snapshots its state when it
+stops so a deactivated plugin saves all it learned, and nothing learned
+is not saved (an empty state broke clap-validator's state
+reproducibility); `test_bender_state` was failing now and then on the
+first.
 
 ## 2026-11-05
 
