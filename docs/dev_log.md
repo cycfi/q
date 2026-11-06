@@ -11,6 +11,25 @@ commits; the feature branches they first cited were squash-merged and no
 longer resolve. The full text before the trim: `git show
 308ddccb:docs/dev_log.md`.
 
+## 2026-11-06
+
+`c69f197e`: `spectral_learner::state`, what a learner has learned (the
+average spectrum, its frame count, the sample rate, the coverage cells),
+with `save` and `restore`; learning goes on from a restored state as if it
+had not stopped, and a state from another sample rate is mapped onto the
+bins by frequency. `formant_learner` inherits it.
+
+`dea517ba`: Q Bender saves the learner's state with the session, not the
+fitted table, so a reload keeps learning where it stopped (a table alone
+was replaced by the next fit, from a few seconds of new audio) and shows
+its true coverage. The worker fits a restored state at once, and a restart
+at any sample rate takes up what the last learner learned; before, a
+re-activation threw the learning away. `test_bender_state` covers both.
+
+`a2a08773`: the formants bypass is an icon button on the Formants title,
+lit while bypassed, with Elements' new `icons::bypass`; the Elements pin
+moves to `19586d01` for it.
+
 ## 2026-11-05
 
 `173cf337`: the pitch shifting pages and the BACF Lag Tracker page play
