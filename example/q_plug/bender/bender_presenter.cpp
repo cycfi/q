@@ -87,11 +87,11 @@ namespace
           , 1.0, false));
    }
 
-   // A framed panel with a button at the right of its title.
-   auto framed(char const* title, auto&& button, auto&& content)
+   // A framed panel with a control at the right of its title.
+   auto framed(char const* title, auto&& control, auto&& content)
    {
       return layer(
-         align_right(align_top(margin({0, 12, 18, 0}, std::move(button)))),
+         align_right(align_top(margin({0, 12, 18, 0}, std::move(control)))),
          framed(title, std::move(content)));
    }
 }
@@ -125,6 +125,7 @@ void bender_presenter::on_attach(elements::view& view_)
          });
    }
    auto scope = share(bend::scope{_ctl});
+   auto readout = share(bend::readout{*scope});
 
    // The wheel moves the Bend parameter, -1 to 1, and springs back.
    auto wheel = share(bend::wheel{});
@@ -155,7 +156,7 @@ void bender_presenter::on_attach(elements::view& view_)
                htile(
                   margin({6, 6, 6, 6},
                      layer(margin({8, 10, 8, 10}, hold(wheel)), frame{})),
-                  framed("Bend",
+                  framed("Bend", hold(readout),
                      layer(hold(editor), hold(scope))
                   ),
                   hsize(200, framed("Formants", hsize(44, hold(bypass)),
@@ -179,12 +180,13 @@ void bender_presenter::on_attach(elements::view& view_)
    // The trace and the learner's coverage move without any parameter
    // moving, so a timer redraws them.
    _attached = true;
-   _tick = [this, scope, coverage, &view_]
+   _tick = [this, scope, readout, coverage, &view_]
    {
       if (!_attached)
          return;
       scope->poll();
       view_.refresh(*scope);
+      view_.refresh(*readout);
       view_.refresh(*coverage);
       view_.post(frame_time, _tick);
    };

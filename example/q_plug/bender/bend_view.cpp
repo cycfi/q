@@ -207,13 +207,31 @@ namespace bend
       cnv.add_circle(sx(x_of_travel(travel_of(range, now))), sy(now), 5);
       cnv.fill_style(dot_color);
       cnv.fill();
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   readout::readout(scope const& s)
+    : _scope{s}
+   {}
+
+   view_limits readout::limits(basic_context const&) const
+   {
+      return {{90, 32}, {90, 32}};
+   }
+
+   void readout::draw(context const& ctx)
+   {
+      auto& cnv = ctx.canvas;
+      auto state = cnv.new_state();
+      auto const b = ctx.bounds;
 
       char text[16];
-      std::snprintf(text, sizeof(text), "%+.1f st", _now);
-      cnv.font(get_theme().label_font.size(13));
-      cnv.text_align(canvas::right | canvas::top);
+      std::snprintf(text, sizeof(text), "%+.1f st", _scope.now());
+      cnv.font(get_theme().label_font.size(15));
+      cnv.text_align(canvas::right | canvas::middle);
       cnv.fill_style(line_color);
-      cnv.fill_text(text, plot.right - 4, plot.top + 4);
+      // Its right edge on the plot's, under it.
+      cnv.fill_text(text, b.right - 10, b.top + b.height() / 2);
    }
 
    ////////////////////////////////////////////////////////////////////////////

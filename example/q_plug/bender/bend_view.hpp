@@ -23,7 +23,8 @@ namespace elements = cycfi::elements;
 // Points 0 and 3 move up and down only; 1 and 2 mirror each other, and sit
 // where the bend range puts the middle's ends. Under the editor, the
 // frame: its grid, the middle shaded, and a trace of the bend after the
-// range over the last few seconds, with a dot where the bar is now.
+// range over the last few seconds, with a dot where the bar is now. The
+// bar's semitones are a readout of their own, out of the plot.
 ///////////////////////////////////////////////////////////////////////////////
 namespace bend
 {
@@ -67,6 +68,9 @@ namespace bend
       // Take what the audio thread has sent. Main thread.
       void                    poll();
 
+      // The bend now, in semitones.
+      float                   now() const { return _now; }
+
       static constexpr double trace_time = 4.0;  // seconds
 
    private:
@@ -75,6 +79,23 @@ namespace bend
       std::vector<float>      _trace;
       std::size_t             _head = 0;
       float                   _now = 0.0f;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // The bend now, as the scope last took it, in semitones.
+   ////////////////////////////////////////////////////////////////////////////
+   class readout : public elements::element
+   {
+   public:
+                              readout(scope const& s);
+
+      elements::view_limits   limits(elements::basic_context const& ctx)
+                                 const override;
+      void                    draw(elements::context const& ctx) override;
+
+   private:
+
+      scope const&            _scope;
    };
 
    ////////////////////////////////////////////////////////////////////////////
