@@ -66,8 +66,7 @@ namespace
       for (std::size_t i = 0; i != table_type::num_rows; ++i)
       {
          auto const& r = i == t->unshifted() ? base : other;
-         std::copy(r.k.begin(), r.k.end(), t->k(i).begin());
-         t->level(i) = r.level;
+         t->set(i, r.k, r.level);
       }
       return t;
    }
@@ -172,4 +171,26 @@ TEST_CASE("formant_corrector: applies F / F(f/r)", "[formant]")
          * double(base.level / other.level);
       CHECK_THAT(sine_gain(fc, f, 2.0f), WithinRel(expected, 0.02));
    }
+}
+
+TEST_CASE("formant_table: a row comes back within its 16 bits", "[formant]")
+{
+   table_type t{order};
+   coefficients k{};
+   for (std::size_t m = 0; m != order; ++m)
+      k[m] = 0.9999f * std::sin(0.7f * float(m + 1));
+   t.set(3, k, 0.25f);
+
+   coefficients back{};
+   float level;
+   t.row(3, back, level);
+   CHECK(level == 0.25f);
+   for (std::size_t m = 0; m != order; ++m)
+      CHECK(std::abs(back[m] - k[m]) <= 0.5f / 32767.0f);
+
+   // The others stay flat.
+   t.row(4, back, level);
+   CHECK(level == 1.0f);
+   for (auto v : back)
+      CHECK(v == 0.0f);
 }

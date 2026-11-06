@@ -48,9 +48,18 @@ namespace
 
    // The spectral envelope a row's model gives at f, in dB (1/|A|, its
    // level).
+   // A row's coefficients, as the table gives them out.
+   std::vector<float> k_of(table_type const& t, std::size_t row)
+   {
+      std::vector<float> k(t.order());
+      float level;
+      t.row(row, k, level);
+      return k;
+   }
+
    double model_db(table_type const& t, std::size_t row, double f)
    {
-      auto const k = t.k(row);
+      auto const k = k_of(t, row);
       auto const order = k.size();
       std::vector<double> a(order + 1, 0.0), prev;
       a[0] = 1;
@@ -120,7 +129,7 @@ TEST_CASE("formant_learner: a well-formed table", "[formant]")
    {
       REQUIRE(std::isfinite(table->level(i)));
       REQUIRE(table->level(i) > 0.0f);
-      for (auto k : table->k(i))
+      for (auto k : k_of(*table, i))
       {
          REQUIRE(std::isfinite(k));
          REQUIRE(std::abs(k) < 1.0f);
@@ -131,7 +140,7 @@ TEST_CASE("formant_learner: a well-formed table", "[formant]")
    std::vector<float> k(table->order());
    float level;
    table->at(1.0f, k, level);
-   auto const base = table->k(table->unshifted());
+   auto const base = k_of(*table, table->unshifted());
    CHECK(std::equal(k.begin(), k.end(), base.begin()));
    CHECK(level == table->level(table->unshifted()));
 }
@@ -145,7 +154,7 @@ TEST_CASE("formant_learner: at order 24", "[formant]")
    for (std::size_t i = 0; i != table_type::num_rows; ++i)
    {
       REQUIRE(table->level(i) > 0.0f);
-      for (auto k : table->k(i))
+      for (auto k : k_of(*table, i))
          REQUIRE(std::abs(k) < 1.0f);
    }
 
@@ -175,6 +184,6 @@ TEST_CASE("formant_learner: a restored learner fits the same table", "[formant]"
    for (std::size_t i = 0; i != table_type::num_rows; ++i)
    {
       CHECK(ta->level(i) == tb->level(i));
-      CHECK(std::equal(ta->k(i).begin(), ta->k(i).end(), tb->k(i).begin()));
+      CHECK(k_of(*ta, i) == k_of(*tb, i));
    }
 }

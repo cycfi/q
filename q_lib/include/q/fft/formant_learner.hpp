@@ -27,10 +27,10 @@ namespace cycfi::q
    // only at construction.
    //
    // fit() fills a table from what has been learned: for every grid ratio,
-   // the spectral envelope as the shift leaves it, fitted with lpc_fit
-   // (see note 1). The model's order is given at construction, and fit()
-   // takes tables of that order. Response is lpc_fit's: how |A(f)|^2 is
-   // computed.
+   // the spectral envelope as the shift leaves it, fitted with lpc_fit on
+   // every `grid`th bin (see notes 1 and 3). The model's order is given at
+   // construction, and fit() takes tables of that order. Response is
+   // lpc_fit's: how |A(f)|^2 is computed.
    ////////////////////////////////////////////////////////////////////////////
    template <typename Response = detail::default_lpc_response>
    class basic_formant_learner : public spectral_learner
@@ -49,6 +49,7 @@ namespace cycfi::q
       std::size_t          order() const;
 
       static constexpr float        boost_cap_db = 9.0f;    // See note 2.
+      static constexpr std::size_t  grid = 2;               // See note 3.
 
    private:
 
@@ -57,12 +58,15 @@ namespace cycfi::q
       void                 shift(float ratio) const;
       double               level(float ratio, double err) const;
 
-      // Scratch, for fit().
+      // Scratch, for fit(). All but _full are on the fit's grid.
       mutable basic_lpc_fit<Response> _fit;
+      mutable spectrum_type _full;        // the spectral envelope, every bin
       mutable spectrum_type _env;
       mutable spectrum_type _shifted;
       mutable spectrum_type _a1;          // |A(f)|^2 of F
+      mutable spectrum_type _a2;          // |A(f)|^2 of the row
       mutable std::vector<float> _k1;      // F's reflection coefficients
+      mutable std::vector<float> _kr;      // the row's
       mutable double       _err1 = 1;     // F's prediction error
    };
 
@@ -74,11 +78,18 @@ namespace cycfi::q
    // 1. Each grid row is fitted to E(f/r), held at its top value past
    //    Nyquist (going down, the shift leaves nothing there), with the
    //    boost capped (note 2). Its level is scaled so the correction keeps
-   //    the learned material's average power, as the shift leaves it.
+   //    the learned material's average power, as the shift leaves it,
+   //    summed over the learned spectrum's own bins.
    //
    // 2. Going down, a full restoration lifts a band the shift has emptied
    //    by 30 dB or more, and the noise there with it. The correction
    //    F / F(f/r) boosts at most this much; cuts are not capped.
+   //
+   // 3. The spectral envelope is smooth (a third of an octave), so the
+   //    fits take every `grid`th bin, for half the work; each row's
+   //    correction stays within 0.2 dB of the full grid's within an octave
+   //    either way. The level is summed on every bin of the learned
+   //    spectrum, which holds lines: on the fit's grid it was 0.8 dB off.
    ////////////////////////////////////////////////////////////////////////////
 
    ////////////////////////////////////////////////////////////////////////////
@@ -104,11 +115,14 @@ namespace cycfi::q
    inline basic_formant_learner<Response>::basic_formant_learner(
       float sps, std::size_t order)
     : spectral_learner{sps}
-    , _fit{bins(), order}
-    , _env(bins())
-    , _shifted(bins())
-    , _a1(bins())
+    , _fit{(bins() - 1) / grid + 1, order}
+    , _full(bins())
+    , _env((bins() - 1) / grid + 1)
+    , _shifted((bins() - 1) / grid + 1)
+    , _a1((bins() - 1) / grid + 1)
+    , _a2((bins() - 1) / grid + 1)
     , _k1(order)
+    , _kr(order)
    {
    }
 
@@ -147,9 +161,10 @@ namespace cycfi::q
          if (from > last)
             continue;
          auto const moved = double(detail::at(mean, from));
+         auto const at = float(b) / float(grid);
          in += moved;
-         out += moved * gain2 * _fit.response(b)
-            / std::max(_a1[b], 1e-20f);
+         out += moved * gain2 * detail::at(_a2, at)
+            / std::max(detail::at(_a1, at), 1e-20f);
       }
       auto const g = out > 0 ? std::sqrt(in / out) : 1.0;
       return std::sqrt(err) / g;
@@ -162,7 +177,9 @@ namespace cycfi::q
       if (frames() == 0)
          return false;
 
-      spectral_envelope(_env);
+      spectral_envelope(_full);
+      for (std::size_t c = 0; c != _env.size(); ++c)
+         _env[c] = _full[c * grid];
       _err1 = _fit(_env, _k1);
       _fit.response(_a1);
 
@@ -172,8 +189,9 @@ namespace cycfi::q
             + float(i) / float(table_type::steps);
          auto const ratio = std::exp2(st / 12.0f);
          shift(ratio);
-         auto const err = _fit(_shifted, table.k(i));
-         table.level(i) = float(level(ratio, err));
+         auto const err = _fit(_shifted, _kr);
+         _fit.response(_a2);
+         table.set(i, _kr, float(level(ratio, err)));
       }
       return true;
    }

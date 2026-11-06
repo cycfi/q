@@ -12,6 +12,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <span>
 #include <vector>
 
@@ -23,12 +24,14 @@ namespace cycfi::q
    // envelope as a pitch shift by a ratio r leaves it, F(f/r), fitted on a
    // grid of ratios: `steps` a semitone from `lo` to `hi` semitones. Each
    // row is the model's reflection coefficients, as many as its order, and
-   // its level. The unshifted row is F itself. formant_learner fills it;
-   // formant_corrector reads it.
+   // its level. The unshifted row is F itself. formant_learner fills it
+   // (set); formant_corrector reads it (row, at).
    //
-   // The order is given at construction, the only place it allocates: 32 by
-   // default; 24 on a smaller core, a quarter cheaper for the corrector and
-   // still close.
+   // The coefficients are held in 16 bits (Q15; a reflection coefficient
+   // is under 1 in magnitude, and a lattice takes the rounding well): about
+   // 13 KB at order 32. The order is given at construction, the only place
+   // it allocates: 32 by default; 24 on a smaller core, a quarter cheaper
+   // for the corrector and still close.
    ////////////////////////////////////////////////////////////////////////////
    class formant_table
    {
@@ -36,17 +39,24 @@ namespace cycfi::q
 
       static constexpr int          lo = -24;
       static constexpr int          hi = 24;
-      static constexpr int          steps = 8;
+      static constexpr int          steps = 4;
       static constexpr std::size_t  num_rows = (hi - lo) * steps + 1;
 
       explicit                formant_table(std::size_t order = 32);
 
       std::size_t             order() const;
 
-      std::span<float>        k(std::size_t row);
-      std::span<float const>  k(std::size_t row) const;
-      float&                  level(std::size_t row);
-      float                   level(std::size_t row) const;
+      void                    row(
+                                 std::size_t i
+                               , std::span<float> k
+                               , float& level
+                              ) const;
+      void                    set(
+                                 std::size_t i
+                               , std::span<float const> k
+                               , float level
+                              );
+      float                   level(std::size_t i) const;
       std::size_t             unshifted() const;
       void                    at(
                                  float ratio
@@ -56,8 +66,11 @@ namespace cycfi::q
 
    private:
 
+      static constexpr float  q15 = 32767.0f;
+      static constexpr float  from_q15 = 1.0f / q15;
+
       std::size_t             _order;
-      std::vector<float>      _k;         // num_rows rows of _order
+      std::vector<std::int16_t> _k;       // num_rows rows of _order, Q15
       std::vector<float>      _level;
    };
 
@@ -110,7 +123,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    inline formant_table::formant_table(std::size_t order)
     : _order{order}
-    , _k(num_rows * order, 0.0f)
+    , _k(num_rows * order, 0)
     , _level(num_rows, 1.0f)
    {
       assert(order > 0);
@@ -121,24 +134,29 @@ namespace cycfi::q
       return _order;
    }
 
-   inline std::span<float> formant_table::k(std::size_t row)
+   inline void formant_table::row(
+      std::size_t i, std::span<float> k, float& level) const
    {
-      return {_k.data() + row * _order, _order};
+      assert(i < num_rows && k.size() == _order);
+      auto const* r = _k.data() + i * _order;
+      for (std::size_t m = 0; m != _order; ++m)
+         k[m] = float(r[m]) * from_q15;
+      level = _level[i];
    }
 
-   inline std::span<float const> formant_table::k(std::size_t row) const
+   inline void formant_table::set(
+      std::size_t i, std::span<float const> k, float level)
    {
-      return {_k.data() + row * _order, _order};
+      assert(i < num_rows && k.size() == _order);
+      auto* r = _k.data() + i * _order;
+      for (std::size_t m = 0; m != _order; ++m)
+         r[m] = std::int16_t(std::lround(std::clamp(k[m], -1.0f, 1.0f) * q15));
+      _level[i] = level;
    }
 
-   inline float& formant_table::level(std::size_t row)
+   inline float formant_table::level(std::size_t i) const
    {
-      return _level[row];
-   }
-
-   inline float formant_table::level(std::size_t row) const
-   {
-      return _level[row];
+      return _level[i];
    }
 
    inline std::size_t formant_table::unshifted() const
@@ -158,10 +176,14 @@ namespace cycfi::q
       auto const i = std::min(std::size_t(u), num_rows - 2);
       auto const t = u - float(i);
 
-      auto const a = this->k(i);
-      auto const b = this->k(i + 1);
+      auto const* a = _k.data() + i * _order;
+      auto const* b = a + _order;
       for (std::size_t m = 0; m != _order; ++m)
-         k[m] = a[m] + t * (b[m] - a[m]);
+      {
+         auto const ka = float(a[m]) * from_q15;
+         auto const kb = float(b[m]) * from_q15;
+         k[m] = ka + t * (kb - ka);
+      }
       level = _level[i] + t * (_level[i + 1] - _level[i]);
    }
 
@@ -187,8 +209,9 @@ namespace cycfi::q
       _table = table;
       if (table)
       {
-         auto const row = table->unshifted();
-         _match.target(table->k(row), table->level(row));
+         float level;
+         table->row(table->unshifted(), _kr, level);
+         _match.target(_kr, level);
       }
       _count = 0;
    }
