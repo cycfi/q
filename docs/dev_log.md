@@ -13,6 +13,17 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-11-06
 
+`5ff1f94c`: `lattice_fir` and `lattice_iir` peel the last stage out of
+their loops (the only one that keeps no state, so no branch a stage) and
+run four stages at a time with each group's coefficients and states read
+before any is written; `eq_matcher` skips its `pow` at an amount of 1.
+Output bit for bit as before (shifter and corrector on four sources, two
+amounts). H723: the corrector 1.95 to 1.54 us a sample, a lattice 0.79 to
+0.55. About 8 instructions a stage remain, the M7's FPU issuing one at a
+time and its FMA overwriting the accumulator still needed for the state,
+so not the 2x a latency count suggested. From the formant filter design
+note (KB `e_whammy/formant_filter_optimization.md`).
+
 `f9794ab5`: `spectral_learner::state`, what a learner has learned (the
 average spectrum, its frame count, the sample rate, the coverage cells),
 with `save` and `restore`; learning goes on from a restored state as if it
