@@ -9,6 +9,7 @@
 #include "plugin_harness.hpp"
 #include "bender_controller.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <numbers>
@@ -85,8 +86,12 @@ TEST_CASE("The learning comes back with the session, and goes on")
    REQUIRE(wait_for([&]{ return a.worker.saved().has_value(); }));
    a.worker.stop();
 
+   // Stopped, everything it learned is in the state.
    auto const learned = *a.worker.saved();
    CHECK(learned.frames > 0);
+   auto const seen = float(std::count(learned.seen.begin(), learned.seen.end(), true))
+      / float(learned.seen.size());
+   CHECK(seen == a.worker.coverage());
    auto const state = a.state();
    REQUIRE(state.contains("formants"));
 
@@ -101,7 +106,7 @@ TEST_CASE("The learning comes back with the session, and goes on")
    // Started, it fits a table from it at once, with no new input.
    b.worker.start(44100);
    REQUIRE(wait_for([&]{ return b.worker.table() != nullptr; }));
-   CHECK(b.worker.coverage() == a.worker.coverage());
+   CHECK(b.worker.coverage() == seen);
    CHECK(b.worker.coverage() > 0.5f);
 
    // And a restart keeps it.

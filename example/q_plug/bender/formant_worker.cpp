@@ -118,6 +118,7 @@ void formant_worker::run()
       {
          _learner->learn();
          _blocks = 0;
+         _coverage = 0.0f;
          snapshot();
       }
 
@@ -132,9 +133,12 @@ void formant_worker::run()
          std::lock_guard<std::mutex> lock{_mutex};
          restored.swap(_restored);
       }
+      // Its coverage before its table, so whoever sees the table sees
+      // what it covers.
       if (restored && _learner->restore(*restored))
       {
          _blocks = 0;
+         _coverage = _learner->coverage();
          fit();
       }
 
@@ -147,6 +151,9 @@ void formant_worker::run()
       _coverage = _learner->coverage();
       std::this_thread::sleep_for(nap);
    }
+
+   // Stopped: what was learned since the last fit is kept too.
+   snapshot();
 }
 
 void formant_worker::take(float const* p, std::size_t n)

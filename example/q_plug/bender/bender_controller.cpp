@@ -28,8 +28,9 @@ parameter_list bender_controller::parameters() const
 // rate it was learned at, and the cells seen.
 void bender_controller::save_extra(json& j) const
 {
+   // Nothing learned is nothing to save.
    auto s = worker.saved();
-   if (!s)
+   if (!s || !(s->frames > 0))
       return;
 
    j["formants"] = {
