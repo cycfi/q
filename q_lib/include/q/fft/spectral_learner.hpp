@@ -213,8 +213,9 @@ namespace cycfi::q
       {
          if (p[b] < top * 1e-4f || p[b] < p[b - 1] || p[b] < p[b + 1])
             continue;
-         auto const left = *std::min_element(&p[b - 4], &p[b]);
-         auto const right = *std::min_element(&p[b + 1], &p[b + 5]);
+         auto const at = p.begin() + b;
+         auto const left = *std::min_element(at - 4, at);
+         auto const right = *std::min_element(at + 1, at + 5);
          if (p[b] < 2.0f * std::max(left, right))
             continue;
          auto const cell = 6.0f * std::log2(float(b) * bin_hz / 80.0f);
@@ -372,8 +373,9 @@ namespace cycfi::q
       {
          if (db[b] < top - 70.0f || db[b] < db[b - 1] || db[b] < db[b + 1])
             continue;
-         auto const left = *std::min_element(&db[b - 8], &db[b]);
-         auto const right = *std::min_element(&db[b + 1], &db[b + 9]);
+         auto const at = db.begin() + b;
+         auto const left = *std::min_element(at - 8, at);
+         auto const right = *std::min_element(at + 1, at + 9);
          if (db[b] - std::max(left, right) < 3.0f)
             continue;
 
