@@ -35,6 +35,14 @@ namespace
       bool hi;
    };
 
+   // The Formants parameter, inverted, for the bypass button: lit while
+   // the formants are bypassed.
+   struct bypassed
+   {
+      double position(double v) const { return v > 0.5 ? 0.0 : 1.0; }
+      double value(double pos) const { return pos > 0.5 ? 0.0 : 1.0; }
+   };
+
    auto make_dial()
    {
       return share(dial(radial_marks<20>(basic_knob<60>())));
@@ -78,6 +86,14 @@ namespace
           , margin({14, 42, 14, 14}, std::move(content))
           , 1.0, false));
    }
+
+   // A framed panel with a button at the right of its title.
+   auto framed(char const* title, auto&& button, auto&& content)
+   {
+      return layer(
+         align_right(align_top(margin({0, 12, 18, 0}, std::move(button)))),
+         framed(title, std::move(content)));
+   }
 }
 
 bender_presenter::bender_presenter(bender_controller& ctl)
@@ -115,8 +131,10 @@ void bender_presenter::on_attach(elements::view& view_)
    bind(ctl::bend_id, wheel, params[ctl::bend_id]);
 
    // The formants.
-   auto on = switch_button("On");
-   bind(ctl::formants_id, on, params[ctl::formants_id]);
+   auto bypass = share(toggle_icon_button(
+      icons::bypass, icons::bypass, 1.2
+    , get_theme().default_button_color, button_on));
+   bind(ctl::formants_id, bypass, bypassed{});
    auto amount = make_dial();
    bind(ctl::amount_id, amount, params[ctl::amount_id]);
    auto freeze = switch_button("Freeze");
@@ -140,13 +158,12 @@ void bender_presenter::on_attach(elements::view& view_)
                   framed("Bend",
                      layer(hold(editor), hold(scope))
                   ),
-                  hsize(200, framed("Formants",
+                  hsize(200, framed("Formants", hsize(44, hold(bypass)),
                      vtile(
-                        align_right(hsize(60, hold(on))),
-                        captioned(
+                        margin_top({35}, captioned(
                            radial_labels<15>(hold(amount), 0.7
                             , "0", "25", "50", "75", "100")
-                         , "Amount (%)"),
+                         , "Amount (%)")),
                         margin_top({16}, centered(hold(learn))),
                         margin_top({8}, centered(hold(freeze))),
                         margin_top({12}, hold(coverage))

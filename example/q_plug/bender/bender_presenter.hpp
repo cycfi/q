@@ -15,7 +15,7 @@ namespace elements = cycfi::elements;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Two panels under the header. Bend: the bend range as a curve editor,
-// over the trace of the bend. Formants: on and off, the amount, Learn and
+// over the trace of the bend. Formants: bypass, the amount, Learn and
 // Freeze, and how much the learner has seen. A timer, while the editor is
 // open, takes the trace from the audio thread and redraws what moves.
 ///////////////////////////////////////////////////////////////////////////////
