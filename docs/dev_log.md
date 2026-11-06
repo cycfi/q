@@ -13,6 +13,12 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-11-06
 
+`c1f11cc0`: the formant table, learner and corrector pages follow
+`3d8de1a3`: `row`, `set` (a new Mutators section), `steps = 4`, about 13
+KB, and their costs measured again on the M2 and the H723, the ratio
+computed outside the timing (the corrector 1.4 us a sample on the H723,
+the fit 0.6 s).
+
 `3d8de1a3`: `formant_table` holds its coefficients in 16 bits (Q15) and
 its rows every quarter semitone, 193 of them: about 13 KB at order 32,
 from 51. Rows are read out with `row(i, k, level)` and written with
