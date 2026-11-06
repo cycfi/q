@@ -120,6 +120,8 @@ struct smoothed
 `delta`        :: Floating point value, the distance from the target within which the output snaps to the target. It is in the units of the smoothed value.
 `target`       :: Floating point value for the target.
 `v`            :: Floating point value for a state.
+`s`            :: Object of type `Smoother`.
+`x`            :: Floating point value for the smoother input.
 
 ==== Requirements on `Smoother`
 

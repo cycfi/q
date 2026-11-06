@@ -82,7 +82,7 @@ TEST_CASE("smoothed: converges to the target and settles, for every time constan
       CHECK(sm.settled());
       CHECK(i < max_samples);
       CHECK(y == 1.0f);          // snapped exactly, not just close
-      CHECK(sm() != 0.0f);
+      CHECK(sm() == 1.0f);       // the smoother itself lands on the target
    }
 }
 
@@ -172,6 +172,6 @@ TEST_CASE("smoothed: using dynamic smoother works as well as one-pole")
       CHECK(sm.settled());
       CHECK(i < max_samples);
       CHECK(y == 1.0f);          // snapped exactly, not just close
-      CHECK(sm() != 0.0f);
+      CHECK(sm() == 1.0f);       // the smoother itself lands on the target
    }
 }
