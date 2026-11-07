@@ -11,6 +11,28 @@ commits; the feature branches they first cited were squash-merged and no
 longer resolve. The full text before the trim: `git show
 308ddccb:docs/dev_log.md`.
 
+## 2026-11-07
+
+`76bf34c2`, `3239ccca`, `83b933ef`: `bacf_pitch_shifter` runs through a
+1 kHz one-pole low-pass (the tap, its splices and the tracker) and undoes
+it after the shift with the exact inverse at 1 kHz times the ratio, which
+fixes the harsh chord re-strums going up (take 70). Picks restart sooner:
+on the tracker's new `provisional()` lag (the pick's first pair of like
+pulses), with the cap down to 10 ms. Splices in flight always complete;
+near unity (under a semitone) one in flight at a pick turns around with
+the new `varispeed_tap::reverse()`, and with no period yet the read holds,
+so a pick still plays once. `bacf_lag_tracker` gains `drop(hint)` (a chord
+check: after a long last lag, a provisional lag must agree with it or
+repeat over one lag; take 75), a one-lag window after a drop, acquisition
+on both edges, a 40% pulse height gate, and a lag that drifts out of range
+now drops the lock instead of holding it (take 74). When the pick is heard
+from hz's blessed onsets at +12: 3.7 to 2.2 cycles median, 7.8 to 3.7 at
+p90, 97 to 29 over 10 ms. At rest the output is still the input, bit for
+bit. Going down the inverse lifts the highs a little (up to 2 to 3 dB
+above 10 kHz); Joel heard it as fine (take 76). New tests: reverse, the
+drifting lag, the provisional lag and its vet; the restart test checks a
+clean millisecond after the restart. The H723 cost is not measured yet.
+
 ## 2026-11-06
 
 `77a303e5`: `bacf_pitch_shifter` no longer plays a pick twice when its
