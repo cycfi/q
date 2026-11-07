@@ -13,6 +13,17 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-11-07
 
+`6cb72f6a`, `61c1f6ad`: two late pick restarts in `bacf_pitch_shifter`.
+Going up, a restart waits for the tap to be idle, but the sample a
+keep-off splice ended the next began, so a due restart could wait through
+several (GStaccato at 3.695 s: due at 10 ms, made at 18.4); the next
+keep-off splice now waits for it. And a lock before the first pick (in 7
+of 37 corpus files, three on 60 Hz hum) no longer stands in as the pick's
+lag. At +12 the worst pick 8.4 to 5.9 cycles, at +5 8.7 to 4.4; Joel hears
+no difference (take 77). On the H723 the port costs 0.83 to 0.94 us a
+sample against develop's 0.71 to 0.83, the worst block still about 100 us
+(15%).
+
 `76bf34c2`, `3239ccca`, `83b933ef`: `bacf_pitch_shifter` runs through a
 1 kHz one-pole low-pass (the tap, its splices and the tracker) and undoes
 it after the shift with the exact inverse at 1 kHz times the ratio, which
