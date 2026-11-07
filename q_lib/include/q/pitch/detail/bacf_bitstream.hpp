@@ -11,6 +11,7 @@
 #include <q/utility/bitstream_acf.hpp>
 #include <q/utility/ring_buffer.hpp>
 #include <q/utility/zero_crossing_collector.hpp>
+#include <infra/assert.hpp>
 
 #include <algorithm>
 #include <cstdint>
@@ -184,10 +185,11 @@ namespace cycfi::q::detail
       return _held >= w + lag + word_size;
    }
 
-   // `w` is whole words.
+   // `w` is whole words; the bits must reach back `w + lag`.
    inline std::uint32_t bacf_bitstream::mismatch(
       std::uint32_t lag, std::uint32_t w) const
    {
+      CYCFI_ASSERT(w + lag <= _pos, "bacf_bitstream: not enough history");
       auto const start = (_pos - w - lag) / word_size;
       bitstream_acf<> const acf{_bits};
       return std::uint32_t(acf(lag, start, w / word_size));

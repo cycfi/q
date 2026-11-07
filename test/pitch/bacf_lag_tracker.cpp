@@ -276,6 +276,31 @@ TEST_CASE("bacf_lag_tracker: after a long hint, a provisional lag is vetted")
    CHECK(other.first > plain.first);
 }
 
+TEST_CASE("bacf_lag_tracker: a provisional lag near the longest is vetted")
+{
+   // After a long hint, an estimate near the longest lag is vetted over one
+   // lag of it: the history must hold that lag, one lag of it and a word.
+   // 22.7 Hz repeats every 2115 samples, under the 45 ms (2160) longest; the
+   // hint, 1440, is not a clean multiple of it.
+   double const freq = 22.7;
+   double const period = sps / freq;
+   q::bacf_lag_tracker tr{2_ms, 45_ms, sps};
+   auto tone = [&](std::size_t i)
+      { return 0.5f * float(std::sin(2 * pi * freq * i / sps)); };
+   std::size_t const at = std::size_t(0.5 * sps);
+   for (std::size_t i = 0; i != at; ++i)
+      tr(tone(i));
+   tr.drop(1440.0f);
+   float prov = 0;
+   for (std::size_t i = at; i != at + std::size_t(0.5 * sps) && !prov; ++i)
+   {
+      tr(tone(i));
+      prov = tr.provisional();
+   }
+   REQUIRE(prov > 0.0f);
+   CHECK(on_multiple(prov, period));
+}
+
 TEST_CASE("bacf_lag_tracker: a pick's provisional lag comes before its lock")
 {
    q::wav_reader src{"audio_files/1a-Low-E.wav"};

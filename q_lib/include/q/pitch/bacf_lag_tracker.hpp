@@ -86,6 +86,10 @@ namespace cycfi::q
 
       struct scorer;
 
+      static std::size_t   history(
+                              std::uint32_t window, std::uint32_t max_lag
+                            , std::uint32_t min_window
+                           );
       void                 edge(bitstream::edge_kind k);
       float                one_lag_periodicity(std::uint32_t lag) const;
 
@@ -126,13 +130,24 @@ namespace cycfi::q
          std::lround(as_double(window) * sps / ws)) * ws)}
     , _bits{
          lin_float(hysteresis)
-       , ((_window + multiples * (_max_lag + sweep) + 2 * ws) / ws + 1) * ws
+       , history(_window, _max_lag, std::uint32_t(min_window * sps))
        , edge_capacity
       }
     , _slice{_window, std::uint32_t(min_window * sps)}
     , _lock{_min_lag, _max_lag, _window, std::uint32_t(threshold * _window)}
     , _prov{_min_lag, _max_lag, long_hint * sps}
    {}
+
+   // The bits a score can reach back: its window (the full one, or one lag
+   // of the slice at the longest lag, whichever is longer), the lag, and a
+   // word for the window's alignment.
+   inline std::size_t bacf_lag_tracker::history(
+      std::uint32_t window, std::uint32_t max_lag, std::uint32_t min_window)
+   {
+      auto const one_lag =
+         (std::max(max_lag, min_window) + ws - 1) / ws * ws;
+      return std::max<std::size_t>(window, one_lag) + max_lag + ws;
+   }
 
    // One sample; true while locked.
    inline bool bacf_lag_tracker::operator()(float s)
