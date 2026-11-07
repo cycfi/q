@@ -13,6 +13,22 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-11-07
 
+`e6cbf253`, `7cb9bc2e`: two latent faults in the lag tracker, found while
+documenting it. The slice marked "no drop yet" with a fixed clock value
+(`0x80000000`), and `reset()` does not restart the clock, so past 2^31
+samples (13.5 hours at 44.1 kHz) with no drop it read as a recent one; the
+slice now keeps a flag. The history was sized one window more than a score
+needs; it is now the furthest a score reaches (the longer of the window and
+one lag at the longest lag, plus that lag and a word), and
+`bacf_bitstream::mismatch()` asserts it in debug builds. Outputs are bit for
+bit those of before on the 37 corpus files.
+
+`354070e7`, `0160a065`, `da699840`: the provisional's check is described as
+what it is, a check after a long last lag (a chord, a low note, a doubled
+lock), and the internals pages now state every rule as the code applies it,
+with a figure of the strummed guitar's re-strum (one pair of like pulses at
+5.03 ms in a chord that repeats at 24.2 ms).
+
 `49d6fca9`, `c6bfa805`: `bacf_lag_tracker` is split into four parts in
 `q/pitch/detail/`, each with its own tests: `bacf_bitstream` (the
 comparator, the bit history, edges, pulses and the mismatch score),
