@@ -108,6 +108,7 @@ namespace cycfi::q
       median3              _lag_median;
       exp_moving_average<8> _lag_average;
       float                _last_lag = 0.0f;
+      bool                 _picked = false;    // a pick since the start
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -158,6 +159,7 @@ namespace cycfi::q
       _lag = 0.0f;
       _prov = 0.0f;
       _last_lag = 0.0f;
+      _picked = false;
    }
 
    // The shortest lag: lag_floor crossfades, so a short period is spliced
@@ -285,8 +287,10 @@ namespace cycfi::q
    {
       _since = 0;
       _pending = true;
-      if (_acquired)
+      // A lock before the first pick (hum, a scrape) is no note's lag.
+      if (_acquired && _picked)
          _last_lag = _lag;
+      _picked = true;
       _acquired = false;
       _prov = 0.0f;
       _tracker.drop(_last_lag);
