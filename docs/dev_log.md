@@ -13,6 +13,18 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-11-07
 
+`49d6fca9`, `c6bfa805`: `bacf_lag_tracker` is split into four parts in
+`q/pitch/detail/`, each with its own tests: `bacf_bitstream` (the
+comparator, the bit history, edges, pulses and the mismatch score),
+`bacf_note` (the note since a drop and the window a score runs over),
+`bacf_lock` (acquire, track, miss) and `bacf_provisional` (the first estimate
+and the chord check). The tracker only wires them, and its outputs are bit
+for bit those of before on all 37 onset corpus files, as are the shifter's
+at -12, +5 and +12; on the H723 it costs about 5% less. Its defaults now use
+`-45_dB` and `11.6_ms`. The design is documented in a new Antora module,
+`internals`, kept off the main navigation; its index is the developers'
+entry point.
+
 `6cb72f6a`, `61c1f6ad`: two late pick restarts in `bacf_pitch_shifter`.
 Going up, a restart waits for the tap to be idle, but the sample a
 keep-off splice ended the next began, so a due restart could wait through
