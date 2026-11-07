@@ -21,14 +21,12 @@ namespace cycfi::q::detail
    // window, a lag and a word are all after the drop, so a score never
    // mixes the slice with what came before it.
    //
-   // Before any drop the slice began long ago (half the clock's wrap):
-   // scores run over the full window and no pulse is after it.
+   // Before any drop, and after reset(), there is no slice yet: scores run
+   // over the full window and no pulse is after it, at any clock.
    ////////////////////////////////////////////////////////////////////////////
    class bacf_slice
    {
    public:
-
-      static constexpr std::uint32_t never = 0x80000000u;
 
                            bacf_slice(
                               std::uint32_t window
@@ -52,7 +50,8 @@ namespace cycfi::q::detail
 
       std::uint32_t        _window;       // bits, whole words
       std::uint32_t        _min_window;
-      std::uint32_t        _drop = never;
+      std::uint32_t        _drop = 0;
+      bool                 _dropped = false;
       float                _hint = 0.0f;
       float                _peak = 0.0f;
    };
@@ -71,13 +70,15 @@ namespace cycfi::q::detail
    inline void bacf_slice::drop(std::uint32_t now, float hint)
    {
       _drop = now;
+      _dropped = true;
       _hint = hint;
       _peak = 0.0f;
    }
 
    inline void bacf_slice::reset()
    {
-      _drop = never;
+      _drop = 0;
+      _dropped = false;
       _hint = 0.0f;
       _peak = 0.0f;
    }
@@ -88,10 +89,10 @@ namespace cycfi::q::detail
          _peak = std::max(_peak, p.peak);
    }
 
-   // `t` at or after the drop.
+   // `t` at or after the drop; false with no drop yet.
    inline bool bacf_slice::after(std::uint32_t t) const
    {
-      return std::int32_t(t - _drop) >= 0;
+      return _dropped && std::int32_t(t - _drop) >= 0;
    }
 
    inline std::uint32_t bacf_slice::one_lag(std::uint32_t lag) const
@@ -103,6 +104,8 @@ namespace cycfi::q::detail
    inline std::uint32_t bacf_slice::window(
       std::uint32_t lag, std::uint32_t now) const
    {
+      if (!_dropped)
+         return _window;
       auto const since = now - _drop;
       if (since < lag + ws)
          return one_lag(lag);
@@ -113,7 +116,7 @@ namespace cycfi::q::detail
    // One lag of the slice, a lag back and a word more, all after the drop.
    inline bool bacf_slice::ready(std::uint32_t lag, std::uint32_t now) const
    {
-      return now - _drop >= one_lag(lag) + lag + ws;
+      return !_dropped || now - _drop >= one_lag(lag) + lag + ws;
    }
 }
 

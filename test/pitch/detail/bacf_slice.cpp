@@ -50,6 +50,29 @@ TEST_CASE("bacf_slice: before any drop, the full window")
    CHECK(slice.hint() == 0.0f);
 }
 
+TEST_CASE("bacf_slice: no drop yet, at any clock")
+{
+   // Before any drop, and after reset(), the slice has no start: the full
+   // window, every lag ready, no pulse after it, whatever the clock reads,
+   // past 2^31 samples and across the wrap included.
+   bacf_slice slice{window, min_window};
+   for (int pass = 0; pass != 2; ++pass)
+   {
+      for (std::uint32_t now : {0u, 0x7FFFFFFFu, 0x80000000u, 0x90000000u
+       , 0xFFFFFFF0u})
+      {
+         CHECK(slice.window(100, now) == window);
+         CHECK(slice.ready(100, now));
+         CHECK(!slice.after(now));
+         CHECK(!slice.after(now - 10));
+      }
+      slice.observe(bacf_pulse{0x90000000u, 0.5f, 20.0f});
+      CHECK(slice.peak() == 0.0f);
+      slice.drop(0x90000000u, 100.0f);
+      slice.reset();
+   }
+}
+
 TEST_CASE("bacf_slice: after a drop, one lag until the window clears it")
 {
    // A score at `lag` reaches a lag and a word back from its window's
