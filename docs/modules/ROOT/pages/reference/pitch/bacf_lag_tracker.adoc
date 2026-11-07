@@ -53,8 +53,8 @@ public:
                            duration min_lag
                          , duration max_lag
                          , float sps
-                         , decibel hysteresis = decibel{-45.0, direct_unit}
-                         , duration window = duration{0.0116}
+                         , decibel hysteresis = -45_dB
+                         , duration window = 11.6_ms
                         );
 
    bool                 operator()(float s);
