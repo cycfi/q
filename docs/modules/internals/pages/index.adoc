@@ -17,4 +17,4 @@ The public documentation does not link here; this page is the entry point.
   window a score runs over
 * xref:bacf/lock.adoc[bacf_lock]: acquiring, tracking and losing the lock
 * xref:bacf/provisional.adoc[bacf_provisional]: a note's first estimate,
-  and the chord check
+  and its check after a long lag

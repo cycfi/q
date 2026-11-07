@@ -22,49 +22,81 @@ image::bacf_lag_tracker_parts.svg[Parts of the BACF lag tracker, width=750]
   tracked edge by edge, tried at twice the lag on a miss, and dropped after
   two misses.
 * xref:bacf/provisional.adoc[`bacf_provisional`]: a note's first estimate of
-  its lag, before any lock, with the chord check.
+  its lag, before any lock, with its check after a long lag.
 * The lock and the provisional take pulses and edges as lists, newest
   first, and scores through a callable. Their tests run on scripted inputs,
   without audio.
 
+== Construction
+
+`bacf_lag_tracker(min_lag, max_lag, sps, hysteresis = -45_dB, window =
+11.6_ms)` sizes the parts, with `ws` the word size:
+
+* Lags in samples: `lround(min_lag * sps)`, `lround(max_lag * sps)`.
+* The window: `max(ws, lround(window * sps / ws) * ws)` bits, whole words.
+* `bacf_bitstream`: the hysteresis as a linear level, a history of
+  `max(window, one_lag(max_lag)) + max_lag + ws` bits, and rings of
+  `edge_capacity` (256). That is the furthest a score reaches back: its
+  window (the full one, or one lag of the slice, which at the longest lag
+  is longer), the lag, and a word for the window's alignment. `one_lag` is
+  the slice's, `max(lag, min_window)` rounded up to words.
+* `bacf_slice`: the window, and a `min_window` of `uint32(0.002 * sps)`.
+* `bacf_lock`: the lag range, the window, and `limit = uint32(threshold *
+  window)`, `threshold` 0.15.
+* `bacf_provisional`: the lag range, and `long_hint = 0.013 * sps`.
+
 == One sample
 
-`operator()(s)` passes the sample to the front end with a callback for the
-edges. Within a sample the steps run in this order:
+`operator()(s)` runs the front end on the sample with the edge callback
+below, then, if an estimate is `pending()`, vets it; it returns whether the
+lock holds. In order:
 
 . The front end detects an edge. At a trailing edge the pulse it ends goes
   into its pulse list first.
 . The callback runs at the edge, before the edge enters its list and before
   the sample's bit enters the history:
-.. at a trailing edge, the pulse goes to the slice, for its peak;
-.. locked, the lock tracks, against the earlier edges of this kind;
-.. unlocked, with two pulses or more, the provisional estimate is made if
-   there is none yet, then the lock tries to acquire from the latest pulse.
+.. at a trailing edge, the newest pulse goes to `slice.observe()`, for the
+   slice's peak;
+.. locked: `lock.track(edges of this kind, now, scorer)`;
+.. unlocked, with two pulses or more: `provisional.estimate(pulses,
+   slice)` if there is no estimate yet, then `lock.acquire(pulses,
+   scorer)`.
 . The front end updates the pulse in progress, stores the bit and advances
   the clock.
-. While an estimate waits to be vetted, the provisional vets it, now with
-  this sample's bit in the history.
+. If an estimate is pending, `provisional.vet(slice, now, periodicity)`,
+  now with this sample's bit in the history.
+
+The other calls: `drop(hint)` is `lock.drop()`, `slice.drop(now, hint)`
+and `provisional.drop()`; `reset()` resets all four parts. `lag()`,
+`locked()` and `periodicity()` are the lock's, `provisional()` is the
+provisional's `value()`, and `window()` is the window in bits.
 
 == Scores
 
-The tracker gives the lock a scorer with two calls:
+The scorer the tracker passes the lock, at the current `now`:
 
-* `fits(lag)`: the lag is in range, the history holds the slice's window at
-  that lag plus the lag and a word, and one lag of the slice can be scored.
-* `operator()(lag)`: the mismatches over the slice's window at that lag,
-  scaled to the full window, so one limit, 15% of the window, applies to
-  both windows.
+* `fits(lag)`: `min_lag <= lag <= max_lag`, and `bits.has(lag, w)` with `w
+  = slice.window(lag, now)`, and `slice.ready(lag, now)`.
+* `operator()(lag)`: `m = bits.mismatch(lag, w)`, the same `w`; `m` itself
+  when `w` is the full window, else `lround(m * window / w)`. Scaled to the
+  full window, one `limit` applies to both windows.
 
-The provisional is passed the match over one lag of the slice, unscaled.
+The periodicity the provisional's vet is passed, for a lag: `1 -
+bits.mismatch(lag, w) / w` with `w = slice.one_lag(lag)`, unscaled.
 
 == Invariants
 
 * The sample clock wraps; times are compared by their difference, never by
   their order.
-* A score never reaches before the last drop: until the full window is
-  after it, the window is one lag of the slice.
-* `lag()` changes only at an edge, or at a drop (unlocked, it holds).
-* Before any drop the slice began long ago: the full window, no estimate.
+* A score never reaches before the last drop: every score the lock makes
+  needs `fits()`, and the vet needs `slice.ready()`, both of which hold only
+  once the compared bits are all after it.
+* `lag()` changes only at an edge. A drop, or the loss of the lock, leaves it
+  at the last value held.
+* Before any drop there is no slice: the full window and no estimate, at any
+  clock value.
+* The history holds the furthest any score reaches back;
+  `bacf_bitstream::mismatch()` asserts it in debug builds.
 * Nothing allocates after construction.
 
 == Verification

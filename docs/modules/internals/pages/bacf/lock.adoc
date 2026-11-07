@@ -52,50 +52,79 @@ namespace cycfi::q::detail
 
 == Inputs
 
-A scorer with `fits(lag)`, whether a lag can be scored now, and
-`operator()(lag)`, its mismatches on the full window's scale. Mismatches
-under `limit` hold the lock. Pulses and edges come as lists, newest first,
-with `size()` and `operator[]`. The tracker passes the front end's lists
-and a scorer over the slice's window; the tests pass vectors and scripted
-scores.
+* A scorer with `fits(lag)`, whether a lag can be scored now, and
+  `operator()(lag)`, its mismatches on the full window's scale (see the
+  design page's Scores). A score holds the lock if it is under `limit`, in
+  mismatches; the tracker sets `limit` to `0.15 * window`, truncated.
+* Pulses and edges as lists, newest first, with `size()` and `operator[]`.
+
+The tracker passes the front end's lists and its scorer; the tests pass
+vectors and scripted scores. The tracker calls `acquire()` at each edge
+while unlocked, with at least two pulses, and `track()` at each edge while
+locked, with the edges of that edge's kind (not yet holding this edge).
 
 == Acquire
 
-Unlocked, `acquire(pulses, score)` scores the latest pulse against the like
-pulses before it (see `similar()`):
+`acquire(pulses, score)` does nothing with fewer than two pulses. It
+anchors on the newest pulse and walks back through the others, newest
+first; `d` is the anchor's `lead` minus the pulse's:
 
-* a lag under `min_lag` is passed over; past `max_lag`, or at the first lag
-  that does not fit, the search stops;
-* at most `partners` lags are scored;
-* the best under `limit` becomes the lock, with no fraction.
+* `d > max_lag`: the search stops.
+* `d < min_lag`, or the pulse is not similar to the anchor (`similar()`):
+  passed over.
+* `score.fits(d)` false: the search stops.
+* Otherwise `d` is scored; at most `partners` (3) are.
+
+The lowest score under `limit` wins; between equal scores, the first found,
+the shorter lag. It becomes the lock: the lag `d`, no fraction, the score as
+the last mismatch, no misses. With none under `limit`, nothing changes, the
+last mismatch included. Pulses are not tested against the drop; the fit is,
+through the slice's window (see xref:bacf/slice.adoc[`bacf_slice`]). Where
+the provisional takes the first similar pulse unscored, the lock scores up
+to three and keeps the best.
 
 == Track
 
-Locked, `track(edges, now, score)` runs at each edge:
+`track(edges, now, score)`, with `L` the held lag (its whole samples):
 
-. **Nudge.** The lag moves to this edge's spacing from the earlier edge of
-  its kind nearest a lag back, if within `nudge` percent (at least 2
-  samples), so the lock follows a bend.
-. **Fit.** If the lag, `sweep` either side, cannot be scored, it is a miss.
-. **Sweep.** The lag and `sweep` either side are scored; the best's
-  fraction of a sample is a parabola through it and its neighbours,
-  clamped to half a sample.
-. **Multiples.** If the best misses, twice the lag and `2 * sweep` either
-  side are scored (up to `multiples` times the lag), since a chord's
-  common period is a multiple of each note's.
-. **Keep or miss.** The best under `limit` is the new lag and clears the
-  misses. Otherwise it is a miss.
+. **Nudge.** `tol = max(2, L * nudge / 100)`, in whole samples (`nudge` is
+  3). Through the edges, newest first, with `d = now - edge`: the search
+  stops at the first `d > L + tol`; the `d` with the smallest `|d - L|`, if
+  that is at most `tol`, is the lag to score (between equals, the first
+  found). With none, `L` itself. This follows a bend in pitch.
+. **Fit.** If `score.fits(lag - sweep)` or `score.fits(lag + sweep)` is
+  false, it is a miss and `track()` ends there: the fraction and the last
+  mismatch are unchanged.
+. **Sweep.** The lags `lag - sweep` to `lag + sweep` (`sweep` is 2) are
+  scored. The best is the lowest; between equals, the first, the shortest
+  lag. If it is not at either end, the fraction is the vertex of the
+  parabola through it and its two neighbours, `0.5 * (l - r) / (l - 2c +
+  r)`, clamped to plus or minus half a sample, when the denominator is
+  positive; otherwise 0. The fraction is set here, whatever follows.
+. **Multiples.** While the best score is not under `limit`, for `k = 2` to
+  `multiples` (2): if `k * lag - k * sweep` and `k * lag + k * sweep` both
+  fit, the lags between them are scored, and any lower than the best so far
+  replaces it, with the fraction set to 0; if either end does not fit, this
+  step ends. A chord's common period is a multiple of each note's, so a
+  lock on one note's lag can move to the chord's.
+. **Keep or miss.** The best score becomes the last mismatch. Under `limit`:
+  the best lag is the lock and the misses go to 0. Otherwise a miss.
 
-`max_misses` misses in a row drop the lock. A lag that cannot be scored
-counts as a miss, so a lag that drifted out of range cannot hold the lock
-for good.
+A miss adds one to the misses; at `max_misses` (2) the lock drops (lag 0)
+and the misses go to 0. Before that, the lock holds its lag, with the
+fraction from this edge's sweep. A lag that cannot be scored counts as a
+miss, so a lag that drifted out of range cannot hold the lock for good.
 
 == Outputs
 
-`lag()` is the lag with its fraction; unlocked, the last good one, which
-`drop()` keeps and `reset()` clears. `periodicity()` is one minus the last
-score's mismatches over the window: 1 when the bits repeat exactly, 0.5 for
-noise.
+* `lag()`: while locked, the lag plus its fraction. Unlocked, the last one
+  it held: after each `acquire()` and `track()` that leaves it locked, the
+  held value is set to the lag plus its fraction. `drop()` keeps it,
+  `reset()` sets it to 0.
+* `periodicity()`: `1 - mismatch / window`, with the last mismatch recorded
+  (1 before any score): 1 when the bits repeat exactly, 0.5 for noise.
+* `drop()`: unlocked, no misses; the fraction, held lag and last mismatch
+  stay. `reset()`: all of it to 0.
 
 == Tests
 

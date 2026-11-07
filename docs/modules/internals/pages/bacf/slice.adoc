@@ -19,8 +19,6 @@ namespace cycfi::q::detail
    {
    public:
 
-      static constexpr std::uint32_t never = 0x80000000u;
-
                            bacf_slice(
                               std::uint32_t window
                             , std::uint32_t min_window
@@ -42,32 +40,40 @@ namespace cycfi::q::detail
 
 == The slice
 
-`drop(now, hint)` begins a slice at `now` on the sample clock. `hint` is the
-last good lag before it (0 for none); the provisional uses it to tell a
-chord's re-strum. `observe(p)` takes each completed pulse, and `peak()` is
-the highest one since the drop. `after(t)` is true for a time at or after
-the drop, by the clock's difference, so it holds across the wrap.
+`drop(now, hint)` begins a slice at `now` on the sample clock, stores
+`hint`, the last good lag before it in samples (0 for none), and sets the
+peak to 0. `observe(p)` takes each completed pulse: if `after(p.lead)`, the
+peak becomes the larger of the two. `after(t)` is
+`std::int32_t(t - drop) >= 0` once there is a drop: the difference on the
+wrapping clock, true for a time up to 2^31^ samples after the drop.
 
-Before any drop, and after `reset()`, the drop is `never`: half the clock's
-wrap ago. No pulse is after it, and every window is full.
+Before any drop, and after `reset()`, there is no slice: `after()` is false
+for every time, `window()` is the full window and `ready()` is true, at any
+clock value. A flag says whether a drop has been made; `drop()` sets it and
+`reset()` clears it, with the hint and peak.
 
 == The window
 
-A score at a lag compares the window ending now with the window one lag
-earlier, so it reaches a lag, the window and a word back. Until all of that
-is after the drop, a full window would mix the slice with what came before it.
+A score at `lag` compares the latest bits of a window with those `lag`
+earlier (see xref:bacf/bitstream.adoc[`bacf_bitstream`]), so it reaches
+back the window, the lag and up to a word. Until all of that is after the
+drop, a full window would mix the slice with what came before it. With
+`since = now - drop`:
 
-* `one_lag(lag)`: the lag, at least `min_window`, rounded up to whole words.
-  The shortest score.
-* `window(lag, now)`: `one_lag(lag)` until the full window, the lag and a
-  word are all after the drop; the full window from then on.
-* `ready(lag, now)`: one lag of the slice can be scored, that is
-  `one_lag(lag)`, the lag and a word are after the drop.
+* `one_lag(lag)`: `max(lag, min_window)`, rounded up to whole words. The
+  tracker's `min_window` is 2 ms.
+* `window(lag, now)`: with no drop, the full window. Otherwise, if
+  `since < lag + word_size`, `one_lag(lag)`.
+  Else, with `clear = floor((since - lag - word_size) / word_size) *
+  word_size`, the full window if `clear >= window`, else `one_lag(lag)`.
+  So the full window from `since = window + lag + word_size` on.
+* `ready(lag, now)`: with no drop, true. Otherwise `since >= one_lag(lag) +
+  lag + word_size`: one lag of the slice can be scored.
 
 == Tests
 
 `test/pitch/detail/bacf_slice.cpp`: one lag's floor and rounding; the full
-window before any drop; the switch from one lag to the full window at the
-exact sample; `ready()` at its exact sample; the peak since the drop,
-ignoring earlier pulses, and starting over at a new drop; the clock's wrap;
-`reset()`.
+window before any drop, at any clock value and after `reset()`; the switch
+from one lag to the full window at the exact sample; `ready()` at its exact
+sample; the peak since the drop, ignoring earlier pulses, and starting over
+at a new drop; the clock's wrap; `reset()`.

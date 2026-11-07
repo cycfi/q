@@ -56,47 +56,84 @@ namespace cycfi::q::detail
 
 == The bitstream
 
-A comparator with hysteresis turns the signal into one bit a sample: it goes
-high when the signal rises over `hysteresis` and low when it falls under its
-negative. The bits are kept in a `bitset` of twice `history` and a word; when
-it fills, the latest `history` bits slide to its start (`history` is rounded
-up to whole words, so a slide moves whole words and keeps every word's
-alignment).
+The comparator starts low. At each sample `s`, it goes high when it is low
+and `s > hysteresis`, and low when it is high and `s < -hysteresis`; between
+the two it keeps its state. The tracker sets `hysteresis` to -45 dB (0.0056).
 
-`history()` counts the bits held, up to `history`. `has(lag, w)` is true
-when they reach the latest `w` bits, `lag` more and a word: enough for
-`mismatch(lag, w)`.
+`history` is rounded up to whole words, `keep`. The bits go into a `bitset`
+of `2 * keep + word_size` bits, one a sample, at the next free position.
+When `2 * keep` bits are stored, at the start of the next sample, the
+latest `keep` (the second half) are moved to the start and the rest is
+cleared, so the next bit goes at `keep`. A move of whole words keeps every
+bit's position within its word: a bit's position in its word is its sample
+index modulo `word_size`, always. `word_size` is the platform's natural
+word, 64 bits on a 64-bit host, 32 on an ARM Cortex-M.
+
+`history()` counts the bits stored since construction or `reset()`,
+saturating at `keep`. `has(lag, w)` is `history() >= w + lag + word_size`.
 
 == Edges and pulses
 
-A leading edge is where the bit goes high, a trailing edge where it goes
-low. Each kind is kept in its own ring of `capacity` times, and the pulses,
-one per completed high run, in a third. `edges(k)` and `pulses()` list them
-newest first.
+A leading edge is the sample where the comparator goes high, a trailing edge
+the sample where it goes low. Their times on the sample clock go into two
+rings, one per kind, and each completed pulse into a third; each ring holds
+`capacity` entries, and its count saturates there. `edges(k)` and
+`pulses()` list them newest first.
 
-A pulse's `lead` is its leading edge, `peak` its highest sample, and `width`
-the samples from the lead to the first one under `width_level` of the peak
-so far, or to the trailing edge if none is. `similar(a, b)` is the test the
-lock and the provisional use for two pulses of one waveform: heights within
-40%, widths within 15%.
+A pulse is measured over the samples where the comparator is high:
+
+* `lead`: the leading edge's time.
+* `peak`: the largest sample, starting from the leading edge's own.
+* `width`: set once, at the first sample, from the leading edge on, that is
+  under `width_level` (30%) of the peak so far: `width = t - lead`. If no
+  sample is, it is set at the trailing edge, to that edge's `t - lead`. It
+  says how soon the pulse falls from its peak, not how long the signal stays
+  above zero.
+
+`similar(a, b)` holds when `|a.peak - b.peak| <= 0.4 * max(a.peak, b.peak)`
+and `|a.width - b.width| <= 0.15 * max(a.width, b.width)` (`rel_within`;
+the width tolerance is `1 - zero_crossing_collector::pulse_width_diff`).
+The lock and the provisional use it; the provisional's page gives the
+reasons for both tolerances and a worked example.
 
 == One sample
 
-`bits(s, on_edge)` calls `on_edge(kind)` at a crossing, at that sample: the
-pulse a trailing edge ends is already in `pulses()`, the edge itself is not
-yet in `edges(kind)`, and the sample's bit is not yet in the history. Then
-the bit is stored and `now()` advances. The callback is a template
-parameter, inlined.
+`bits(s, on_edge)`, in order:
+
+. If `2 * keep` bits are stored, the move above.
+. A crossing: at a leading edge, the pulse in progress starts (`lead` and
+  `peak` this sample, `width` 0), `on_edge(leading)` runs, then the edge's
+  time goes into its ring. At a trailing edge, the pulse's width is set if
+  it is not yet, the pulse goes into the pulse ring, `on_edge(trailing)`
+  runs, then the edge's time goes into its ring.
+. While high, the pulse's peak and width are updated with this sample.
+. The sample's bit is stored, `now()` advances by one, `history()` by one
+  up to `keep`.
+
+So in `on_edge`, `now()` is the edge's sample, `pulses()` already holds the
+pulse a trailing edge ends, `edges(k)` does not yet hold this edge, and the
+history ends at the sample before. The callback is a template parameter,
+inlined. `now()` is a `std::uint32_t` from construction; `reset()` does not
+restart it, and it wraps.
 
 == The score
 
-`mismatch(lag, w)` counts the bits that differ between the latest `w` bits
-and the `w` bits `lag` earlier, with the end of the window aligned down to a
-word, through `bitstream_acf`. `w` is whole words.
+`mismatch(lag, w)`, with `w` a whole number of words and `p` the position
+of the next bit: `start = floor((p - w - lag) / word_size) * word_size`,
+and the result is the number of `i` in `[0, w)` where bit `start + i`
+differs from bit `start + lag + i`. The bits must reach back `w + lag`
+(`w + lag <= p`, asserted in debug builds); the owner sizes the history
+for the furthest score it makes. The later window ends between
+`word_size - 1` bits before the latest bit and the latest bit itself, and
+the earlier one `lag` before it. `bitstream_acf` counts it a word at a time
+with XOR and popcount.
 
 == Reset
 
-`reset()` empties the history, the edges and the pulses. The clock runs on.
+`reset()` clears the bits, the three rings' counts, the bit position and
+`history()`, and sets the comparator low. The pulse in progress is not
+cleared; with the comparator low, the next leading edge overwrites it. The
+clock runs on.
 
 == Tests
 
