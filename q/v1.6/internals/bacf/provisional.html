@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>bacf_provisional :: Q Docs</title>
+    <meta name="generator" content="Antora 3.1.15">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+<script defer src="../../../../_/js/lightbox.js"></script>
+<meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
+<link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="96x96" href="https://cycfi.com/assets/icons/favicon-96x96.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="https://cycfi.com/assets/icons/android-chrome-192x192.png"/>
+<link rel="icon" type="image/png" sizes="256x256" href="https://cycfi.com/assets/icons/android-chrome-256x256.png"/>
+<link rel="apple-touch-icon" type="image/png" href="https://cycfi.com/assets/icons/apple-touch-icon.png"/>
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <!--  Cycfi Logo -->
+      <a class="m-nav__logo" href="https://www.cycfi.com">
+        <svg version="1.1" x="0px" y="0px" width="200" viewBox="0 0 600 100" style="padding-top: 15;" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(2.55, 0, 0, 2.62, -464.010406, -1042.918213)" fill="#202020">
+            <path d="M234.37,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.7-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-3.5-0.04-4.6,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.59,0.66-0.76,1.35c-0.14,0.84-0.18,1.03-0.19,1.43l-0.14,3.91 c-0.01,0.39,0.04,0.84,0.09,1.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h33.85 c0.8,0,1.45,0.67,1.42,1.47L234.37,431.65z"/>
+            <path d="M276.06,433.02H257.9c-0.8,0-1.45-0.67-1.42-1.47l0.15-4.18c0.03-0.76,0.65-1.37,1.42-1.37h14.16 c1.91,0,3.52,0,4.61-0.12c1.23-0.13,1.75-0.25,2.17-0.71c0.36-0.39,0.4-2.52,0.4-2.52h-27.92c-11.11,0-13.26-5.13-13.1-9.44 l0.12-3.38c0.03-0.76,0.65-1.37,1.42-1.37h8.43c0.8,0,1.45,0.67,1.42,1.47l-0.05,1.36c-0.02,0.46-0.01,2.03,0.11,2.51 c0.1,0.42,0.44,0.82,0.78,1.07c0.47,0.35,0.83,0.42,1.64,0.54c0.9,0.14,2.09,0.21,3.54,0.21h24.09l0.21-5.8 c0.03-0.76,0.65-1.37,1.42-1.37h8.46c0.8,0,1.45,0.67,1.42,1.47l-0.49,13.57c-0.06,1.58-0.46,3.96-1.12,5.07 c-0.68,1.15-1.71,2.08-3.04,2.76c-1.23,0.63-2.76,1.07-4.56,1.32C280.44,432.9,278.4,433.02,276.06,433.02L276.06,433.02z"/>
+            <path d="M401.95,431.55l0.78-21.72c0.03-0.76,0.65-1.37,1.42-1.37h8.59c0.8,0,1.45,0.67,1.42,1.47l-0.78,21.72 c-0.03,0.76-0.65,1.37-1.42,1.37h-8.59C402.56,433.02,401.92,432.35,401.95,431.55z"/>
+            <path d="M346.77,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.71-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-2.47-0.04-3.58,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.58,0.66-0.76,1.35c-0.14,0.84-0.22,2.03-0.23,2.43l-0.07,1.91 c-0.01,0.39,0.01,1.84,0.06,2.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h32.83 c0.8,0,1.45,0.67,1.42,1.47L346.77,431.65z"/>
+            <path d="M386.2,425.88l-24.93-0.03l-0.21,5.8c-0.03,0.76-0.65,1.37-1.42,1.37h-8.46c-0.8,0-1.45-0.67-1.42-1.47 l0.49-13.57c0.06-1.58,0.46-3.96,1.12-5.07c0.68-1.15,1.71-2.08,3.04-2.76c1.23-0.63,2.76-1.07,4.56-1.32 c1.7-0.24,3.75-0.36,6.08-0.36l0,0h33.68c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.18c-0.03,0.76-0.65,1.37-1.42,1.37H368.9 c-1.91,0-3.52,0-4.61,0.12c-1.23,0.13-1.75,0.25-2.17,0.71c-0.36,0.39-0.4,2.52-0.4,2.52h24.63c0.8,0,1.45,0.67,1.42,1.47 l-0.15,4.22C387.59,425.28,386.96,425.88,386.2,425.88z"/>
+          </g>
+        </svg>
+      </a>
+      <a class="navbar-item" href="https://www.cycfi.com">Q Docs</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="q" data-version="v1.6">
+  <aside class="nav">
+    <div class="panels">
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../../index.html">Q Audio DSP Library</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../installation.html">Setup and Installation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../setup.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../microcontrollers.html">Microcontrollers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../testing.html">Testing Q</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../q_plug/setup.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/standalone.html">The Standalone App</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/outside_project.html">Building Outside the Project</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/testing.html">Testing QPlug</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/advanced_builds.html">Advanced Builds</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials.html">Tutorials</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_basics">Basics</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/waveforms.html">Waveforms</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/io_delay.html">IO Delay</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_synthesis_and_midi">Synthesis and MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/square_synth.html">Square Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/poly_synth.html">Polyphonic Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/va_synth.html">Virtual Analog Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/fm_synth.html">FM Synth</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_granular">Granular</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/grain_freeze.html">Grain Freeze</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/sustain_hold.html">Sustain Hold</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_pitch_shifting">Pitch Shifting</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/whammy.html">Whammy Bar</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../q_plug/tutorials/index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/gain.html">Your First Plugin: Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/sampler.html">Sampler: Handing Data to the Audio Thread</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/looper.html">Looper: Work for the Main Thread</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_1.html">Anna I: The Voice</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_2.html">Anna II: The Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_3.html">Anna III: The Chorus</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_4.html">Anna IV: Drawn Envelopes</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_5.html">Anna V: Presets</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/dexter.html">Dexter: Full Featured DX7 Synth</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference.html">Reference</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/q_lib.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../fundamentals.html">Fundamentals</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/units.html">Units</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/frequency.html">Frequency</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/duration.html">Duration</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/period.html">Period</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/units/phase.html">Phase</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/units/phase_iterator.html">Phase Iterator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/decibel.html">Decibel</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/units/interval.html">Interval</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/units/pitch.html">Pitch</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/pitch_names.html">Pitch Names</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/literals.html">Literals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/biquad.html">Biquad</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/lowpass.html">Low Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/highpass.html">High Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/allpass.html">All Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/notch.html">Notch Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/peaking.html">Peaking Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/lowshelf.html">Low Shelf Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/highshelf.html">High Shelf Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/resonant.html">Resonant Filters</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/resonant/svf.html">State Variable Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/resonant/ladder.html">Ladder Filter</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/resonant/ota_ladder.html">OTA Ladder Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/resonant/chamberlin_filter.html">Chamberlin Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/envelope.html">Envelope</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/true_rms_envelope_follower.html">True RMS Envelope Follower</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/dynamic.html">Dynamic</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/dynamic/compressor.html">Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/dynamic/expander.html">Expander</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/dynamic/agc.html">AGC</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/misc.html">Miscellaneous</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/varispeed_tap.html">Varispeed Tap</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/sample_hold.html">Sample Hold</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/moving_maximum.html">Moving Maximum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/one_pole_highpass.html">One Pole High Pass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/smoothing.html">Smoothing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/dc_block.html">DC Block</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/dynamic_smoother.html">Dynamic Smoother</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/integrator.html">Integrator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/median3.html">Median</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/fast_downsample.html">Fast Downsample</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/differentiator.html">Differentiators</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/allpass.html">All-Pass Phase Shifters</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/hilbert_quadrature.html">Hilbert Quadrature</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/delta_gate.html">Delta Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/zero_crossing.html">Zero Crossing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/schmitt_trigger.html">Schmitt Trigger</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/window_comparator.html">Window Comparator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/edge.html">Edge Detectors</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/monostable.html">Monostable</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/peak.html">Peak</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/peak_picker.html">Peak Picker</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/spectral_flux.html">Spectral Flux</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/transient_detector.html">Transient Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/map.html">Map</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/clip.html">Clippers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/level_crossfade.html">Level Crossfade</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/signal_conditioner.html">Signal Conditioner</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/synth.html">Synthesizers</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/synth/sin_osc.html">Sine Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/synth/grain.html">Grain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/synth/va.html">Virtual Analog</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/analog_osc.html">Analog Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/sync.html">Hard Sync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Generators</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/noise_gen.html">Noise Generators</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/lfo_gen.html">LFO Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/synth/fm.html">FM Synthesis</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/fm_operator.html">FM Operator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/fm_routing.html">FM Routing</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/fm_algorithm.html">FM Algorithm</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/fm_voice.html">FM Voice</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/dx_patcher.html">DX Patcher</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/dx_sysex.html">DX System Exclusive</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/dx7_design.html">DX7 Design Notes</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/spectral.html">Frequency Domain</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/spectral/fft.html">FFT</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/spectral/spectral_learner.html">Spectral Learner</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/spectral/lpc_fit.html">LPC Fit</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/spectral/eq_matcher.html">EQ Matcher</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/spectral/convolver.html">Convolver</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/support.html">Support</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/base.html">Base</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/fast_math.html">Fast Math</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/basic_concepts.html">Basic Concepts</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/flush_denormals.html">Flush Denormals</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/audio_stream.html">Audio Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/midi.html">MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/messages.html">MIDI 1.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/controller_numbers.html">MIDI Controller Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/notes.html">MIDI Notes</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/bend_range.html">Bend Range</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/midi2_messages.html">MIDI 2.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/processor.html">MIDI Processor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/readers.html">MIDI Readers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/stages.html">MIDI Stages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/translation.html">MIDI Translation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/per_note.html">Per-Note Expression</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/endpoint.html">MIDI Endpoint</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/ci.html">MIDI Capability Inquiry</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/conformance.html">MIDI 2.0 Conformance</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/utility.html">Utility</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/ring_buffer.html">Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/sample_interpolation.html">Sample Interpolation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/best_lag.html">Best Lag</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/antialiasing.html">Antialiasing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/float_convert.html">Sample Format Conversion</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/bitset.html">Bitset</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/handoff.html">Handoff</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/ring_allocator.html">Ring Allocator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/tasks.html">Tasks</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/audio_clock.html">Audio Clock</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/pitch.html">Pitch Detection</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch/bacf_period_detector.html">BACF Period Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch/bacf_pitch_detector.html">BACF Pitch Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch/bitstream_acf.html">Bitstream Autocorrelation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch/zero_crossing_collector.html">Zero Crossing Collector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch/bacf_follower.html">BACF Follower</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/pitch_shifting.html">Pitch Shifting</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch_shifting/bacf_pitch_shifter.html">BACF Pitch Shifter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/pitch_shifting/formant_preservation.html">Formant Preservation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/pitch_shifting/formant_learner.html">Formant Learner</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/pitch_shifting/formant_table.html">Formant Table</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/pitch_shifting/formant_corrector.html">Formant Corrector</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/q_io.html">QIO</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/audio_device.html">Audio Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/audio_file.html">Audio File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/midi_file.html">MIDI File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/midi_device.html">MIDI Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/midi_stream.html">MIDI Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/midi2_stream.html">MIDI 2.0 Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../q_plug/index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/architecture.html">Architecture</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/parameter.html">Parameters</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/data_stream.html">Data Streams</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/processor.html">Processor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/midi.html">MIDI</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/presenter.html">Presenter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/header.html">The Header</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/zoom.html">Zoom and Display Scale</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Q Audio DSP Library</span>
+    <span class="version">v1.6-beta.1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../../../v1.5/index.html">Q Audio DSP Library</a></div>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="../../index.html">v1.6-beta.1</a>
+        </li>
+        <li class="version is-latest">
+          <a href="../../../v1.5/index.html">v1.5</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../v1.5/index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../index.html">Q Audio DSP Library</a></li>
+    <li><a href="provisional.html">bacf_provisional</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">v1.6-beta.1</button>
+  <div class="version-menu">
+    <a class="version is-current" href="provisional.html">v1.6-beta.1</a>
+    <a class="version is-missing" href="../../../v1.5/index.html">v1.5</a>
+  </div>
+</div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">bacf_provisional</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>A note&#8217;s first estimate of its lag, before any lock, for the
+<a href="follower.html" class="xref page">BACF follower</a>. The follower gives it out as
+<code>provisional()</code>; the pitch shifter restarts a pick&#8217;s read on it.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/pitch/detail/bacf_provisional.hpp&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::detail
+{
+   class bacf_provisional
+   {
+   public:
+
+      static constexpr float        strong      = 0.6f;
+      static constexpr int          fractions   = 4;
+      static constexpr float        agree       = 0.02f;
+      static constexpr float        repeat      = 0.85f;
+
+                           bacf_provisional(
+                              std::uint32_t min_lag
+                            , std::uint32_t max_lag
+                            , float long_hint
+                           );
+
+                           template &lt;typename Pulses&gt;
+      void                 estimate(
+                              Pulses const&amp; pulses, bacf_slice const&amp; slice
+                           );
+
+                           template &lt;typename Periodicity&gt;
+      void                 vet(
+                              bacf_slice const&amp; slice, std::uint32_t now
+                            , Periodicity const&amp; periodicity
+                           );
+
+      bool                 estimated() const;
+      bool                 pending() const;
+      float                value() const;
+      void                 drop();
+      void                 reset();
+   };
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_estimate"><a class="anchor" href="#_the_estimate"></a>The estimate</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The follower calls <code>estimate(pulses, slice)</code> at each edge, leading and
+trailing, while unlocked, with at least two pulses and no estimate yet. A
+lock ends the attempts: if it comes first, the slice has no estimate. The
+estimate is the leading-edge spacing of one pair of pulses, in whole
+samples:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>The anchor:</strong> the newest completed pulse. If it began before the drop
+(<code>!slice.after(lead)</code>), or is not strong (<code>peak &lt; strong * slice.peak()</code>,
+<code>strong</code> 60%; at a trailing edge the slice&#8217;s peak already includes the
+anchor), there is no estimate at this edge; the next edge tries again with
+the pulse newest then.</p>
+</li>
+<li>
+<p><strong>The search:</strong> the pulses before it, newest first. A span under
+<code>min_lag</code> is passed over, and so is a pulse that is not similar. The
+search stops at the first similar pulse, whose span is the estimate, at a
+pulse that began before the drop, or at a span past <code>max_lag</code>. The first
+similar pulse is taken, not the best; no bits are scored.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><code>bacf_period_detector::predict_period()</code>, the period detector&#8217;s early
+prediction, pairs pulses the same way with the same 60%, with two
+differences: it takes the newest strong pulse in its frame as the anchor,
+rather than waiting for the newest pulse to be strong, and its search is
+bounded only by the frame (no drop, no lag range;
+<code>bacf_pitch_detector::predict_frequency()</code> then rejects a period under the
+minimum).</p>
+</div>
+<div class="paragraph">
+<p>Two pulses are similar (<code>similar()</code>, in <code>bacf_bitstream.hpp</code>) when both
+hold:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Height:</strong> their peaks are within 40% of the larger. The test in
+<code>zero_crossing_collector</code>, which <code>predict_period()</code> uses, allows 20%; the
+follower widened it to 40% for an earlier estimate (take 58&#8217;s pick path).</p>
+</li>
+<li>
+<p><strong>Width:</strong> their widths are within 15%
+(<code>zero_crossing_collector::pulse_width_diff</code>). A pulse&#8217;s width is the
+samples from its leading edge to the first sample under 30% of its peak so
+far, or to its trailing edge if it never falls that low: how soon the
+pulse falls from its peak, not how long the signal stays above zero.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>On a single note a pair forms about two periods in, before the lock: on the
+Low E test note, 15 ms after the pick against 40 ms. Without a long hint
+the estimate stands on this pulse test alone; its bits are not scored.</p>
+</div>
+<div class="paragraph">
+<p>At the re-strum of the next section, the estimate was made at the trailing
+edge 9.82 ms after the drop, when the slice&#8217;s peak was 0.460. The latest
+pulse and those before it, newest first:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 14.2857%;">
+<col style="width: 14.2857%;">
+<col style="width: 14.2857%;">
+<col style="width: 57.1429%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Lead (sample)</th>
+<th class="tableblock halign-left valign-top">Peak</th>
+<th class="tableblock halign-left valign-top">Width</th>
+<th class="tableblock halign-left valign-top">Against 243881</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">243881</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.354</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">32</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">the latest, strong: 0.354 is over 0.6 x 0.460 = 0.276</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">243791</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.156</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">33</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">not similar: heights 0.198 apart, over 40% of 0.354</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">243710</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.460</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">50</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">not similar: heights pass (0.106 apart), widths 18 apart, over 15% of 50</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">243659</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.270</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">35</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">similar: heights 0.084 apart, widths 3: the estimate, 222 samples (5.03 ms)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The pair passes only with the wider height test: at 20%, 0.084 is over
+0.2 x 0.354 = 0.071, and the two pulses are not similar. Both come from the
+chord, from different notes in it; a test of height and width cannot tell
+two notes' pulses apart.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_after_a_long_lag"><a class="anchor" href="#_after_a_long_lag"></a>After a long lag</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The estimate rests on one pair of like pulses, and two pulses can look alike
+without the sound repeating at their spacing. After a sound that repeated
+only at a long lag, a short estimate is suspect: the old lag says the
+signal had no short repeat, and one pair of pulses is no evidence that the
+new sound has one. A long last lag comes from a chord (its common period is
+a multiple of each note&#8217;s), a low note, a lock on a multiple of a period, or
+a sound that hardly repeats at all.</p>
+</div>
+<div class="paragraph">
+<p>The case that showed it, a strummed guitar recording shifted up 12
+semitones: at a re-strum the first pair came from one note of the chord and
+gave 5.03 ms, a period the chord as a whole does not repeat at. The shifter
+spliced the chord every 5 ms for 42 ms, until the lock found the chord&#8217;s
+24.2 ms, and it was heard as a thud.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../_images/bacf_long_lag.svg" alt="A pair of like pulses at 5.03 ms in a chord that repeats at 24.2 ms" width="750">
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Top: the recording at that re-strum, low-passed at 1 kHz as the follower
+reads it, its level scaled to the peak in view, timed from the first pulse
+of the estimate&#8217;s pair; the dashed line is the drop. The pair is 5.03 ms apart (pink); the chord repeats at
+24.2 ms (green).</p>
+</li>
+<li>
+<p>Bottom: the bits over one lag against the lag before, at each lag, 65
+ms after the drop, as the normalized mismatch count of the bitstream
+autocorrelation: 0 is a perfect match, noise 0.5, a repeat a notch. Same
+axis as above: each span ends over its lag. At the estimate&#8217;s 5.03 ms,
+0.43; at the chord&#8217;s 24.2 ms, 0.06. The dashed line, 0.15, is the most a
+repeat may mismatch (<code>repeat</code>, 85% matched).</p>
+</li>
+<li>
+<p>The two pulses look alike, but the signal does not repeat at their
+spacing.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The check applies when the slice&#8217;s hint, the last good lag before the drop,
+is over <code>long_hint</code>, 13 ms in the follower (<code>0.013 * sps</code> samples). 13 ms is above a guitar&#8217;s low E
+period (12.1 ms) and below a chord&#8217;s common period (24.3 ms for an E chord).
+After a shorter hint, or none, the estimate stands at once: checking every
+estimate cost single notes 1.3 ms of latency at +12 semitones, for estimates
+that were already right.</p>
+</div>
+<div class="paragraph">
+<p>The hint only stands in for "the sound before had no short repeat". It can
+be long after a single note: in the onset corpus, 4 of 161 picks had a hint
+over 13 ms, all after single notes (a low B&#8217;s 16.2 ms, a low E locked at
+twice its period). There the check costs a right estimate the wait of one
+lag. And it can be short in a chord, if the lock held one note&#8217;s lag; then
+the check does not run.</p>
+</div>
+<div class="paragraph">
+<p>After a long hint the estimate stands when either holds:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>It agrees with the hint.</strong> For some <code>k</code> from 1 to <code>fractions</code> (4),
+<code>|estimate * k / hint - 1| &#8656; agree</code> (2%). A long lag is often a whole multiple of a
+shorter period in the same sound (a chord&#8217;s common period of its notes'
+periods, a doubled lock of the note&#8217;s own), so an estimate that divides it
+is consistent with the sound before, and passes at once. The 5.03 ms above
+does not: 24.2 / 5.03 is 4.81.</p>
+</li>
+<li>
+<p><strong>It repeats.</strong> Once one lag of the slice can be scored
+(<code>slice.ready(estimate, now)</code>), the bits over that lag match the lag
+before at <code>repeat</code> (85%) or more: <code>periodicity(estimate)</code>, which the
+follower computes as <code>1 - mismatch(estimate, w) / w</code> with <code>w =
+slice.one_lag(estimate)</code>, the latest bits (see
+<a href="bitstream.html" class="xref page"><code>bacf_bitstream</code></a>). A score under 85% does not
+end it: the vet runs again at every sample with the newest bits, until the
+estimate stands or the next drop. A single note does. One note of a
+chord does not: in the recording above, the chord&#8217;s bitstream at a half to
+a quarter of its period matches 50 to 70%, noise 50%. The mismatch is
+read at the estimate&#8217;s lag only, not at the bottom of a notch near it: in
+the figure, the notch nearest 5.03 ms bottoms at 0.29 at 4.6 ms, 20
+samples earlier, still over 0.15. One lag is the
+earliest a repeat can be scored after the drop; the full window would
+wait until 11.6 ms of the slice can be scored, the latency the estimate is
+there to save.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>vet()</code> runs at the end of each sample, after the sample&#8217;s bit is stored,
+while an estimate is <code>pending()</code>; a hint at or under <code>long_hint</code> (0
+included) lets it stand at the first vet. Until it stands <code>value()</code> is 0,
+and the shifter&#8217;s restart waits for the lock or its latency cap; once it
+stands it stays, until <code>drop()</code> or <code>reset()</code> clears it.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tests"><a class="anchor" href="#_tests"></a>Tests</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>test/pitch/detail/bacf_provisional.cpp</code>: the first strong pair after the
+drop, with earlier pulses ignored; only pulses after the drop pairing; a weak
+latest pulse giving none; lags out of range; after a long hint, an estimate
+that agrees standing at once (3 and 4 times it); one that does not, waiting
+for one lag, then standing only once it repeats; <code>drop()</code> and <code>reset()</code>.</p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+<script src="../../../../_/js/vendor/lunr.js"></script>
+<script src="../../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../../.." data-snippet-length="100" data-stylesheet="../../../../_/css/search.css"></script>
+<script async src="../../../../search-index.js"></script>
+  </body>
+</html>

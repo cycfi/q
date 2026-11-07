@@ -707,7 +707,7 @@
     <a class="nav-link" href="../pitch/zero_crossing_collector.html">Zero Crossing Collector</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../pitch/bacf_lag_tracker.html">BACF Lag Tracker</a>
+    <a class="nav-link" href="../pitch/bacf_follower.html">BACF Follower</a>
   </li>
 </ul>
   </li>
@@ -935,11 +935,11 @@ This API is new and unstable: it may change in any release, without a deprecatio
 <div class="sect2">
 <h3 id="_finding_the_period"><a class="anchor" href="#_finding_the_period"></a>Finding the Period</h3>
 <div class="paragraph">
-<p>Where the waveform repeats is found by autocorrelation, here by the <code><a href="../pitch/bacf_lag_tracker.html" class="xref page">BACF Lag Tracker</a></code>. Bitstream autocorrelation, BACF, is a 1-bit autocorrelator: each sample becomes a single bit, 1 above zero and 0 below (see <code><a href="../pitch/bitstream_acf.html" class="xref page">Bitstream Autocorrelation</a></code>). The video below shows the mechanism. The latest bits (blue) are laid over the bits from a moment earlier (orange), and every bit where they differ is marked (red). As the lag slides back, the red shows how much the two differ: less red, closer match.</p>
+<p>Where the waveform repeats is found by autocorrelation, here by the <code><a href="../pitch/bacf_follower.html" class="xref page">BACF Follower</a></code>. Bitstream autocorrelation, BACF, is a 1-bit autocorrelator: each sample becomes a single bit, 1 above zero and 0 below (see <code><a href="../pitch/bitstream_acf.html" class="xref page">Bitstream Autocorrelation</a></code>). The video below shows the mechanism. The latest bits (blue) are laid over the bits from a moment earlier (orange), and every bit where they differ is marked (red). As the lag slides back, the red shows how much the two differ: less red, closer match.</p>
 </div>
 <div class="videoblock">
 <div class="content">
-<video src="https://media.cycfi.com/q/bacf-pitch-shifter/chord_strobe_v2.mp4" width="750" autoplay muted controls loop>
+<video src="https://media.cycfi.com/q/bacf-pitch-shifter/chord_strobe_v5.mp4" width="750" autoplay muted controls loop>
 Your browser does not support the video tag.
 </video>
 </div>

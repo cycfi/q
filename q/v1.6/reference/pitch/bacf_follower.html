@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>BACF Lag Tracker :: Q Docs</title>
+    <title>BACF Follower :: Q Docs</title>
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <script defer src="../../../../_/js/lightbox.js"></script>
@@ -707,7 +707,7 @@
     <a class="nav-link" href="zero_crossing_collector.html">Zero Crossing Collector</a>
   </li>
   <li class="nav-item is-current-page" data-depth="4">
-    <a class="nav-link" href="bacf_lag_tracker.html">BACF Lag Tracker</a>
+    <a class="nav-link" href="bacf_follower.html">BACF Follower</a>
   </li>
 </ul>
   </li>
@@ -839,13 +839,13 @@
     <li><a href="../../reference.html">Reference</a></li>
     <li><a href="../q_lib.html">Q</a></li>
     <li><a href="../pitch.html">Pitch Detection</a></li>
-    <li><a href="bacf_lag_tracker.html">BACF Lag Tracker</a></li>
+    <li><a href="bacf_follower.html">BACF Follower</a></li>
   </ul>
 </nav>
 <div class="page-versions">
   <button class="version-menu-toggle" title="Show other versions of page">v1.6-beta.1</button>
   <div class="version-menu">
-    <a class="version is-current" href="bacf_lag_tracker.html">v1.6-beta.1</a>
+    <a class="version is-current" href="bacf_follower.html">v1.6-beta.1</a>
     <a class="version is-missing" href="../../../v1.5/index.html">v1.5</a>
   </div>
 </div>
@@ -855,7 +855,7 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">BACF Lag Tracker</h1>
+<h1 class="page">BACF Follower</h1>
 <div id="preamble">
 <div class="sectionbody">
 <div class="admonitionblock caution">
@@ -876,26 +876,26 @@ This API is new and unstable: it may change in any release, without a deprecatio
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The BACF lag tracker follows the lag at which a signal repeats: its period, or a multiple of it. It is built for a time-domain splicer such as the <code><a href="../pitch_shifting/bacf_pitch_shifter.html" class="xref page">BACF Pitch Shifter</a></code>, which splices at how far back the sound repeats, whatever the note. The tracker is implemented by a class named <code>bacf_lag_tracker</code>.</p>
+<p>The BACF follower tracks the lag at which a signal repeats: its period, or a multiple of it. It is built for a time-domain splicer such as the <code><a href="../pitch_shifting/bacf_pitch_shifter.html" class="xref page">BACF Pitch Shifter</a></code>, which splices at how far back the sound repeats, whatever the note. The follower is implemented by a class named <code>bacf_follower</code>.</p>
 </div>
 <div class="paragraph">
-<p>A strobe tuner shows pitch with a pattern lit in time with the note: off pitch, the pattern drifts; on pitch, it stands still. The tracker works the same way, with the signal against itself. It compares the latest window of the signal with the window one lag earlier. Slide the lag, and the two windows drift past each other; at the period they line up, and the pattern freezes.</p>
+<p>The follower compares the signal with itself one lag back. Each sample becomes one bit, 1 above zero and 0 below (with a little hysteresis), and the XOR of the latest window&#8217;s bits with the bits one lag back marks each sample where the two disagree. Where the waveform matches itself, few bits differ; that lag is where it repeats, its period.</p>
 </div>
 <div class="videoblock">
 <div class="content">
-<video src="https://media.cycfi.com/q/bacf-pitch-shifter/chord_strobe_v2.mp4" width="750" autoplay muted controls loop>
+<video src="https://media.cycfi.com/q/bacf-pitch-shifter/chord_strobe_v5.mp4" width="750" autoplay muted controls loop>
 Your browser does not support the video tag.
 </video>
 </div>
 </div>
 <div class="paragraph">
-<p>The video shows an E chord, ringing, as the lag slides from 1 to 30 ms. The signal, low-passed at 1 kHz, becomes one bit a sample, a bitstream, and the XOR of the two windows' bits marks each sample where they disagree (see <code><a href="bitstream_acf.html" class="xref page">Bitstream Autocorrelation</a></code>). Most lags leave about half the bits mismatched, the level of chance; where the windows are out of phase, more (89% near 3.6 ms). At 24.3 ms, the period the chord&#8217;s notes share, only 8% differ: the pattern freezes. The low E&#8217;s own period, 12.1 ms, leaves 42% differing, since the other strings stand elsewhere in their cycles.</p>
+<p>The video shows an E chord, ringing, as the lag slides from 1 to 30 ms. At the top, the input, low-passed at 1 kHz, with the latest window (blue) and the window one lag back (orange). Below it, the two windows overlaid, and under them their bits, one a sample, with the XOR marking in red each sample where they disagree (see <code><a href="bitstream_acf.html" class="xref page">Bitstream Autocorrelation</a></code>). At the bottom, the share of bits that differ at each lag. Most lags leave about half the bits mismatched, the level of chance; where the windows are out of phase, more (89% near 3.6 ms). At 24.3 ms, the period the chord&#8217;s notes share, only 8% differ. The low E&#8217;s own period, 12.1 ms, leaves 42%, since the other strings stand elsewhere in their cycles.</p>
 </div>
 <div class="paragraph">
-<p>Sliding the lag across the whole range is a search, and the tracker searches only to find a lock. After that it keeps the pattern frozen: at each zero crossing, leading and trailing, it scores the lag it holds and two samples either side, moves to the best, and takes the fraction of a sample from a parabola through the scores. A crossing is where the waveform&#8217;s timing can change, so the tracker scores there, and does nothing between crossings.</p>
+<p>Sliding the lag across the whole range is a search, and the follower searches only to find a lock. After that it stays on that match as the period drifts: at each zero crossing, leading and trailing, it scores the lag it holds and two samples either side, moves to the best, and takes the fraction of a sample from a parabola through the scores. A crossing is where the waveform&#8217;s timing can change, so the follower scores there, and does nothing between crossings.</p>
 </div>
 <div class="paragraph">
-<p>Twice the period freezes the pattern too, so the lag may be a period or any multiple of one. Octaves are left unsettled on purpose: a splice at twice the period matches as well as one at the period. When the held lag misses, the tracker scores twice the lag.</p>
+<p>Twice the period matches too, so the lag may be a period or any multiple of one. Octaves are left unsettled on purpose: a splice at twice the period matches as well as one at the period. When the held lag misses, the follower scores twice the lag.</p>
 </div>
 <div class="paragraph">
 <p>Low-pass the input first, near the top of its fundamental range (about 1 kHz for a guitar): fewer crossings, and lags that follow the fundamental.</p>
@@ -922,7 +922,7 @@ Your browser does not support the video tag.
 </ul>
 </div>
 <div class="paragraph">
-<p>The lag changes only at a crossing, and <code>tr(s)</code> returns true at every sample while locked: a client that smooths the lag, or acts on a change, compares <code>lag()</code> with its last value.</p>
+<p>The lag changes only at a crossing, and <code>tr(s)</code> returns it at every sample while locked, and 0 while unlocked: a client that smooths the lag, or acts on a change, compares it with its last value.</p>
 </div>
 </div>
 </div>
@@ -931,7 +931,7 @@ Your browser does not support the video tag.
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/pitch/bacf_lag_tracker.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/pitch/bacf_follower.hpp&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -941,7 +941,7 @@ Your browser does not support the video tag.
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">class bacf_lag_tracker
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">class bacf_follower
 {
 public:
 
@@ -952,15 +952,15 @@ public:
    static constexpr int          partners       = 3;
    static constexpr std::size_t  edge_capacity  = 256;
 
-                        bacf_lag_tracker(
+                        bacf_follower(
                            duration min_lag
                          , duration max_lag
                          , float sps
-                         , decibel hysteresis = decibel{-45.0, direct_unit}
-                         , duration window = duration{0.0116}
+                         , decibel hysteresis = -45_dB
+                         , duration window = 11.6_ms
                         );
 
-   bool                 operator()(float s);
+   float                operator()(float s);
    bool                 locked() const;
    float                lag() const;
    float                periodicity() const;
@@ -981,7 +981,7 @@ public:
 <dl>
 <dt class="hdlist1"><code>tr</code>, <code>a</code>, <code>b</code>    </dt>
 <dd>
-<p>Objects of type <code>bacf_lag_tracker</code>.</p>
+<p>Objects of type <code>bacf_follower</code>.</p>
 </dd>
 <dt class="hdlist1"><code>lo</code>, <code>hi</code>        </dt>
 <dd>
@@ -1021,15 +1021,15 @@ public:
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bacf_lag_tracker(lo, hi, sps [, h, w])</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>bacf_lag_tracker</code> for lags from <code>lo</code> to <code>hi</code>,
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bacf_follower(lo, hi, sps [, h, w])</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>bacf_follower</code> for lags from <code>lo</code> to <code>hi</code>,
                                               given <code>sps</code> (samples per second), and optionally <code>h</code>
                                               (hysteresis, -45 dB if not given) and <code>w</code> (window,
                                               11.6 ms if not given).</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bacf_lag_tracker(tr)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>bacf_lag_tracker tr</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bacf_follower(tr)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>bacf_follower tr</code>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
@@ -1050,7 +1050,7 @@ C++ brace initialization may also be used.
 </table>
 </div>
 <div class="paragraph">
-<p>The window is rounded to whole words of the bitset, at least one: the default is 512 bits at 44.1 kHz, and at 48 kHz 576 with 64-bit words or 544 with 32-bit ones. The tracker allocates at construction only.</p>
+<p>The window is rounded to whole words of the bitset, at least one: the default is 512 bits at 44.1 kHz, and at 48 kHz 576 with 64-bit words or 544 with 32-bit ones. The follower allocates at construction only.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1072,8 +1072,9 @@ C++ brace initialization may also be used.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>tr(s)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Process the input sample <code>s</code> and return
-                      whether a lag is locked.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+                      the lag, in samples, while a lag is
+                      locked; 0 while not.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -1167,37 +1168,37 @@ C++ brace initialization may also be used.
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bacf_lag_tracker::threshold</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bacf_follower::threshold</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the most mismatched bits a match may
                                           have, as a share of the window: 0.15.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bacf_lag_tracker::max_misses</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bacf_follower::max_misses</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the misses in a row that drop the
                                           lock: 2.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bacf_lag_tracker::sweep</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bacf_follower::sweep</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get how far either side of the locked lag
                                           each crossing scores, in samples: 2.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bacf_lag_tracker::multiples</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bacf_follower::multiples</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the multiple of the lag tried on a
                                           miss: 2.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bacf_lag_tracker::partners</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bacf_follower::partners</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the similar pulses an unlocked pulse
                                           is scored against: 3.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bacf_lag_tracker::edge_capacity</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bacf_follower::edge_capacity</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the crossings and pulses kept for
                                           scoring: 256.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
@@ -1212,7 +1213,7 @@ C++ brace initialization may also be used.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/pitch/bacf_lag_tracker.hpp&gt;
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/pitch/bacf_follower.hpp&gt;
 #include &lt;q/fx/biquad.hpp&gt;              // For lowpass
 #include &lt;q/support/literals.hpp&gt;
 #include &lt;span&gt;
@@ -1224,12 +1225,12 @@ float sps;                       // samples per second
 std::span&lt;float const&gt; in;       // the input samples
 ...
 auto lp = q::lowpass{1_kHz, sps};                            <i class="conum" data-value="1"></i><b>(1)</b>
-auto tracker = q::bacf_lag_tracker{2.5_ms, 45_ms, sps};      <i class="conum" data-value="2"></i><b>(2)</b>
+auto follower = q::bacf_follower{2.5_ms, 45_ms, sps};        <i class="conum" data-value="2"></i><b>(2)</b>
 float lag = 0;
 for (auto s : in)
 {
-   if (tracker(lp(s)))                                       <i class="conum" data-value="3"></i><b>(3)</b>
-      lag = tracker.lag();                                   <i class="conum" data-value="4"></i><b>(4)</b>
+   if (auto l = follower(lp(s)))                             <i class="conum" data-value="3"></i><b>(3)</b>
+      lag = l;                                               <i class="conum" data-value="4"></i><b>(4)</b>
 }</code></pre>
 </div>
 </div>
@@ -1241,11 +1242,11 @@ for (auto s : in)
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Construct the tracker for lags from 2.5 to 45 ms: from the period of a high note to the common period of an open G chord.</td>
+<td>Construct the follower for lags from 2.5 to 45 ms: from the period of a high note to the common period of an open G chord.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Process the low-passed sample; the tracker returns whether it holds a lock.</td>
+<td>Process the low-passed sample; while the follower holds a lock it returns the lag, else 0.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
@@ -1301,7 +1302,7 @@ Measured at 48 kHz in blocks of 32 samples (0.67 ms), on an Apple M2 and on an S
 </tbody>
 </table>
 <div class="paragraph">
-<p>The worst block comes when a crossing scores its lags: five of them, and five more at twice the lag on a miss. On the M2 the figure is mostly the operating system&#8217;s scheduling. The tracker allocates about 6 KB at 48 kHz, most of it the bitstream.</p>
+<p>The worst block comes when a crossing scores its lags: five of them, and five more at twice the lag on a miss. On the M2 the figure is mostly the operating system&#8217;s scheduling. The follower allocates about 6 KB at 48 kHz, most of it the bitstream.</p>
 </div>
 </div>
 </div>

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="358"
+     viewBox="0 0 750 358"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+
+  <rect x="35" y="66" width="680" height="222" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5" stroke-dasharray="7,5"/>
+  <text x="375" y="96" text-anchor="middle" fill="#1a1a1a"> </text>
+
+  <rect x="55" y="116" width="640" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="375" y="142.9" text-anchor="middle" fill="#1a1a1a">bacf_bitstream</text>
+
+  <rect x="150.07" y="224" width="129.859" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="215" y="250.9" text-anchor="middle" fill="#1a1a1a">bacf_provisional</text>
+
+  <rect x="329.641" y="224" width="90.7188" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="375" y="250.9" text-anchor="middle" fill="#1a1a1a">bacf_slice</text>
+
+  <rect x="490.805" y="224" width="88.3906" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="535" y="250.9" text-anchor="middle" fill="#1a1a1a">bacf_lock</text>
+
+  <line x1="375" y1="32" x2="375" y2="116" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="215" y1="160" x2="215" y2="224" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="375" y1="160" x2="375" y2="224" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="535" y1="160" x2="535" y2="224" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="329.641" y1="246" x2="279.93" y2="246" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="420.359" y1="246" x2="490.805" y2="246" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="215" y1="268" x2="215" y2="322" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="535" y1="268" x2="535" y2="322" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="375" y1="322" x2="375" y2="268" stroke="#43a047" stroke-width="1.4"/>
+
+  <text x="49" y="96" fill="#1a1a1a">bacf_follower</text>
+  <text x="375" y="24" text-anchor="middle" fill="#1a1a1a">samples</text>
+  <text x="215" y="340" text-anchor="middle" fill="#1a1a1a">provisional()</text>
+  <text x="535" y="340" text-anchor="middle" fill="#1a1a1a">lag(), locked()</text>
+  <text x="375" y="340" text-anchor="middle" fill="#1a1a1a">drop(hint)</text>
+
+  <polygon points="375,116 371,107 379,107" fill="#1565c0"/>
+  <polygon points="215,224 211,215 219,215" fill="#1565c0"/>
+  <polygon points="375,224 371,215 379,215" fill="#1565c0"/>
+  <polygon points="535,224 531,215 539,215" fill="#1565c0"/>
+  <polygon points="279.93,246 288.93,242 288.93,250" fill="#43a047"/>
+  <polygon points="490.805,246 481.805,250 481.805,242" fill="#43a047"/>
+  <polygon points="215,322 211,313 219,313" fill="#1565c0"/>
+  <polygon points="535,322 531,313 539,313" fill="#1565c0"/>
+  <polygon points="375,268 379,277 371,277" fill="#43a047"/>
+</svg>
