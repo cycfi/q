@@ -9,7 +9,7 @@ Q shifts the pitch of a sound in real time, chords included, in the time domain.
 * The `{bacf_pitch_shifter}` shifts the pitch by a ratio that may change every sample, by reading the input faster or slower and splicing a period at a time.
 * `{formant_preservation}` puts back what a shift moves with the pitch: the fixed resonances of the source, such as a guitar's pickup and body or a singer's vocal tract, which a shift up turns into a chipmunk's.
 
-Both build on blocks with pages of their own: the `{varispeed_tap}` that does the reading, the `{transient_detector}` that finds the attacks, and the `{bacf_lag_tracker}` that finds where the sound repeats.
+Both build on blocks with pages of their own: the `{varispeed_tap}` that does the reading, the `{transient_detector}` that finds the attacks, and the `{bacf_follower}` that finds where the sound repeats.
 
 IMPORTANT: Pitch shifting works best on a clean signal, direct from the source. Put the shifter first in the chain, and any amplification, distortion or effects after it. Noise, hum and processing all degrade the shift; see the shifter's xref:reference/pitch_shifting/bacf_pitch_shifter.adoc#_input[Input].
 

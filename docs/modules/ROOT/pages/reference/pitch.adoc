@@ -13,7 +13,7 @@ BACF is fast: about 50 nanoseconds a sample, on a 2016 MacBook Pro, tracking gui
 
 IMPORTANT: Q's BACF pitch detection is tuned for *multichannel guitar* and tested on it: the test suite covers a 2-octave range on every string of 6-string and 8-string guitars. The algorithm is generic and applies to other sources, but instruments outside that range, especially ones that need more than 2 octaves, may perform differently.
 
-The API is documented on the member pages: {bacf_pitch_detector}, {bacf_period_detector}, {bitstream_acf} and {zero_crossing_collector}. The {bacf_lag_tracker} uses the same engine to follow the lag at which a signal repeats, a period or a multiple of one, for time-domain splicing.
+The API is documented on the member pages: {bacf_pitch_detector}, {bacf_period_detector}, {bitstream_acf} and {zero_crossing_collector}. The {bacf_follower} uses the same engine to follow the lag at which a signal repeats, a period or a multiple of one, for time-domain splicing.
 
 == Zero Crossings
 

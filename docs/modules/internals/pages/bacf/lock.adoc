@@ -1,6 +1,6 @@
 = bacf_lock
 
-The lock of the xref:bacf/lag_tracker.adoc[BACF lag tracker]: the lag at which
+The lock of the xref:bacf/follower.adoc[BACF follower]: the lag at which
 the signal repeats, acquired from like pulses and kept edge by edge.
 
 == Include
@@ -55,11 +55,11 @@ namespace cycfi::q::detail
 * A scorer with `fits(lag)`, whether a lag can be scored now, and
   `operator()(lag)`, its mismatches on the full window's scale (see the
   design page's Scores). A score holds the lock if it is under `limit`, in
-  mismatches; the tracker sets `limit` to `0.15 * window`, truncated.
+  mismatches; the follower sets `limit` to `0.15 * window`, truncated.
 * Pulses and edges as lists, newest first, with `size()` and `operator[]`.
 
-The tracker passes the front end's lists and its scorer; the tests pass
-vectors and scripted scores. The tracker calls `acquire()` at each edge
+The follower passes the front end's lists and its scorer; the tests pass
+vectors and scripted scores. The follower calls `acquire()` at each edge
 while unlocked, with at least two pulses, and `track()` at each edge while
 locked, with the edges of that edge's kind (not yet holding this edge).
 

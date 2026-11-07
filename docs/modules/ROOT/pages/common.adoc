@@ -63,7 +63,7 @@
 :pitch_detection: xref:reference/pitch.adoc[Pitch Detection]
 :bacf_pitch_detector: xref:reference/pitch/bacf_pitch_detector.adoc[BACF Pitch Detector]
 :pitch_data_flow: xref:reference/pitch/bacf_pitch_detector.adoc#_the_data_flow[The Data Flow]
-:bacf_lag_tracker: xref:reference/pitch/bacf_lag_tracker.adoc[BACF Lag Tracker]
+:bacf_follower: xref:reference/pitch/bacf_follower.adoc[BACF Follower]
 :grain: xref:reference/synth/grain.adoc[Grain]
 :clippers: xref:reference/misc/clip.adoc[Clippers]
 :hard_clip: xref:reference/misc/clip.adoc[Hard Clip]

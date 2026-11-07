@@ -83,7 +83,7 @@ envelope as an all-pole filter. `eq_matcher` gives a sound the spectral
 envelope of another, sample by sample, with no latency. `convolver`
 applies an impulse response, partitioned, with no latency.
 
-**Pitch tracking and attacks** *(unstable)*. `bacf_lag_tracker` follows
+**Pitch tracking and attacks** *(unstable)*. `bacf_follower` follows
 the lag at which a signal repeats, for a time-domain splicer.
 `transient_detector` fires at each attack, within a fraction of a
 millisecond on a plucked string.

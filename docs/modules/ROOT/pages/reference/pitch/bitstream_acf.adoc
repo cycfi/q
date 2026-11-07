@@ -25,7 +25,7 @@ image::pitch_bacf_low_e.svg[alt="BACF of a guitar low E", width=760px, align=cen
 
 <<fig-bacf-count>> is the output of the test suite on a guitar's low E. The {bacf_period_detector} runs an analysis every 672 samples, over a 1344-bit bitset. The bottom trace is each analysis's periodicity, `1 - count * 2 / bits.size()`, at every lag from 0 to 672, one analysis after another. Each starts with a blank, the lags below the shortest period, and peaks at the period. {pitch_detection} has more graphs in the same layout.
 
-`bitstream_acf` scores one lag per call, over the first half of the bitset or over any window of it. The {bacf_period_detector} proposes the candidate lags, from zero-crossing edges, and chooses the best; the {bacf_lag_tracker} scores the latest window of a longer bitstream at the lag it tracks. For a general lag search, independent of pitch, see {best_lag}.
+`bitstream_acf` scores one lag per call, over the first half of the bitset or over any window of it. The {bacf_period_detector} proposes the candidate lags, from zero-crossing edges, and chooses the best; the {bacf_follower} scores the latest window of a longer bitstream at the lag it tracks. For a general lag search, independent of pitch, see {best_lag}.
 
 == Include
 

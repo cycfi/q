@@ -14,7 +14,7 @@
 namespace cycfi::q::detail
 {
    ////////////////////////////////////////////////////////////////////////////
-   // bacf_lock: the BACF lag tracker's lock, the lag at which the signal
+   // bacf_lock: the BACF follower's lock, the lag at which the signal
    // repeats, kept edge by edge. Unlocked, acquire() scores the latest
    // pulse against the like pulses before it and locks on the best under
    // the limit. Locked, track() nudges the lag to this edge's spacing from

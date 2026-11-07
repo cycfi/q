@@ -11,7 +11,7 @@
 #include <q/fx/varispeed_tap.hpp>
 #include <q/fx/median.hpp>
 #include <q/fx/moving_average.hpp>
-#include <q/pitch/bacf_lag_tracker.hpp>
+#include <q/pitch/bacf_follower.hpp>
 #include <q/support/literals.hpp>
 
 #include <algorithm>
@@ -28,7 +28,7 @@ namespace cycfi::q
    // runs out and it splices back by a period, keeping only the headroom
    // the next fade needs; going down it falls behind and splices forward
    // by as many periods as fit. The whole machinery (the tap, its splices
-   // and the bacf_lag_tracker that gives the period) runs on the input
+   // and the bacf_follower that gives the period) runs on the input
    // through a 1 kHz one-pole low-pass, and the output is that low-pass
    // undone, its exact inverse at 1 kHz times the ratio (the shift moves
    // the low-pass's shape up with the pitch). The lag is smoothed as the
@@ -36,7 +36,7 @@ namespace cycfi::q
    //
    // At each transient the read restarts at the pick's own start: going
    // down at once, going up on the pick's first estimate of its period
-   // (the tracker's provisional()), its lock, or after `max_latency` at
+   // (the follower's provisional()), its lock, or after `max_latency` at
    // the latest, which is what latency() reports. Until then the last lag
    // stands in. A splice in flight always completes. Crossfades are half
    // a period (2 to 8 ms); no lag is under 1.25 crossfades or over 45 ms.
@@ -96,7 +96,7 @@ namespace cycfi::q
       float                _inv_ratio = 0.0f;  // the inverse's, at its ratio
       float                _inv_g = 1.0f;
       float                _inv = 0.0f;
-      bacf_lag_tracker     _tracker;
+      bacf_follower     _follower;
 
       std::size_t          _since;
       bool                 _pending = false;
@@ -130,7 +130,7 @@ namespace cycfi::q
     , _env{duration{0.1}, sps}
     , _transient{sps}
     , _lp_g{float(1.0 - std::exp(-2_pi * lp_corner / sps))}
-    , _tracker{
+    , _follower{
          duration{double(lag_lo()) / sps}
        , duration{double(_lag_max) / sps}
        , sps
@@ -152,7 +152,7 @@ namespace cycfi::q
       _lp = 0.0f;
       _inv_ratio = 0.0f;
       _inv = 0.0f;
-      _tracker.reset();
+      _follower.reset();
       _since = _tap.max_delay();
       _pending = false;
       _acquired = false;
@@ -193,13 +193,12 @@ namespace cycfi::q
       // A lock since the last transient gives the lag; without one, the
       // pick's first estimate or the last lag stands in.
       _lp += _lp_g * (s - _lp);
-      if (_tracker(_lp))
+      if (auto const l = _follower(_lp))
       {
          // As the period detectors do: a new lock, or a jump (another
          // multiple, a new note), is set outright; otherwise each new
          // reading goes through a median of 3 (a one-edge outlier never
          // reaches a splice) and an average.
-         auto const l = _tracker.lag();
          if (!_acquired || std::abs(l - _lag) > 0.1f * _lag)
          {
             _lag_median = median3{l};
@@ -214,7 +213,7 @@ namespace cycfi::q
          _acquired = true;
       }
       if (!_acquired && _prov == 0.0f)
-         _prov = _tracker.provisional();
+         _prov = _follower.provisional();
 
       // The new pick plays from its own start, a pre-roll before the
       // detection: going down at once (the read never runs out), going
@@ -293,7 +292,7 @@ namespace cycfi::q
       _picked = true;
       _acquired = false;
       _prov = 0.0f;
-      _tracker.drop(_last_lag);
+      _follower.drop(_last_lag);
    }
 
    // Half a period, from the lag in use

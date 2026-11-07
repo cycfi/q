@@ -1,6 +1,6 @@
 = bacf_bitstream
 
-The front end of the xref:bacf/lag_tracker.adoc[BACF lag tracker]: the
+The front end of the xref:bacf/follower.adoc[BACF follower]: the
 bitstream, its edges and pulses, and the score.
 
 == Include
@@ -58,7 +58,7 @@ namespace cycfi::q::detail
 
 The comparator starts low. At each sample `s`, it goes high when it is low
 and `s > hysteresis`, and low when it is high and `s < -hysteresis`; between
-the two it keeps its state. The tracker sets `hysteresis` to -45 dB (0.0056).
+the two it keeps its state. The follower sets `hysteresis` to -45 dB (0.0056).
 
 `history` is rounded up to whole words, `keep`. The bits go into a `bitset`
 of `2 * keep + word_size` bits, one a sample, at the next free position.

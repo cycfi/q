@@ -6,7 +6,7 @@ lag.
 Produces, in docs/modules/internals/images/:
 
    bacf_long_lag.svg -- a re-strum of an open E chord on a Strat (Joel's
-                        own recording), low-passed at 1 kHz as the tracker
+                        own recording), low-passed at 1 kHz as the follower
                         sees it. Top: the signal after the drop, with the
                         pair of like pulses that gave the estimate (5.03
                         ms) and the chord's period (24.2 ms), timed from
@@ -16,12 +16,12 @@ Produces, in docs/modules/internals/images/:
                         perfect match, noise 0.5), on the same axis, so
                         each span above ends over its lag.
 
-The data, strat_restrum_lp.txt, is the tracker's input from 100 ms before
+The data, strat_restrum_lp.txt, is the follower's input from 100 ms before
 the drop (at 5.5219 s in the recording, sample 243517 at 44.1 kHz) to 72 ms
 after, starting on a 64-sample word boundary so the windows align as in
 q::detail::bacf_bitstream. The comparator and the match are recomputed
 here and checked against q's own: 57.4% at 222 samples and 93.7% at 1067
-(the tracker's lock), from bacf_lag_tracker at the same sample.
+(the follower's lock), from bacf_follower at the same sample.
 
 Usage: python3 docs/scripts/gen_bacf_long_lag_figures.py
 """

@@ -185,7 +185,7 @@
 **** xref:reference/pitch/bacf_pitch_detector.adoc[BACF Pitch Detector]
 **** xref:reference/pitch/bitstream_acf.adoc[Bitstream Autocorrelation]
 **** xref:reference/pitch/zero_crossing_collector.adoc[Zero Crossing Collector]
-**** xref:reference/pitch/bacf_lag_tracker.adoc[BACF Lag Tracker]
+**** xref:reference/pitch/bacf_follower.adoc[BACF Follower]
 *** xref:reference/pitch_shifting.adoc[Pitch Shifting]
 **** xref:reference/pitch_shifting/bacf_pitch_shifter.adoc[BACF Pitch Shifter]
 **** xref:reference/pitch_shifting/formant_preservation.adoc[Formant Preservation]

@@ -49,7 +49,7 @@ namespace cycfi::q::detail
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // bacf_bitstream: the front end of the BACF lag tracker. A comparator
+   // bacf_bitstream: the front end of the BACF follower. A comparator
    // with hysteresis turns the signal into one bit a sample, kept as a
    // history of the latest `history` bits; its edges (leading: rising over
    // the hysteresis, trailing: falling under its negative) and its pulses
@@ -59,7 +59,7 @@ namespace cycfi::q::detail
    // Each sample, operator() reports an edge to `on_edge` at that sample:
    // the pulse it ends already in pulses(), the edge itself not yet in
    // edges(), the sample's bit not yet in the history. mismatch() is the
-   // bitstream autocorrelation the tracker scores with: the latest `w` bits
+   // bitstream autocorrelation the follower scores with: the latest `w` bits
    // against the `w` bits `lag` earlier, the end aligned down to a word.
    // Allocates at construction only.
    ////////////////////////////////////////////////////////////////////////////

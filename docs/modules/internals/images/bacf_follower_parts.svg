@@ -27,7 +27,7 @@
   <line x1="535" y1="268" x2="535" y2="322" stroke="#1565c0" stroke-width="1.4"/>
   <line x1="375" y1="322" x2="375" y2="268" stroke="#43a047" stroke-width="1.4"/>
 
-  <text x="49" y="96" fill="#1a1a1a">bacf_lag_tracker</text>
+  <text x="49" y="96" fill="#1a1a1a">bacf_follower</text>
   <text x="375" y="24" text-anchor="middle" fill="#1a1a1a">samples</text>
   <text x="215" y="340" text-anchor="middle" fill="#1a1a1a">provisional()</text>
   <text x="535" y="340" text-anchor="middle" fill="#1a1a1a">lag(), locked()</text>

@@ -1,7 +1,7 @@
 = bacf_provisional
 
 A note's first estimate of its lag, before any lock, for the
-xref:bacf/lag_tracker.adoc[BACF lag tracker]. The tracker gives it out as
+xref:bacf/follower.adoc[BACF follower]. The follower gives it out as
 `provisional()`; the pitch shifter restarts a pick's read on it.
 
 == Include
@@ -52,7 +52,7 @@ namespace cycfi::q::detail
 
 == The estimate
 
-The tracker calls `estimate(pulses, slice)` at each edge, leading and
+The follower calls `estimate(pulses, slice)` at each edge, leading and
 trailing, while unlocked, with at least two pulses and no estimate yet. A
 lock ends the attempts: if it comes first, the slice has no estimate. The
 estimate is the leading-edge spacing of one pair of pulses, in whole
@@ -82,7 +82,7 @@ hold:
 
 * **Height:** their peaks are within 40% of the larger. The test in
   `zero_crossing_collector`, which `predict_period()` uses, allows 20%; the
-  tracker widened it to 40% for an earlier estimate (take 58's pick path).
+  follower widened it to 40% for an earlier estimate (take 58's pick path).
 * **Width:** their widths are within 15%
   (`zero_crossing_collector::pulse_width_diff`). A pulse's width is the
   samples from its leading edge to the first sample under 30% of its peak so
@@ -130,7 +130,7 @@ spliced the chord every 5 ms for 42 ms, until the lock found the chord's
 
 image::bacf_long_lag.svg[A pair of like pulses at 5.03 ms in a chord that repeats at 24.2 ms, width=750]
 
-* Top: the recording at that re-strum, low-passed at 1 kHz as the tracker
+* Top: the recording at that re-strum, low-passed at 1 kHz as the follower
   reads it, its level scaled to the peak in view, timed from the first pulse
   of the estimate's pair; the dashed line is the drop. The pair is 5.03 ms apart (pink); the chord repeats at
   24.2 ms (green).
@@ -144,7 +144,7 @@ image::bacf_long_lag.svg[A pair of like pulses at 5.03 ms in a chord that repeat
   spacing.
 
 The check applies when the slice's hint, the last good lag before the drop,
-is over `long_hint`, 13 ms in the tracker (`0.013 * sps` samples). 13 ms is above a guitar's low E
+is over `long_hint`, 13 ms in the follower (`0.013 * sps` samples). 13 ms is above a guitar's low E
 period (12.1 ms) and below a chord's common period (24.3 ms for an E chord).
 After a shorter hint, or none, the estimate stands at once: checking every
 estimate cost single notes 1.3 ms of latency at +12 semitones, for estimates
@@ -168,7 +168,7 @@ After a long hint the estimate stands when either holds:
 * **It repeats.** Once one lag of the slice can be scored
   (`slice.ready(estimate, now)`), the bits over that lag match the lag
   before at `repeat` (85%) or more: `periodicity(estimate)`, which the
-  tracker computes as `1 - mismatch(estimate, w) / w` with `w =
+  follower computes as `1 - mismatch(estimate, w) / w` with `w =
   slice.one_lag(estimate)`, the latest bits (see
   xref:bacf/bitstream.adoc[`bacf_bitstream`]). A score under 85% does not
   end it: the vet runs again at every sample with the newest bits, until the

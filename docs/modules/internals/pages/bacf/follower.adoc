@@ -1,15 +1,15 @@
-= BACF Lag Tracker: Design
+= BACF Follower: Design
 
 The public class is documented in the
-xref:ROOT:reference/pitch/bacf_lag_tracker.adoc[reference]. This page is
+xref:ROOT:reference/pitch/bacf_follower.adoc[reference]. This page is
 about how it is built.
 
 == The parts
 
-`bacf_lag_tracker` holds four parts, each a class in `cycfi::q::detail`
+`bacf_follower` holds four parts, each a class in `cycfi::q::detail`
 under `q/pitch/detail/`, and calls them in a fixed order each sample.
 
-image::bacf_lag_tracker_parts.svg[Parts of the BACF lag tracker, width=750]
+image::bacf_follower_parts.svg[Parts of the BACF follower, width=750]
 
 * xref:bacf/bitstream.adoc[`bacf_bitstream`], the front end: the comparator
   with hysteresis, the bit history, the edges, the pulses and the sample
@@ -29,7 +29,7 @@ image::bacf_lag_tracker_parts.svg[Parts of the BACF lag tracker, width=750]
 
 == Construction
 
-`bacf_lag_tracker(min_lag, max_lag, sps, hysteresis = -45_dB, window =
+`bacf_follower(min_lag, max_lag, sps, hysteresis = -45_dB, window =
 11.6_ms)` sizes the parts, with `ws` the word size:
 
 * Lags in samples: `lround(min_lag * sps)`, `lround(max_lag * sps)`.
@@ -48,8 +48,9 @@ image::bacf_lag_tracker_parts.svg[Parts of the BACF lag tracker, width=750]
 == One sample
 
 `operator()(s)` runs the front end on the sample with the edge callback
-below, then, if an estimate is `pending()`, vets it; it returns whether the
-lock holds. In order:
+below, then, if an estimate is `pending()`, vets it; it returns the lock's
+`lag()` while the lock holds, and 0 while it does not. In
+order:
 
 . The front end detects an edge. At a trailing edge the pulse it ends goes
   into its pulse list first.
@@ -73,7 +74,7 @@ provisional's `value()`, and `window()` is the window in bits.
 
 == Scores
 
-The scorer the tracker passes the lock, at the current `now`:
+The scorer the follower passes the lock, at the current `now`:
 
 * `fits(lag)`: `min_lag <= lag <= max_lag`, and `bits.has(lag, w)` with `w
   = slice.window(lag, now)`, and `slice.ready(lag, now)`.
@@ -105,8 +106,8 @@ The refactor into these parts was checked bit for bit: `lag()`, `locked()`,
 `periodicity()` and `provisional()` at every sample, and the
 `bacf_pitch_shifter` output at -12, +5 and +12 semitones, on all 37 files of
 the onset corpus, identical before and after. Each part has its own test
-under `test/pitch/detail/`; the tracker's tests in
-`test/pitch/bacf_lag_tracker.cpp` are the integration tests.
+under `test/pitch/detail/`; the follower's tests in
+`test/pitch/bacf_follower.cpp` are the integration tests.
 
 == Known
 

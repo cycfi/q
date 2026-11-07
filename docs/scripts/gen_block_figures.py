@@ -983,7 +983,7 @@ def formant_chain():
     return f.write(os.path.join(OUT, 'formant_chain.svg'))
 
 
-def bacf_lag_tracker_parts():
+def bacf_follower_parts():
     # The internals: the front end across the top feeds edges and pulses
     # down to the provisional estimate, the note context and the lock; the
     # note gives the other two the window a score runs over. Three
@@ -1000,23 +1000,23 @@ def bacf_lag_tracker_parts():
     for k, b in enumerate(blocks):
         f.place(b, x0 + span * (k + 1) / 4 - b.w / 2, y_row)
     prov, note, lock = blocks
-    tracker = f.container(' ', [bits] + blocks, dashed=True)
-    f.label('bacf_lag_tracker', tracker.left + 14, tracker.top + 30)
+    follower = f.container(' ', [bits] + blocks, dashed=True)
+    f.label('bacf_follower', follower.left + 14, follower.top + 30)
 
-    f.source('samples', bits, side='top', length=bits.top - tracker.top + 34)
+    f.source('samples', bits, side='top', length=bits.top - follower.top + 34)
     for b in blocks:
         f.arrow(bits, b, leave=b.cx)
     f.arrow(note, prov, 'control')
     f.arrow(note, lock, 'control')
 
-    out = tracker.bottom + 34
+    out = follower.bottom + 34
     for b, text in ((prov, 'provisional()'), (lock, 'lag(), locked()')):
         f.path([(b.cx, b.bottom), (b.cx, out)])
         f.label(text, b.cx, out + 18, 'middle')
     f.source('drop(hint)', note, 'control', side='bottom',
              length=out - note.bottom)
     return f.write(os.path.join(HERE, '..', 'modules', 'internals',
-                                'images', 'bacf_lag_tracker_parts.svg'))
+                                'images', 'bacf_follower_parts.svg'))
 
 
 FIGURES = [square_synth, poly_synth, va_synth, fm_synth, midi_monitor,
@@ -1027,7 +1027,7 @@ FIGURES = [square_synth, poly_synth, va_synth, fm_synth, midi_monitor,
            midi_processor_overloads, ci_responder_chain, q_layers, q_io_stack,
            q_io_flow, handoff,
            handoff_implementation, tasks, tasks_implementation,
-           formant_chain, bacf_lag_tracker_parts]
+           formant_chain, bacf_follower_parts]
 
 if __name__ == '__main__':
     for make in FIGURES:

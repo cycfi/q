@@ -1,4 +1,4 @@
-= BACF Lag Tracker
+= BACF Follower
 
 include::../../common.adoc[]
 
@@ -6,17 +6,17 @@ CAUTION: {unstable}
 
 == Overview
 
-The BACF lag tracker follows the lag at which a signal repeats: its period, or a multiple of it. It is built for a time-domain splicer such as the `{bacf_pitch_shifter}`, which splices at how far back the sound repeats, whatever the note. The tracker is implemented by a class named `bacf_lag_tracker`.
+The BACF follower tracks the lag at which a signal repeats: its period, or a multiple of it. It is built for a time-domain splicer such as the `{bacf_pitch_shifter}`, which splices at how far back the sound repeats, whatever the note. The follower is implemented by a class named `bacf_follower`.
 
-A strobe tuner shows pitch with a pattern lit in time with the note: off pitch, the pattern drifts; on pitch, it stands still. The tracker works the same way, with the signal against itself. It compares the latest window of the signal with the window one lag earlier. Slide the lag, and the two windows drift past each other; at the period they line up, and the pattern freezes.
+A strobe tuner shows pitch with a pattern lit in time with the note: off pitch, the pattern drifts; on pitch, it stands still. The follower works the same way, with the signal against itself. It compares the latest window of the signal with the window one lag earlier. Slide the lag, and the two windows drift past each other; at the period they line up, and the pattern freezes.
 
 video::https://media.cycfi.com/q/bacf-pitch-shifter/chord_strobe_v2.mp4[width=750, opts="autoplay,loop,muted"]
 
 The video shows an E chord, ringing, as the lag slides from 1 to 30 ms. The signal, low-passed at 1 kHz, becomes one bit a sample, a bitstream, and the XOR of the two windows' bits marks each sample where they disagree (see `{bitstream_acf}`). Most lags leave about half the bits mismatched, the level of chance; where the windows are out of phase, more (89% near 3.6 ms). At 24.3 ms, the period the chord's notes share, only 8% differ: the pattern freezes. The low E's own period, 12.1 ms, leaves 42% differing, since the other strings stand elsewhere in their cycles.
 
-Sliding the lag across the whole range is a search, and the tracker searches only to find a lock. After that it keeps the pattern frozen: at each zero crossing, leading and trailing, it scores the lag it holds and two samples either side, moves to the best, and takes the fraction of a sample from a parabola through the scores. A crossing is where the waveform's timing can change, so the tracker scores there, and does nothing between crossings.
+Sliding the lag across the whole range is a search, and the follower searches only to find a lock. After that it keeps the pattern frozen: at each zero crossing, leading and trailing, it scores the lag it holds and two samples either side, moves to the best, and takes the fraction of a sample from a parabola through the scores. A crossing is where the waveform's timing can change, so the follower scores there, and does nothing between crossings.
 
-Twice the period freezes the pattern too, so the lag may be a period or any multiple of one. Octaves are left unsettled on purpose: a splice at twice the period matches as well as one at the period. When the held lag misses, the tracker scores twice the lag.
+Twice the period freezes the pattern too, so the lag may be a period or any multiple of one. Octaves are left unsettled on purpose: a splice at twice the period matches as well as one at the period. When the held lag misses, the follower scores twice the lag.
 
 Low-pass the input first, near the top of its fundamental range (about 1 kHz for a guitar): fewer crossings, and lags that follow the fundamental.
 
@@ -27,18 +27,18 @@ Low-pass the input first, near the top of its fundamental range (about 1 kHz for
 * **Loss.** Two misses in a row drop the lock. `lag()` then holds the last good lag, fraction and all, until a new lock.
 * **Drop.** `drop()` releases the lock on demand, at a new note for instance, so the next lock comes from the new material. The held lag stands in meanwhile.
 
-The lag changes only at a crossing, and `tr(s)` returns true at every sample while locked: a client that smooths the lag, or acts on a change, compares `lag()` with its last value.
+The lag changes only at a crossing, and `tr(s)` returns it at every sample while locked, and 0 while unlocked: a client that smooths the lag, or acts on a change, compares it with its last value.
 
 == Include
 
 ```c++
-#include <q/pitch/bacf_lag_tracker.hpp>
+#include <q/pitch/bacf_follower.hpp>
 ```
 
 == Declaration
 
 ```c++
-class bacf_lag_tracker
+class bacf_follower
 {
 public:
 
@@ -49,7 +49,7 @@ public:
    static constexpr int          partners       = 3;
    static constexpr std::size_t  edge_capacity  = 256;
 
-                        bacf_lag_tracker(
+                        bacf_follower(
                            duration min_lag
                          , duration max_lag
                          , float sps
@@ -57,7 +57,7 @@ public:
                          , duration window = 11.6_ms
                         );
 
-   bool                 operator()(float s);
+   float                operator()(float s);
    bool                 locked() const;
    float                lag() const;
    float                periodicity() const;
@@ -71,7 +71,7 @@ public:
 
 === Notation
 
-`tr`, `a`, `b`    :: Objects of type `bacf_lag_tracker`.
+`tr`, `a`, `b`    :: Objects of type `bacf_follower`.
 `lo`, `hi`        :: Objects of type `duration`: the shortest and the longest lag.
 `sps`             :: Floating point value for samples per second.
 `h`               :: Object of type `decibel`: the comparator's hysteresis.
@@ -84,17 +84,17 @@ public:
 |===
 | Expression                                | Semantics
 
-| `bacf_lag_tracker(lo, hi, sps [, h, w])`  | Construct a `bacf_lag_tracker` for lags from `lo` to `hi`,
+| `bacf_follower(lo, hi, sps [, h, w])`  | Construct a `bacf_follower` for lags from `lo` to `hi`,
                                               given `sps` (samples per second), and optionally `h`
                                               (hysteresis, -45 dB if not given) and `w` (window,
                                               11.6 ms if not given).
-| `bacf_lag_tracker(tr)`                    | Copy construct from `bacf_lag_tracker tr`.
+| `bacf_follower(tr)`                    | Copy construct from `bacf_follower tr`.
 | `a = b`                                   | Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
 
-The window is rounded to whole words of the bitset, at least one: the default is 512 bits at 44.1 kHz, and at 48 kHz 576 with 64-bit words or 544 with 32-bit ones. The tracker allocates at construction only.
+The window is rounded to whole words of the bitset, at least one: the default is 512 bits at 44.1 kHz, and at 48 kHz 576 with 64-bit words or 544 with 32-bit ones. The follower allocates at construction only.
 
 === Function Call
 
@@ -103,7 +103,8 @@ The window is rounded to whole words of the bitset, at least one: the default is
 | Expression        | Semantics                                 | Return Type
 
 | `tr(s)`           | Process the input sample `s` and return
-                      whether a lag is locked.                  | `bool`
+                      the lag, in samples, while a lag is
+                      locked; 0 while not.                      | `float`
 |===
 
 === Accessors
@@ -138,17 +139,17 @@ The window is rounded to whole words of the bitset, at least one: the default is
 |===
 | Expression                            | Semantics                                   | Return Type
 
-| `bacf_lag_tracker::threshold`         | Get the most mismatched bits a match may
+| `bacf_follower::threshold`         | Get the most mismatched bits a match may
                                           have, as a share of the window: 0.15.     | `float`
-| `bacf_lag_tracker::max_misses`        | Get the misses in a row that drop the
+| `bacf_follower::max_misses`        | Get the misses in a row that drop the
                                           lock: 2.                                  | `int`
-| `bacf_lag_tracker::sweep`             | Get how far either side of the locked lag
+| `bacf_follower::sweep`             | Get how far either side of the locked lag
                                           each crossing scores, in samples: 2.      | `int`
-| `bacf_lag_tracker::multiples`         | Get the multiple of the lag tried on a
+| `bacf_follower::multiples`         | Get the multiple of the lag tried on a
                                           miss: 2.                                  | `int`
-| `bacf_lag_tracker::partners`          | Get the similar pulses an unlocked pulse
+| `bacf_follower::partners`          | Get the similar pulses an unlocked pulse
                                           is scored against: 3.                     | `int`
-| `bacf_lag_tracker::edge_capacity`     | Get the crossings and pulses kept for
+| `bacf_follower::edge_capacity`     | Get the crossings and pulses kept for
                                           scoring: 256.                             | `std::size_t`
 |===
 
@@ -157,7 +158,7 @@ The window is rounded to whole words of the bitset, at least one: the default is
 Track the period of a signal, `in`, at `sps` samples per second, for lags of 2.5 to 45 ms:
 
 ```c++
-#include <q/pitch/bacf_lag_tracker.hpp>
+#include <q/pitch/bacf_follower.hpp>
 #include <q/fx/biquad.hpp>              // For lowpass
 #include <q/support/literals.hpp>
 #include <span>
@@ -169,18 +170,18 @@ float sps;                       // samples per second
 std::span<float const> in;       // the input samples
 ...
 auto lp = q::lowpass{1_kHz, sps};                            <1>
-auto tracker = q::bacf_lag_tracker{2.5_ms, 45_ms, sps};      <2>
+auto follower = q::bacf_follower{2.5_ms, 45_ms, sps};        <2>
 float lag = 0;
 for (auto s : in)
 {
-   if (tracker(lp(s)))                                       <3>
-      lag = tracker.lag();                                   <4>
+   if (auto l = follower(lp(s)))                             <3>
+      lag = l;                                               <4>
 }
 ```
 
 <1> A 1 kHz low pass in front: fewer crossings, lags that follow the fundamental.
-<2> Construct the tracker for lags from 2.5 to 45 ms: from the period of a high note to the common period of an open G chord.
-<3> Process the low-passed sample; the tracker returns whether it holds a lock.
+<2> Construct the follower for lags from 2.5 to 45 ms: from the period of a high note to the common period of an open G chord.
+<3> Process the low-passed sample; while the follower holds a lock it returns the lag, else 0.
 <4> The lag, in samples, a period or a multiple of one.
 
 == Performance
@@ -202,4 +203,4 @@ Measured tracking an E chord, with the 1 kHz low pass in front and lags of 2.5 t
 | 21 µs (3%)
 |===
 
-The worst block comes when a crossing scores its lags: five of them, and five more at twice the lag on a miss. On the M2 the figure is mostly the operating system's scheduling. The tracker allocates about 6 KB at 48 kHz, most of it the bitstream.
+The worst block comes when a crossing scores its lags: five of them, and five more at twice the lag on a miss. On the M2 the figure is mostly the operating system's scheduling. The follower allocates about 6 KB at 48 kHz, most of it the bitstream.

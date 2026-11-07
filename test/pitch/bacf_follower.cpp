@@ -5,7 +5,7 @@
 =============================================================================*/
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
-#include <q/pitch/bacf_lag_tracker.hpp>
+#include <q/pitch/bacf_follower.hpp>
 #include <q/fx/biquad.hpp>
 #include <q/support/literals.hpp>
 #include <q_io/audio_file.hpp>
@@ -39,14 +39,14 @@ namespace
    };
 
    template <typename Gen>
-   run_result run(q::bacf_lag_tracker& tr, Gen gen, std::size_t n
+   run_result run(q::bacf_follower& tr, Gen gen, std::size_t n
     , double period)
    {
       run_result r;
       bool started = false;
       for (std::size_t i = 0; i != n; ++i)
       {
-         bool const l = tr(gen(i));
+         bool const l = tr(gen(i)) != 0.0f;
          if (l && !started)
          {
             started = true;
@@ -69,11 +69,11 @@ namespace
    double const pi = 3.14159265358979;
 }
 
-TEST_CASE("bacf_lag_tracker: locks on a sine, to a fraction of a sample")
+TEST_CASE("bacf_follower: locks on a sine, to a fraction of a sample")
 {
    // 196 Hz: 244.9 samples, not a whole number.
    double const f = 196.0, period = sps / f;
-   q::bacf_lag_tracker tr{2_ms, 45_ms, sps};
+   q::bacf_follower tr{2_ms, 45_ms, sps};
    auto r = run(tr, [&](std::size_t i)
       { return 0.5f * float(std::sin(2 * pi * f * i / sps)); }
     , std::size_t(sps), period);
@@ -87,11 +87,11 @@ TEST_CASE("bacf_lag_tracker: locks on a sine, to a fraction of a sample")
    CHECK(tr.window() % q::bitset<>::value_size == 0);
 }
 
-TEST_CASE("bacf_lag_tracker: a harmonic tone locks on its period")
+TEST_CASE("bacf_follower: a harmonic tone locks on its period")
 {
    // 110 Hz, five harmonics falling 6 dB each.
    double const f = 110.0, period = sps / f;
-   q::bacf_lag_tracker tr{2_ms, 45_ms, sps};
+   q::bacf_follower tr{2_ms, 45_ms, sps};
    auto r = run(tr, [&](std::size_t i)
       {
          double s = 0, a = 0.5;
@@ -106,12 +106,12 @@ TEST_CASE("bacf_lag_tracker: a harmonic tone locks on its period")
    CHECK(r.on_period == r.locked);
 }
 
-TEST_CASE("bacf_lag_tracker: two notes lock on their common period")
+TEST_CASE("bacf_follower: two notes lock on their common period")
 {
    // 200 and 300 Hz repeat every 10 ms (480 samples); neither note's own
    // period does.
    double const period = sps / 100.0;
-   q::bacf_lag_tracker tr{2_ms, 45_ms, sps};
+   q::bacf_follower tr{2_ms, 45_ms, sps};
    auto r = run(tr, [&](std::size_t i)
       {
          return float(0.4 * std::sin(2 * pi * 200 * i / sps)
@@ -123,12 +123,12 @@ TEST_CASE("bacf_lag_tracker: two notes lock on their common period")
    CHECK(r.on_period == r.locked);
 }
 
-TEST_CASE("bacf_lag_tracker: holds through a loss, then locks again")
+TEST_CASE("bacf_follower: holds through a loss, then locks again")
 {
    // 196 Hz for half a second, then 330 Hz.
    double const p1 = sps / 196.0, p2 = sps / 330.0;
    std::size_t const change = std::size_t(0.5 * sps);
-   q::bacf_lag_tracker tr{2_ms, 45_ms, sps};
+   q::bacf_follower tr{2_ms, 45_ms, sps};
    auto tone = [&](std::size_t i)
    {
       double const f = i < change ? 196.0 : 330.0;
@@ -139,7 +139,7 @@ TEST_CASE("bacf_lag_tracker: holds through a loss, then locks again")
    float held = 0, last = 0;
    for (std::size_t i = 0; i != std::size_t(sps); ++i)
    {
-      bool const l = tr(tone(i));
+      bool const l = tr(tone(i)) != 0.0f;
       if (l)
          last = tr.lag();
       if (i < change)
@@ -169,9 +169,30 @@ TEST_CASE("bacf_lag_tracker: holds through a loss, then locks again")
    CHECK(relocked);
 }
 
-TEST_CASE("bacf_lag_tracker: drop and reset")
+TEST_CASE("bacf_follower: the lag while locked, 0 while unlocked")
 {
-   q::bacf_lag_tracker tr{2_ms, 45_ms, sps};
+   // operator() returns the lag while the lock holds, and 0 while it does
+   // not; lag() holds the last good lag through a drop.
+   q::bacf_follower tr{2_ms, 45_ms, sps};
+   float got = 0;
+   for (std::size_t i = 0; i != std::size_t(0.2 * sps); ++i)
+   {
+      got = tr(0.5f * float(std::sin(2 * pi * 196 * i / sps)));
+      CHECK((got != 0.0f) == tr.locked());
+      if (got != 0.0f)
+         CHECK(got == tr.lag());
+   }
+   REQUIRE(got != 0.0f);
+   auto const held = got;
+
+   tr.drop();
+   CHECK(tr(0.0f) == 0.0f);
+   CHECK(tr.lag() == held);
+}
+
+TEST_CASE("bacf_follower: drop and reset")
+{
+   q::bacf_follower tr{2_ms, 45_ms, sps};
    for (std::size_t i = 0; i != std::size_t(0.2 * sps); ++i)
       tr(0.5f * float(std::sin(2 * pi * 196 * i / sps)));
    REQUIRE(tr.locked());
@@ -186,7 +207,7 @@ TEST_CASE("bacf_lag_tracker: drop and reset")
    CHECK(tr.lag() == 0.0f);
 }
 
-TEST_CASE("bacf_lag_tracker: a lag that drifts out of range drops the lock")
+TEST_CASE("bacf_follower: a lag that drifts out of range drops the lock")
 {
    // 400 Hz (120 samples) for 0.2 s, a glide up to 600 Hz (80) over 0.5 s,
    // past the 96-sample floor, then 600 Hz: the lock must not hold the
@@ -196,7 +217,7 @@ TEST_CASE("bacf_lag_tracker: a lag that drifts out of range drops the lock")
    std::size_t const hold = std::size_t(0.2 * sps)
     , glide = std::size_t(0.5 * sps)
     , end = hold + glide + std::size_t(0.4 * sps);
-   q::bacf_lag_tracker tr{2_ms, 45_ms, sps};
+   q::bacf_follower tr{2_ms, 45_ms, sps};
    double phase = 0;
    bool lost = false;
    std::size_t on = 0, locked = 0;
@@ -205,7 +226,7 @@ TEST_CASE("bacf_lag_tracker: a lag that drifts out of range drops the lock")
       double const f = i < hold ? 400.0
          : i < hold + glide ? 400.0 + 200.0 * (i - hold) / glide : 600.0;
       phase += 2 * pi * f / sps;
-      bool const l = tr(0.5f * float(std::sin(phase)));
+      bool const l = tr(0.5f * float(std::sin(phase))) != 0.0f;
       if (i == hold)
          REQUIRE(l);
       if (i > hold && !l)
@@ -227,7 +248,7 @@ namespace
    // to the first provisional lag, and that lag.
    std::pair<std::size_t, float> provisional_after(double freq, float hint)
    {
-      q::bacf_lag_tracker tr{2_ms, 45_ms, sps};
+      q::bacf_follower tr{2_ms, 45_ms, sps};
       auto tone = [=](std::size_t i)
          { return 0.5f * float(std::sin(2 * pi * freq * i / sps)); };
       std::size_t const at = std::size_t(0.2 * sps);
@@ -245,7 +266,7 @@ namespace
    }
 }
 
-TEST_CASE("bacf_lag_tracker: a provisional lag after a drop")
+TEST_CASE("bacf_follower: a provisional lag after a drop")
 {
    // The first pair of like pulses after the drop gives the period, about
    // two periods in.
@@ -256,7 +277,7 @@ TEST_CASE("bacf_lag_tracker: a provisional lag after a drop")
    CHECK(plain.first < std::size_t(2.5 * period));
 }
 
-TEST_CASE("bacf_lag_tracker: after a long hint, a provisional lag is vetted")
+TEST_CASE("bacf_follower: after a long hint, a provisional lag is vetted")
 {
    // 600 Hz is under the floor, so the estimate is two periods (160
    // samples). After a long hint (a chord) the estimate stands at once if
@@ -276,7 +297,7 @@ TEST_CASE("bacf_lag_tracker: after a long hint, a provisional lag is vetted")
    CHECK(other.first > plain.first);
 }
 
-TEST_CASE("bacf_lag_tracker: a provisional lag near the longest is vetted")
+TEST_CASE("bacf_follower: a provisional lag near the longest is vetted")
 {
    // After a long hint, an estimate near the longest lag is vetted over one
    // lag of it: the history must hold that lag, one lag of it and a word.
@@ -284,7 +305,7 @@ TEST_CASE("bacf_lag_tracker: a provisional lag near the longest is vetted")
    // hint, 1440, is not a clean multiple of it.
    double const freq = 22.7;
    double const period = sps / freq;
-   q::bacf_lag_tracker tr{2_ms, 45_ms, sps};
+   q::bacf_follower tr{2_ms, 45_ms, sps};
    auto tone = [&](std::size_t i)
       { return 0.5f * float(std::sin(2 * pi * freq * i / sps)); };
    std::size_t const at = std::size_t(0.5 * sps);
@@ -301,7 +322,7 @@ TEST_CASE("bacf_lag_tracker: a provisional lag near the longest is vetted")
    CHECK(on_multiple(prov, period));
 }
 
-TEST_CASE("bacf_lag_tracker: a pick's provisional lag comes before its lock")
+TEST_CASE("bacf_follower: a pick's provisional lag comes before its lock")
 {
    q::wav_reader src{"audio_files/1a-Low-E.wav"};
    REQUIRE(src);
@@ -315,7 +336,7 @@ TEST_CASE("bacf_lag_tracker: a pick's provisional lag comes before its lock")
    while (std::abs(in[pick]) < 0.1f * peak)
       ++pick;
 
-   q::bacf_lag_tracker tr{2_ms, 45_ms, fs};
+   q::bacf_follower tr{2_ms, 45_ms, fs};
    q::lowpass lp{1_kHz, fs};
    double const period = fs / 82.41;
    std::size_t first_prov = 0, first_lock = 0;
@@ -324,7 +345,7 @@ TEST_CASE("bacf_lag_tracker: a pick's provisional lag comes before its lock")
    {
       if (i == pick)
          tr.drop();
-      bool const l = tr(lp(in[i]));
+      bool const l = tr(lp(in[i])) != 0.0f;
       if (i < pick)
          continue;
       if (!first_prov && tr.provisional() > 0.0f)
@@ -342,11 +363,11 @@ TEST_CASE("bacf_lag_tracker: a pick's provisional lag comes before its lock")
    CHECK(first_prov < first_lock);
 }
 
-TEST_CASE("bacf_lag_tracker: stays locked over a long run")
+TEST_CASE("bacf_follower: stays locked over a long run")
 {
    // Ten seconds: the bitstream slides many times over.
    double const period = sps / 196.0;
-   q::bacf_lag_tracker tr{2_ms, 45_ms, sps};
+   q::bacf_follower tr{2_ms, 45_ms, sps};
    auto r = run(tr, [&](std::size_t i)
       { return 0.5f * float(std::sin(2 * pi * 196 * i / sps)); }
     , std::size_t(10 * sps), period);
@@ -374,7 +395,7 @@ namespace
       while (std::abs(in[pick]) < 0.1f * peak)
          ++pick;
 
-      q::bacf_lag_tracker tr{5_ms, 45_ms, fs};
+      q::bacf_follower tr{5_ms, 45_ms, fs};
       q::lowpass lp{1_kHz, fs};
       double const period = fs / freq;
       std::size_t const from = pick + std::size_t(0.2 * fs);
@@ -382,7 +403,7 @@ namespace
       std::size_t good = 0;
       for (std::size_t i = 0; i != to; ++i)
       {
-         bool const l = tr(lp(in[i]));
+         bool const l = tr(lp(in[i])) != 0.0f;
          if (i >= from)
             good += l && on_multiple(tr.lag(), period);
       }
@@ -390,7 +411,7 @@ namespace
    }
 }
 
-TEST_CASE("bacf_lag_tracker: guitar single notes")
+TEST_CASE("bacf_follower: guitar single notes")
 {
    CHECK(on_period_share("1a-Low-E", 82.41) > 0.95f);
    CHECK(on_period_share("3a-D", 146.83) > 0.95f);

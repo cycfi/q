@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(CYCFI_Q_BACF_LAG_TRACKER_NOVEMBER_2_2026)
-#define CYCFI_Q_BACF_LAG_TRACKER_NOVEMBER_2_2026
+#if !defined(CYCFI_Q_BACF_FOLLOWER_NOVEMBER_2_2026)
+#define CYCFI_Q_BACF_FOLLOWER_NOVEMBER_2_2026
 
 #include <q/pitch/detail/bacf_bitstream.hpp>
 #include <q/pitch/detail/bacf_lock.hpp>
@@ -22,7 +22,7 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // bacf_lag_tracker: the lag at which a signal repeats, tracked with
+   // bacf_follower: the lag at which a signal repeats, tracked with
    // bitstream autocorrelation, one correlation per zero crossing. A
    // comparator with hysteresis makes the bitstream; at each crossing,
    // leading and trailing, a locked lag is scored over the latest window
@@ -47,9 +47,12 @@ namespace cycfi::q
    // for a guitar): fewer crossings, cleaner lags. Allocates at
    // construction only. The parts are in q/pitch/detail.
    ////////////////////////////////////////////////////////////////////////////
-   class bacf_lag_tracker
+   class bacf_follower
    {
+      using bitstream = detail::bacf_bitstream;
+      using slice = detail::bacf_slice;
       using lock = detail::bacf_lock;
+      using provisional_lag = detail::bacf_provisional;
 
    public:
 
@@ -60,7 +63,7 @@ namespace cycfi::q
       static constexpr int          partners       = lock::partners;
       static constexpr std::size_t  edge_capacity  = 256;
 
-                           bacf_lag_tracker(
+                           bacf_follower(
                               duration min_lag
                             , duration max_lag
                             , float sps
@@ -68,7 +71,7 @@ namespace cycfi::q
                             , duration window = 11.6_ms
                            );
 
-      bool                 operator()(float s);
+      float                operator()(float s);
       bool                 locked() const       { return _lock.locked(); }
       float                lag() const          { return _lock.lag(); }
       float                periodicity() const;
@@ -79,8 +82,7 @@ namespace cycfi::q
 
    private:
 
-      using bitstream = detail::bacf_bitstream;
-      static constexpr std::size_t ws = bitstream::word_size;
+      static constexpr std::size_t  ws             = bitstream::word_size;
       static constexpr float        min_window     = 0.002f; // seconds
       static constexpr float        long_hint      = 0.013f; // seconds
 
@@ -97,27 +99,27 @@ namespace cycfi::q
       std::uint32_t        _max_lag;
       std::uint32_t        _window;       // bits, whole words
       bitstream            _bits;
-      detail::bacf_slice    _slice;
-      detail::bacf_lock    _lock;
-      detail::bacf_provisional _prov;
+      slice                _slice;
+      lock                 _lock;
+      provisional_lag      _prov;
    };
 
    ////////////////////////////////////////////////////////////////////////////
    // Scores at a lag for the lock: over the slice's window at that lag,
    // scaled to the full window.
    ////////////////////////////////////////////////////////////////////////////
-   struct bacf_lag_tracker::scorer
+   struct bacf_follower::scorer
    {
       bool                 fits(std::uint32_t lag) const;
       std::uint32_t        operator()(std::uint32_t lag) const;
 
-      bacf_lag_tracker const& _t;
+      bacf_follower const& _t;
    };
 
    ////////////////////////////////////////////////////////////////////////////
    // Inlines
    ////////////////////////////////////////////////////////////////////////////
-   inline bacf_lag_tracker::bacf_lag_tracker(
+   inline bacf_follower::bacf_follower(
       duration min_lag
     , duration max_lag
     , float sps
@@ -141,7 +143,7 @@ namespace cycfi::q
    // The bits a score can reach back: its window (the full one, or one lag
    // of the slice at the longest lag, whichever is longer), the lag, and a
    // word for the window's alignment.
-   inline std::size_t bacf_lag_tracker::history(
+   inline std::size_t bacf_follower::history(
       std::uint32_t window, std::uint32_t max_lag, std::uint32_t min_window)
    {
       auto const one_lag =
@@ -149,8 +151,8 @@ namespace cycfi::q
       return std::max<std::size_t>(window, one_lag) + max_lag + ws;
    }
 
-   // One sample; true while locked.
-   inline bool bacf_lag_tracker::operator()(float s)
+   // One sample; the lag while locked, 0 while not.
+   inline float bacf_follower::operator()(float s)
    {
       _bits(s, [this](bitstream::edge_kind k) { edge(k); });
       if (_prov.pending())
@@ -158,24 +160,24 @@ namespace cycfi::q
          _prov.vet(_slice, _bits.now()
           , [this](std::uint32_t lag) { return one_lag_periodicity(lag); });
       }
-      return _lock.locked();
+      return _lock.locked() ? _lock.lag() : 0.0f;
    }
 
-   inline float bacf_lag_tracker::periodicity() const
+   inline float bacf_follower::periodicity() const
    {
       return _lock.periodicity();
    }
 
    // Drop the lock, at a new note: lag() holds until a new lock. `hint`
    // is the last good lag, in samples (0: none).
-   inline void bacf_lag_tracker::drop(float hint)
+   inline void bacf_follower::drop(float hint)
    {
       _lock.drop();
       _slice.drop(_bits.now(), hint);
       _prov.drop();
    }
 
-   inline void bacf_lag_tracker::reset()
+   inline void bacf_follower::reset()
    {
       _bits.reset();
       _slice.reset();
@@ -186,7 +188,7 @@ namespace cycfi::q
    // At an edge: a pulse that ends counts toward the slice's peak; locked,
    // the lock tracks; unlocked, the provisional estimate and the lock's
    // acquisition both use the latest pulse.
-   inline void bacf_lag_tracker::edge(bitstream::edge_kind k)
+   inline void bacf_follower::edge(bitstream::edge_kind k)
    {
       auto const pulses = _bits.pulses();
       if (k == bitstream::trailing)
@@ -205,7 +207,7 @@ namespace cycfi::q
    }
 
    // The match at `lag` over one lag of the slice, for the estimate's vet.
-   inline float bacf_lag_tracker::one_lag_periodicity(
+   inline float bacf_follower::one_lag_periodicity(
       std::uint32_t lag) const
    {
       auto const w = _slice.one_lag(lag);
@@ -213,7 +215,7 @@ namespace cycfi::q
    }
 
    // In range, and history enough for the slice's window at `lag`.
-   inline bool bacf_lag_tracker::scorer::fits(std::uint32_t lag) const
+   inline bool bacf_follower::scorer::fits(std::uint32_t lag) const
    {
       auto const now = _t._bits.now();
       return lag >= _t._min_lag && lag <= _t._max_lag
@@ -221,7 +223,7 @@ namespace cycfi::q
          && _t._slice.ready(lag, now);
    }
 
-   inline std::uint32_t bacf_lag_tracker::scorer::operator()(
+   inline std::uint32_t bacf_follower::scorer::operator()(
       std::uint32_t lag) const
    {
       auto const w = _t._slice.window(lag, _t._bits.now());

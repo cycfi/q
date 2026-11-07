@@ -14,7 +14,7 @@
   <text x="519.422" y="117.9" text-anchor="middle" fill="#1a1a1a">correction</text>
 
   <rect x="305.688" y="193" width="134.781" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="373.078" y="219.9" text-anchor="middle" fill="#1a1a1a">BACF lag tracker</text>
+  <text x="373.078" y="219.9" text-anchor="middle" fill="#1a1a1a">BACF follower</text>
 
   <rect x="457.742" y="193" width="123.359" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
   <text x="519.422" y="219.9" text-anchor="middle" fill="#1a1a1a">formant learner</text>

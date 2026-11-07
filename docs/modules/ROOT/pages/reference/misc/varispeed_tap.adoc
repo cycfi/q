@@ -41,7 +41,7 @@ A crossfade is only clean when the two reads look alike. A pitched sound repeats
 * **Top:** the read jumps back one period. The old read (light blue) and the new read (red, dotted) are the same wave, so the output (black) runs through the crossfade unchanged.
 * **Bottom:** the read jumps back half a period, to the other half of the cycle, and the two reads differ. Mixed, they partly cancel: through the crossfade the output takes neither shape and loses level, its deepest dips at half the depth of the wave. Only once the new read takes over does the wave come back.
 
-So a splice should jump by a whole number of periods. Finding the period of what the tap holds is up to the caller: the `{bacf_pitch_shifter}` tracks it with a `{bacf_lag_tracker}`. To compare the material at two delays, `tap[d]` reads it at any delay.
+So a splice should jump by a whole number of periods. Finding the period of what the tap holds is up to the caller: the `{bacf_pitch_shifter}` tracks it with a `{bacf_follower}`. To compare the material at two delays, `tap[d]` reads it at any delay.
 
 == Include
 
