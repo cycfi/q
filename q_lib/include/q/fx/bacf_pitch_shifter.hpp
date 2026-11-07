@@ -253,8 +253,12 @@ namespace cycfi::q
          }
       }
 
+      // A restart that is due goes first, at the next sample: no new splice
+      // may hold it off.
+      bool const due = _pending
+         && (ratio < 1.0f || _acquired || _prov > 0.0f || _since >= _latency);
       auto const y = _tap(_lp, ratio);
-      if (!_tap.splicing())
+      if (!_tap.splicing() && !due)
       {
          auto const delay = _tap.delay();
          if (ratio > 1.0f)
