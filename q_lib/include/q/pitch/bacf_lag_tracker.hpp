@@ -30,14 +30,22 @@ namespace cycfi::q
    // and kept while under the mismatch threshold (a parabola through the
    // best and its neighbours gives the fraction of a sample). On a miss,
    // twice the lag is tried, since a chord's common period is a multiple
-   // of each note's. Two misses in a row drop the lock; lag() then holds
-   // the last good lag until a new lock. Unlocked, each completed pulse is
-   // scored against the latest similar pulses before it in range.
+   // of each note's. Two misses in a row drop the lock, as does a lag that
+   // has drifted out of range; lag() then holds the last good lag until a
+   // new lock. Unlocked, at each crossing the latest pulse is scored
+   // against the latest similar pulses before it in range.
+   //
+   // drop() starts a new note: until the window holds only the note, the
+   // score runs over one lag of it. provisional() is the note's first
+   // estimate, before a lock: the latest strong pulse's span to the nearest
+   // similar one. drop's `hint`, the last good lag, guards a chord: after a
+   // long one (over 13 ms), an estimate that is not that lag or a clean
+   // fraction of it must first repeat over one lag.
    //
    // The lag is a period or a multiple of one: octaves are not settled.
-   // The work is per crossing, flat: no search runs per sample or per
-   // frame. Low-pass the input first (about 1 kHz for a guitar): fewer
-   // crossings, cleaner lags. Allocates at construction only.
+   // The work is per crossing, flat. Low-pass the input first (about 1 kHz
+   // for a guitar): fewer crossings, cleaner lags. Allocates at
+   // construction only.
    ////////////////////////////////////////////////////////////////////////////
    class bacf_lag_tracker
    {
@@ -63,8 +71,9 @@ namespace cycfi::q
       bool                 locked() const;
       float                lag() const;
       float                periodicity() const;
+      float                provisional() const;
       std::size_t          window() const;
-      void                 drop();
+      void                 drop(float hint = 0.0f);
       void                 reset();
 
    private:
@@ -88,12 +97,25 @@ namespace cycfi::q
       void                 track(edge_ring const& kind, std::size_t count);
       void                 acquire();
       std::uint32_t        score(std::uint32_t lag) const;
+      std::uint32_t        score(std::uint32_t lag, std::uint32_t w) const;
+      std::uint32_t        one_lag(std::uint32_t lag) const;
+      std::uint32_t        span(std::uint32_t lag) const;
       bool                 fits(std::uint32_t lag) const;
+      void                 estimate();
+      void                 vet();
       void                 compact();
+
+      static constexpr float        height_diff    = 0.4f;   // similar pulses
+      static constexpr float        strong         = 0.6f;   // of the peak pulse
+      static constexpr float        long_hint      = 0.013f; // seconds
+      static constexpr float        agree          = 0.02f;
+      static constexpr float        vet_periodicity = 0.85f;
 
       std::uint32_t        _min_lag;
       std::uint32_t        _max_lag;
       std::uint32_t        _window;       // bits, whole words
+      std::uint32_t        _min_window;   // samples, the least a score runs over
+      float                _long_hint;    // samples
       std::uint32_t        _limit;        // mismatches
       float                _hysteresis;
       std::size_t          _keep;         // bits a correlation reaches back
@@ -114,6 +136,14 @@ namespace cycfi::q
       float                _frac = 0.0f;
       std::uint32_t        _mismatch = 0;
       int                  _misses = 0;
+      // _now at the last drop; before any, long ago (half the wrap): the
+      // full window from the start, and no estimate.
+      static constexpr std::uint32_t never = 0x80000000u;
+      std::uint32_t        _drop = never;
+      float                _hint = 0.0f;
+      float                _peak = 0.0f;  // the peak pulse since the drop
+      std::uint32_t        _estimate = 0; // its first pair's span
+      bool                 _vetted = false;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -130,6 +160,8 @@ namespace cycfi::q
     , _max_lag{std::uint32_t(std::lround(as_double(max_lag) * sps))}
     , _window{std::max<std::uint32_t>(ws, std::uint32_t(
          std::lround(as_double(window) * sps / ws)) * ws)}
+    , _min_window{std::uint32_t(0.002f * sps)}
+    , _long_hint{long_hint * sps}
     , _limit{std::uint32_t(threshold * _window)}
     , _hysteresis{lin_float(hysteresis)}
     , _keep{
@@ -157,6 +189,8 @@ namespace cycfi::q
          if (_pulse.width == 0.0f)
             _pulse.width = float(_now - _pulse.lead);
          _pulses.push(_pulse);
+         if (std::int32_t(_pulse.lead - _drop) >= 0)
+            _peak = std::max(_peak, _pulse.peak);
          _num_pulses = std::min(_num_pulses + 1, edge_capacity);
          edge(_trail, _num_trail, true);
       }
@@ -171,6 +205,8 @@ namespace cycfi::q
       _since = std::min(_since + 1, _keep);
       if (_lag)
          _held = float(_lag) + _frac;
+      if (_estimate && !_vetted)
+         vet();
       return _lag != 0;
    }
 
@@ -193,16 +229,29 @@ namespace cycfi::q
       return 1.0f - float(_mismatch) / float(_window);
    }
 
+   // The note's first estimate since the drop, in samples; 0 until there
+   // is one (or, after a long hint, until it agrees or has repeated).
+   inline float bacf_lag_tracker::provisional() const
+   {
+      return _vetted ? float(_estimate) : 0.0f;
+   }
+
    inline std::size_t bacf_lag_tracker::window() const
    {
       return _window;
    }
 
-   // Drop the lock, at a new note: lag() holds until a new lock.
-   inline void bacf_lag_tracker::drop()
+   // Drop the lock, at a new note: lag() holds until a new lock. `hint`
+   // is the last good lag, in samples (0: none).
+   inline void bacf_lag_tracker::drop(float hint)
    {
       _lag = 0;
       _misses = 0;
+      _drop = _now;
+      _hint = hint;
+      _peak = 0.0f;
+      _estimate = 0;
+      _vetted = false;
    }
 
    inline void bacf_lag_tracker::reset()
@@ -217,22 +266,56 @@ namespace cycfi::q
       _frac = 0.0f;
       _mismatch = 0;
       _misses = 0;
+      _drop = never;
+      _hint = 0.0f;
+      _peak = 0.0f;
+      _estimate = 0;
+      _vetted = false;
    }
 
-   // Mismatches between the latest window and the window `lag` earlier,
-   // the window's end aligned down to a word.
+   // Mismatches between the latest `w` bits and the `w` bits `lag`
+   // earlier, the end aligned down to a word.
+   inline std::uint32_t bacf_lag_tracker::score(
+      std::uint32_t lag, std::uint32_t w) const
+   {
+      auto const start = (_pos - w - lag) / ws;
+      bitstream_acf<> const acf{_bits};
+      return std::uint32_t(acf(lag, start, w / ws));
+   }
+
+   // One lag (at least _min_window), whole words: the shortest score.
+   inline std::uint32_t bacf_lag_tracker::one_lag(std::uint32_t lag) const
+   {
+      auto const m = std::max(lag, _min_window);
+      return (m + ws - 1) / ws * ws;
+   }
+
+   // The window a score at `lag` runs over: one lag of the note until the
+   // whole window is after the drop.
+   inline std::uint32_t bacf_lag_tracker::span(std::uint32_t lag) const
+   {
+      auto const since = _now - _drop;
+      if (since < lag + ws)
+         return one_lag(lag);
+      auto const after = (since - lag - ws) / ws * ws;
+      return after >= _window ? _window : one_lag(lag);
+   }
+
+   // Mismatches at `lag`, scaled to the full window.
    inline std::uint32_t bacf_lag_tracker::score(std::uint32_t lag) const
    {
-      auto const start = (_pos - _window - lag) / ws;
-      bitstream_acf<> const acf{_bits};
-      return std::uint32_t(acf(lag, start, _window / ws));
+      auto const w = span(lag);
+      auto const m = score(lag, w);
+      return w == _window ? m
+         : std::uint32_t(std::lround(double(m) * _window / w));
    }
 
    // Enough history for a score at `lag`, and in range.
    inline bool bacf_lag_tracker::fits(std::uint32_t lag) const
    {
       return lag >= _min_lag && lag <= _max_lag
-         && _since >= _window + lag + ws;
+         && _since >= span(lag) + lag + ws
+         && _now - _drop >= one_lag(lag) + lag + ws;
    }
 
    inline void bacf_lag_tracker::edge(
@@ -240,7 +323,7 @@ namespace cycfi::q
    {
       if (_lag)
          track(kind, count);
-      else if (trailing)
+      else
          acquire();
       kind.push(_now);
       count = std::min(count + 1, edge_capacity);
@@ -267,7 +350,15 @@ namespace cycfi::q
          }
       }
       if (!fits(lag - sweep) || !fits(lag + sweep))
+      {
+         // A lag that cannot be scored is a miss, or the lock would hold.
+         if (++_misses >= max_misses)
+         {
+            _lag = 0;
+            _misses = 0;
+         }
          return;
+      }
 
       std::uint32_t m[2 * sweep + 1];
       std::uint32_t best = 0;
@@ -327,6 +418,8 @@ namespace cycfi::q
    {
       if (_num_pulses < 2)
          return;
+      if (!_estimate)
+         estimate();
       auto const& now = _pulses[0];
       auto best = std::uint32_t(0);
       auto best_m = _limit;
@@ -340,8 +433,7 @@ namespace cycfi::q
          if (d < _min_lag)
             continue;
          bool const similar =
-            rel_within(p.peak, now.peak
-             , 1.0f - zero_crossing_collector::pulse_height_diff)
+            rel_within(p.peak, now.peak, height_diff)
             && rel_within(p.width, now.width
              , 1.0f - zero_crossing_collector::pulse_width_diff);
          if (!similar)
@@ -363,6 +455,56 @@ namespace cycfi::q
          _mismatch = best_m;
          _misses = 0;
       }
+   }
+
+   // The note's first estimate: the latest pulse, if strong, to the
+   // nearest similar pulse after the drop.
+   inline void bacf_lag_tracker::estimate()
+   {
+      auto const& now = _pulses[0];
+      if (std::int32_t(now.lead - _drop) < 0 || now.peak < strong * _peak)
+         return;
+      for (std::size_t j = 1; j != _num_pulses; ++j)
+      {
+         auto const& p = _pulses[j];
+         if (std::int32_t(p.lead - _drop) < 0)
+            break;
+         auto const d = now.lead - p.lead;
+         if (d > _max_lag)
+            break;
+         if (d < _min_lag)
+            continue;
+         if (rel_within(p.peak, now.peak, height_diff)
+            && rel_within(p.width, now.width
+             , 1.0f - zero_crossing_collector::pulse_width_diff))
+         {
+            _estimate = d;      // vetted at the end of the sample
+            return;
+         }
+      }
+   }
+
+   // After a long hint (a chord), the estimate stands if it is the hint or
+   // a clean fraction of it, or once it repeats over one lag.
+   inline void bacf_lag_tracker::vet()
+   {
+      if (_hint <= _long_hint)
+      {
+         _vetted = true;
+         return;
+      }
+      for (int k = 1; k <= 4; ++k)
+      {
+         if (std::abs(float(_estimate) * float(k) / _hint - 1.0f) <= agree)
+         {
+            _vetted = true;
+            return;
+         }
+      }
+      auto const w = one_lag(_estimate);
+      if (_now - _drop >= w + _estimate + ws)
+         _vetted = 1.0f - float(score(_estimate, w)) / float(w)
+            >= vet_periodicity;
    }
 
    // Slide the bits: keep the latest _keep, moved to the start, a whole

@@ -12,6 +12,7 @@
 
 #include <cmath>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace q = cycfi::q;
@@ -183,6 +184,137 @@ TEST_CASE("bacf_lag_tracker: drop and reset")
    tr.reset();
    CHECK(!tr.locked());
    CHECK(tr.lag() == 0.0f);
+}
+
+TEST_CASE("bacf_lag_tracker: a lag that drifts out of range drops the lock")
+{
+   // 400 Hz (120 samples) for 0.2 s, a glide up to 600 Hz (80) over 0.5 s,
+   // past the 96-sample floor, then 600 Hz: the lock must not hold the
+   // last lag it could score. It locks again on a multiple of the new
+   // period.
+   double const period = sps / 600.0;
+   std::size_t const hold = std::size_t(0.2 * sps)
+    , glide = std::size_t(0.5 * sps)
+    , end = hold + glide + std::size_t(0.4 * sps);
+   q::bacf_lag_tracker tr{2_ms, 45_ms, sps};
+   double phase = 0;
+   bool lost = false;
+   std::size_t on = 0, locked = 0;
+   for (std::size_t i = 0; i != end; ++i)
+   {
+      double const f = i < hold ? 400.0
+         : i < hold + glide ? 400.0 + 200.0 * (i - hold) / glide : 600.0;
+      phase += 2 * pi * f / sps;
+      bool const l = tr(0.5f * float(std::sin(phase)));
+      if (i == hold)
+         REQUIRE(l);
+      if (i > hold && !l)
+         lost = true;
+      if (i >= end - std::size_t(0.1 * sps) && l)
+      {
+         ++locked;
+         on += on_multiple(tr.lag(), period);
+      }
+   }
+   CHECK(lost);
+   CHECK(locked == std::size_t(0.1 * sps));
+   CHECK(on == locked);
+}
+
+namespace
+{
+   // A sine for 0.2 s, then a drop with `hint`: the samples from the drop
+   // to the first provisional lag, and that lag.
+   std::pair<std::size_t, float> provisional_after(double freq, float hint)
+   {
+      q::bacf_lag_tracker tr{2_ms, 45_ms, sps};
+      auto tone = [=](std::size_t i)
+         { return 0.5f * float(std::sin(2 * pi * freq * i / sps)); };
+      std::size_t const at = std::size_t(0.2 * sps);
+      for (std::size_t i = 0; i != at; ++i)
+         tr(tone(i));
+      tr.drop(hint);
+      REQUIRE(tr.provisional() == 0.0f);
+      for (std::size_t i = at; i != at + std::size_t(0.1 * sps); ++i)
+      {
+         tr(tone(i));
+         if (tr.provisional() > 0.0f)
+            return {i - at, tr.provisional()};
+      }
+      return {0, 0.0f};
+   }
+}
+
+TEST_CASE("bacf_lag_tracker: a provisional lag after a drop")
+{
+   // The first pair of like pulses after the drop gives the period, about
+   // two periods in.
+   double const period = sps / 196.0;
+   auto const plain = provisional_after(196, 0.0f);
+   REQUIRE(plain.second > 0.0f);
+   CHECK(on_multiple(plain.second, period));
+   CHECK(plain.first < std::size_t(2.5 * period));
+}
+
+TEST_CASE("bacf_lag_tracker: after a long hint, a provisional lag is vetted")
+{
+   // 600 Hz is under the floor, so the estimate is two periods (160
+   // samples). After a long hint (a chord) the estimate stands at once if
+   // the hint is a clean multiple of it, else only once it has repeated
+   // over one lag, which comes later.
+   double const period = sps / 600.0;
+   auto const plain = provisional_after(600, 0.0f);
+   REQUIRE(plain.second > 0.0f);
+   CHECK(on_multiple(plain.second, period));
+
+   auto const agrees = provisional_after(600, 4 * plain.second);
+   CHECK(agrees.first == plain.first);
+   CHECK(agrees.second == plain.second);
+
+   auto const other = provisional_after(600, float(0.017 * sps));
+   CHECK(other.second == plain.second);
+   CHECK(other.first > plain.first);
+}
+
+TEST_CASE("bacf_lag_tracker: a pick's provisional lag comes before its lock")
+{
+   q::wav_reader src{"audio_files/1a-Low-E.wav"};
+   REQUIRE(src);
+   float const fs = src.sps();
+   std::vector<float> in(src.length());
+   src.read(in);
+   float peak = 0;
+   for (auto s : in)
+      peak = std::max(peak, std::abs(s));
+   std::size_t pick = 0;
+   while (std::abs(in[pick]) < 0.1f * peak)
+      ++pick;
+
+   q::bacf_lag_tracker tr{2_ms, 45_ms, fs};
+   q::lowpass lp{1_kHz, fs};
+   double const period = fs / 82.41;
+   std::size_t first_prov = 0, first_lock = 0;
+   float prov = 0;
+   for (std::size_t i = 0; i != pick + std::size_t(0.1 * fs); ++i)
+   {
+      if (i == pick)
+         tr.drop();
+      bool const l = tr(lp(in[i]));
+      if (i < pick)
+         continue;
+      if (!first_prov && tr.provisional() > 0.0f)
+      {
+         first_prov = i - pick;
+         prov = tr.provisional();
+      }
+      if (!first_lock && l)
+         first_lock = i - pick;
+   }
+   INFO("provisional at " << first_prov / fs * 1000 << " ms, lock at "
+      << first_lock / fs * 1000 << " ms");
+   REQUIRE(prov > 0.0f);
+   CHECK(on_multiple(prov, period, 0.07));
+   CHECK(first_prov < first_lock);
 }
 
 TEST_CASE("bacf_lag_tracker: stays locked over a long run")
