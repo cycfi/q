@@ -11,8 +11,8 @@
   <rect x="150.07" y="224" width="129.859" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
   <text x="215" y="250.9" text-anchor="middle" fill="#1a1a1a">bacf_provisional</text>
 
-  <rect x="329.898" y="224" width="90.2031" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="375" y="250.9" text-anchor="middle" fill="#1a1a1a">bacf_note</text>
+  <rect x="329.641" y="224" width="90.7188" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="375" y="250.9" text-anchor="middle" fill="#1a1a1a">bacf_slice</text>
 
   <rect x="490.805" y="224" width="88.3906" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
   <text x="535" y="250.9" text-anchor="middle" fill="#1a1a1a">bacf_lock</text>
@@ -21,8 +21,8 @@
   <line x1="215" y1="160" x2="215" y2="224" stroke="#1565c0" stroke-width="1.4"/>
   <line x1="375" y1="160" x2="375" y2="224" stroke="#1565c0" stroke-width="1.4"/>
   <line x1="535" y1="160" x2="535" y2="224" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="329.898" y1="246" x2="279.93" y2="246" stroke="#43a047" stroke-width="1.4"/>
-  <line x1="420.102" y1="246" x2="490.805" y2="246" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="329.641" y1="246" x2="279.93" y2="246" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="420.359" y1="246" x2="490.805" y2="246" stroke="#43a047" stroke-width="1.4"/>
   <line x1="215" y1="268" x2="215" y2="322" stroke="#1565c0" stroke-width="1.4"/>
   <line x1="535" y1="268" x2="535" y2="322" stroke="#1565c0" stroke-width="1.4"/>
   <line x1="375" y1="322" x2="375" y2="268" stroke="#43a047" stroke-width="1.4"/>

@@ -8,7 +8,7 @@
 
 #include <q/pitch/detail/bacf_bitstream.hpp>
 #include <q/pitch/detail/bacf_lock.hpp>
-#include <q/pitch/detail/bacf_note.hpp>
+#include <q/pitch/detail/bacf_slice.hpp>
 #include <q/pitch/detail/bacf_provisional.hpp>
 #include <q/support/base.hpp>
 #include <q/support/decibel.hpp>
@@ -93,13 +93,13 @@ namespace cycfi::q
       std::uint32_t        _max_lag;
       std::uint32_t        _window;       // bits, whole words
       bitstream            _bits;
-      detail::bacf_note    _note;
+      detail::bacf_slice    _slice;
       detail::bacf_lock    _lock;
       detail::bacf_provisional _prov;
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // Scores at a lag for the lock: over the note's window at that lag,
+   // Scores at a lag for the lock: over the slice's window at that lag,
    // scaled to the full window.
    ////////////////////////////////////////////////////////////////////////////
    struct bacf_lag_tracker::scorer
@@ -129,7 +129,7 @@ namespace cycfi::q
        , ((_window + multiples * (_max_lag + sweep) + 2 * ws) / ws + 1) * ws
        , edge_capacity
       }
-    , _note{_window, std::uint32_t(min_window * sps)}
+    , _slice{_window, std::uint32_t(min_window * sps)}
     , _lock{_min_lag, _max_lag, _window, std::uint32_t(threshold * _window)}
     , _prov{_min_lag, _max_lag, long_hint * sps}
    {}
@@ -140,7 +140,7 @@ namespace cycfi::q
       _bits(s, [this](bitstream::edge_kind k) { edge(k); });
       if (_prov.pending())
       {
-         _prov.vet(_note, _bits.now()
+         _prov.vet(_slice, _bits.now()
           , [this](std::uint32_t lag) { return one_lag_periodicity(lag); });
       }
       return _lock.locked();
@@ -156,26 +156,26 @@ namespace cycfi::q
    inline void bacf_lag_tracker::drop(float hint)
    {
       _lock.drop();
-      _note.drop(_bits.now(), hint);
+      _slice.drop(_bits.now(), hint);
       _prov.drop();
    }
 
    inline void bacf_lag_tracker::reset()
    {
       _bits.reset();
-      _note.reset();
+      _slice.reset();
       _lock.reset();
       _prov.reset();
    }
 
-   // At an edge: a pulse that ends counts toward the note's peak; locked,
-   // the lock tracks; unlocked, the note's estimate and the lock's
+   // At an edge: a pulse that ends counts toward the slice's peak; locked,
+   // the lock tracks; unlocked, the provisional estimate and the lock's
    // acquisition both use the latest pulse.
    inline void bacf_lag_tracker::edge(bitstream::edge_kind k)
    {
       auto const pulses = _bits.pulses();
       if (k == bitstream::trailing)
-         _note.observe(pulses[0]);
+         _slice.observe(pulses[0]);
 
       if (_lock.locked())
       {
@@ -184,32 +184,32 @@ namespace cycfi::q
       else if (pulses.size() >= 2)
       {
          if (!_prov.estimated())
-            _prov.estimate(pulses, _note);
+            _prov.estimate(pulses, _slice);
          _lock.acquire(pulses, scorer{*this});
       }
    }
 
-   // The match at `lag` over one lag of the note, for the estimate's vet.
+   // The match at `lag` over one lag of the slice, for the estimate's vet.
    inline float bacf_lag_tracker::one_lag_periodicity(
       std::uint32_t lag) const
    {
-      auto const w = _note.one_lag(lag);
+      auto const w = _slice.one_lag(lag);
       return 1.0f - float(_bits.mismatch(lag, w)) / float(w);
    }
 
-   // In range, and history enough for the note's window at `lag`.
+   // In range, and history enough for the slice's window at `lag`.
    inline bool bacf_lag_tracker::scorer::fits(std::uint32_t lag) const
    {
       auto const now = _t._bits.now();
       return lag >= _t._min_lag && lag <= _t._max_lag
-         && _t._bits.has(lag, _t._note.window(lag, now))
-         && _t._note.ready(lag, now);
+         && _t._bits.has(lag, _t._slice.window(lag, now))
+         && _t._slice.ready(lag, now);
    }
 
    inline std::uint32_t bacf_lag_tracker::scorer::operator()(
       std::uint32_t lag) const
    {
-      auto const w = _t._note.window(lag, _t._bits.now());
+      auto const w = _t._slice.window(lag, _t._bits.now());
       auto const m = _t._bits.mismatch(lag, w);
       return w == _t._window ? m
          : std::uint32_t(std::lround(double(m) * _t._window / w));

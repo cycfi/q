@@ -6,7 +6,7 @@
 #if !defined(CYCFI_Q_DETAIL_BACF_PROVISIONAL_NOVEMBER_7_2026)
 #define CYCFI_Q_DETAIL_BACF_PROVISIONAL_NOVEMBER_7_2026
 
-#include <q/pitch/detail/bacf_note.hpp>
+#include <q/pitch/detail/bacf_slice.hpp>
 
 #include <cmath>
 #include <cstdint>
@@ -17,9 +17,9 @@ namespace cycfi::q::detail
    // bacf_provisional: a note's first estimate of its lag, before any
    // lock: the latest pulse, if strong (60% of the peak since the drop),
    // to the nearest like pulse after the drop. It stands at once, unless
-   // the note's hint is long (over `long_hint` samples: a chord's), when
+   // the slice's hint is long (over `long_hint` samples: a chord's), when
    // it stands only if the hint is it or a clean multiple of it (2 to 4,
-   // within 2%), or once it repeats over one lag of the note (85%).
+   // within 2%), or once it repeats over one lag of the slice (85%).
    //
    // estimate() runs at an unlocked edge; vet(), at the end of each sample
    // while an estimate waits, takes the one-lag periodicity at a lag.
@@ -41,12 +41,12 @@ namespace cycfi::q::detail
 
                            template <typename Pulses>
       void                 estimate(
-                              Pulses const& pulses, bacf_note const& note
+                              Pulses const& pulses, bacf_slice const& slice
                            );
 
                            template <typename Periodicity>
       void                 vet(
-                              bacf_note const& note, std::uint32_t now
+                              bacf_slice const& slice, std::uint32_t now
                             , Periodicity const& periodicity
                            );
 
@@ -98,16 +98,16 @@ namespace cycfi::q::detail
 
    template <typename Pulses>
    inline void bacf_provisional::estimate(
-      Pulses const& pulses, bacf_note const& note)
+      Pulses const& pulses, bacf_slice const& slice)
    {
       auto const& now = pulses[0];
-      if (!note.after(now.lead) || now.peak < strong * note.peak())
+      if (!slice.after(now.lead) || now.peak < strong * slice.peak())
          return;
 
       for (std::size_t j = 1; j != pulses.size(); ++j)
       {
          auto const& p = pulses[j];
-         if (!note.after(p.lead))
+         if (!slice.after(p.lead))
             break;
          auto const d = now.lead - p.lead;
          if (d > _max_lag)
@@ -122,10 +122,10 @@ namespace cycfi::q::detail
 
    template <typename Periodicity>
    inline void bacf_provisional::vet(
-      bacf_note const& note, std::uint32_t now
+      bacf_slice const& slice, std::uint32_t now
     , Periodicity const& periodicity)
    {
-      auto const hint = note.hint();
+      auto const hint = slice.hint();
       if (hint <= _long_hint)
       {
          _vetted = true;
@@ -141,7 +141,7 @@ namespace cycfi::q::detail
          }
       }
 
-      if (note.ready(_estimate, now))
+      if (slice.ready(_estimate, now))
          _vetted = periodicity(_estimate) >= repeat;
    }
 }

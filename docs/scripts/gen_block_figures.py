@@ -995,7 +995,7 @@ def bacf_lag_tracker_parts():
     y_bits = f.margin + 18 + 34 + 30 + 20
     bits = f.place(Block('bacf_bitstream', width=span), x0, y_bits)
     y_row = bits.bottom + 64
-    blocks = [Block('bacf_provisional'), Block('bacf_note'),
+    blocks = [Block('bacf_provisional'), Block('bacf_slice'),
               Block('bacf_lock')]
     for k, b in enumerate(blocks):
         f.place(b, x0 + span * (k + 1) / 4 - b.w / 2, y_row)

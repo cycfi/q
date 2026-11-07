@@ -1,13 +1,13 @@
-= bacf_note
+= bacf_slice
 
-The note since the last drop, for the xref:bacf/lag_tracker.adoc[BACF lag
+The signal since the last drop, for the xref:bacf/lag_tracker.adoc[BACF lag
 tracker]: when it began, its hint, its strongest pulse, and the window a
 score may run over.
 
 == Include
 
 ```c++
-#include <q/pitch/detail/bacf_note.hpp>
+#include <q/pitch/detail/bacf_slice.hpp>
 ```
 
 == Declaration
@@ -15,13 +15,13 @@ score may run over.
 ```c++
 namespace cycfi::q::detail
 {
-   class bacf_note
+   class bacf_slice
    {
    public:
 
       static constexpr std::uint32_t never = 0x80000000u;
 
-                           bacf_note(
+                           bacf_slice(
                               std::uint32_t window
                             , std::uint32_t min_window
                            );
@@ -40,9 +40,9 @@ namespace cycfi::q::detail
 }
 ```
 
-== The note
+== The slice
 
-`drop(now, hint)` begins a note at `now` on the sample clock. `hint` is the
+`drop(now, hint)` begins a slice at `now` on the sample clock. `hint` is the
 last good lag before it (0 for none); the provisional uses it to tell a
 chord's re-strum. `observe(p)` takes each completed pulse, and `peak()` is
 the highest one since the drop. `after(t)` is true for a time at or after
@@ -55,18 +55,18 @@ wrap ago. No pulse is after it, and every window is full.
 
 A score at a lag compares the window ending now with the window one lag
 earlier, so it reaches a lag, the window and a word back. Until all of that
-is after the drop, a full window would mix the note with what came before it.
+is after the drop, a full window would mix the slice with what came before it.
 
 * `one_lag(lag)`: the lag, at least `min_window`, rounded up to whole words.
   The shortest score.
 * `window(lag, now)`: `one_lag(lag)` until the full window, the lag and a
   word are all after the drop; the full window from then on.
-* `ready(lag, now)`: one lag of the note can be scored, that is
+* `ready(lag, now)`: one lag of the slice can be scored, that is
   `one_lag(lag)`, the lag and a word are after the drop.
 
 == Tests
 
-`test/pitch/detail/bacf_note.cpp`: one lag's floor and rounding; the full
+`test/pitch/detail/bacf_slice.cpp`: one lag's floor and rounding; the full
 window before any drop; the switch from one lag to the full window at the
 exact sample; `ready()` at its exact sample; the peak since the drop,
 ignoring earlier pulses, and starting over at a new drop; the clock's wrap;

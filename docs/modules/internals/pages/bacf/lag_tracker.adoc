@@ -15,7 +15,7 @@ image::bacf_lag_tracker_parts.svg[Parts of the BACF lag tracker, width=750]
   with hysteresis, the bit history, the edges, the pulses and the sample
   clock. Its `mismatch()` is the score the other parts use: the bits that
   differ between two windows a lag apart.
-* xref:bacf/note.adoc[`bacf_note`]: the note since the last `drop()`, with
+* xref:bacf/slice.adoc[`bacf_slice`]: the signal since the last `drop()`, with
   its start, its hint and its strongest pulse, and the window a score at a
   lag runs over.
 * xref:bacf/lock.adoc[`bacf_lock`]: the lag, acquired from like pulses,
@@ -36,7 +36,7 @@ edges. Within a sample the steps run in this order:
   into its pulse list first.
 . The callback runs at the edge, before the edge enters its list and before
   the sample's bit enters the history:
-.. at a trailing edge, the pulse goes to the note, for its peak;
+.. at a trailing edge, the pulse goes to the slice, for its peak;
 .. locked, the lock tracks, against the earlier edges of this kind;
 .. unlocked, with two pulses or more, the provisional estimate is made if
    there is none yet, then the lock tries to acquire from the latest pulse.
@@ -49,22 +49,22 @@ edges. Within a sample the steps run in this order:
 
 The tracker gives the lock a scorer with two calls:
 
-* `fits(lag)`: the lag is in range, the history holds the note's window at
-  that lag plus the lag and a word, and one lag of the note can be scored.
-* `operator()(lag)`: the mismatches over the note's window at that lag,
+* `fits(lag)`: the lag is in range, the history holds the slice's window at
+  that lag plus the lag and a word, and one lag of the slice can be scored.
+* `operator()(lag)`: the mismatches over the slice's window at that lag,
   scaled to the full window, so one limit, 15% of the window, applies to
   both windows.
 
-The provisional is given the match over one lag of the note, unscaled.
+The provisional is passed the match over one lag of the slice, unscaled.
 
 == Invariants
 
 * The sample clock wraps; times are compared by their difference, never by
   their order.
 * A score never reaches before the last drop: until the full window is
-  after it, the window is one lag of the note.
+  after it, the window is one lag of the slice.
 * `lag()` changes only at an edge, or at a drop (unlocked, it holds).
-* Before any drop the note is long ago: the full window, no estimate.
+* Before any drop the slice began long ago: the full window, no estimate.
 * Nothing allocates after construction.
 
 == Verification

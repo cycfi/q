@@ -11,7 +11,7 @@
 #include <vector>
 
 namespace q = cycfi::q;
-using q::detail::bacf_note;
+using q::detail::bacf_slice;
 using q::detail::bacf_provisional;
 using q::detail::bacf_pulse;
 
@@ -21,13 +21,13 @@ namespace
    constexpr float long_hint = 624.0f;          // 13 ms at 48 kHz
    using pulses = std::vector<bacf_pulse>;      // newest first
 
-   bacf_note dropped(std::uint32_t at, float hint, pulses const& seen)
+   bacf_slice dropped(std::uint32_t at, float hint, pulses const& seen)
    {
-      bacf_note note{8 * ws, 96};
-      note.drop(at, hint);
+      bacf_slice slice{8 * ws, 96};
+      slice.drop(at, hint);
       for (auto i = seen.size(); i-- != 0;)
-         note.observe(seen[i]);
-      return note;
+         slice.observe(seen[i]);
+      return slice;
    }
 
    auto const repeats = [](std::uint32_t) { return 0.95f; };
@@ -44,12 +44,12 @@ TEST_CASE("bacf_provisional: the first strong pair after the drop")
     , {1100, 1.0f, 40.0f}
     , {900, 1.0f, 40.0f}       // before the drop
    };
-   auto const note = dropped(1000, 0.0f, p);
+   auto const slice = dropped(1000, 0.0f, p);
    bacf_provisional prov{96, 2000, long_hint};
-   prov.estimate(p, note);
+   prov.estimate(p, slice);
    REQUIRE(prov.estimated());
    CHECK(prov.value() == 0.0f);      // until vetted, at the sample's end
-   prov.vet(note, 1501, repeats);
+   prov.vet(slice, 1501, repeats);
    CHECK(prov.value() == 200.0f);
    CHECK(!prov.pending());
 }
@@ -99,33 +99,33 @@ TEST_CASE("bacf_provisional: after a long hint, one that agrees stands")
    {
       if (250.0f * k <= long_hint)
          continue;
-      auto const note = dropped(1000, 250.0f * k * 1.015f, p);
+      auto const slice = dropped(1000, 250.0f * k * 1.015f, p);
       bacf_provisional prov{96, 2000, long_hint};
-      prov.estimate(p, note);
-      prov.vet(note, 1501, does_not);
+      prov.estimate(p, slice);
+      prov.vet(slice, 1501, does_not);
       CHECK(prov.value() == 250.0f);
    }
 }
 
 TEST_CASE("bacf_provisional: after a long hint, others must repeat")
 {
-   // Else it waits until one lag of the note can be scored, and stands
+   // Else it waits until one lag of the slice can be scored, and stands
    // only if it repeats over that lag (85%).
    pulses const p{{1500, 1.0f, 40.0f}, {1250, 1.0f, 40.0f}};
-   auto const note = dropped(1000, 816.0f, p);   // 3.26 times 250
+   auto const slice = dropped(1000, 816.0f, p);   // 3.26 times 250
    bacf_provisional prov{96, 2000, long_hint};
-   prov.estimate(p, note);
-   auto const ready = 1000 + note.one_lag(250) + 250 + ws;
+   prov.estimate(p, slice);
+   auto const ready = 1000 + slice.one_lag(250) + 250 + ws;
 
-   prov.vet(note, ready - 1, repeats);
+   prov.vet(slice, ready - 1, repeats);
    CHECK(prov.pending());
    CHECK(prov.value() == 0.0f);
 
-   prov.vet(note, ready, does_not);
+   prov.vet(slice, ready, does_not);
    CHECK(prov.pending());
    CHECK(prov.value() == 0.0f);
 
-   prov.vet(note, ready + 1, repeats);
+   prov.vet(slice, ready + 1, repeats);
    CHECK(!prov.pending());
    CHECK(prov.value() == 250.0f);
 }
@@ -133,15 +133,15 @@ TEST_CASE("bacf_provisional: after a long hint, others must repeat")
 TEST_CASE("bacf_provisional: drop and reset")
 {
    pulses const p{{1500, 1.0f, 40.0f}, {1300, 1.0f, 40.0f}};
-   auto const note = dropped(1000, 0.0f, p);
+   auto const slice = dropped(1000, 0.0f, p);
    bacf_provisional prov{96, 2000, long_hint};
-   prov.estimate(p, note);
-   prov.vet(note, 1501, repeats);
+   prov.estimate(p, slice);
+   prov.vet(slice, 1501, repeats);
    REQUIRE(prov.value() == 200.0f);
    prov.drop();
    CHECK(!prov.estimated());
    CHECK(prov.value() == 0.0f);
-   prov.estimate(p, note);
+   prov.estimate(p, slice);
    prov.reset();
    CHECK(!prov.estimated());
 }

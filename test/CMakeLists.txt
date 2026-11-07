@@ -150,7 +150,7 @@ set(APP_SOURCES
    pitch/pitch_detector_ex.cpp
    pitch/bacf_lag_tracker.cpp
    pitch/detail/bacf_bitstream.cpp
-   pitch/detail/bacf_note.cpp
+   pitch/detail/bacf_slice.cpp
    pitch/detail/bacf_lock.cpp
    pitch/detail/bacf_provisional.cpp
    fft/fft.cpp
@@ -309,7 +309,7 @@ add_test(NAME test_pitch_detector COMMAND test_pitch_detector)
 add_test(NAME test_pitch_detector_ex COMMAND test_pitch_detector_ex)
 add_test(NAME test_bacf_lag_tracker COMMAND test_bacf_lag_tracker)
 add_test(NAME test_bacf_bitstream COMMAND test_bacf_bitstream)
-add_test(NAME test_bacf_note COMMAND test_bacf_note)
+add_test(NAME test_bacf_slice COMMAND test_bacf_slice)
 add_test(NAME test_bacf_lock COMMAND test_bacf_lock)
 add_test(NAME test_bacf_provisional COMMAND test_bacf_provisional)
 add_test(NAME test_sin COMMAND test_sin)

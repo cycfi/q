@@ -32,12 +32,12 @@ namespace cycfi::q::detail
 
                            template <typename Pulses>
       void                 estimate(
-                              Pulses const& pulses, bacf_note const& note
+                              Pulses const& pulses, bacf_slice const& slice
                            );
 
                            template <typename Periodicity>
       void                 vet(
-                              bacf_note const& note, std::uint32_t now
+                              bacf_slice const& slice, std::uint32_t now
                             , Periodicity const& periodicity
                            );
 
@@ -52,9 +52,9 @@ namespace cycfi::q::detail
 
 == The estimate
 
-`estimate(pulses, note)` runs at an unlocked edge, until there is an
+`estimate(pulses, slice)` runs at an unlocked edge, until there is an
 estimate. The latest pulse must be after the drop and strong, at least
-`strong` of the note's peak. Its estimate is the span to the nearest like
+`strong` of the slice's peak. Its estimate is the span to the nearest like
 pulse before it that is also after the drop, within the lag range (a span
 under `min_lag` is passed over; past `max_lag` the search stops). A pair of
 like pulses exists about two periods into a note, before the lock: on the
@@ -62,7 +62,7 @@ Low E test note, 15 ms after the pick against 40 ms.
 
 == The chord check
 
-`vet(note, now, periodicity)` runs at the end of each sample while an
+`vet(slice, now, periodicity)` runs at the end of each sample while an
 estimate is `pending()`. A short hint, at most `long_hint` samples (13 ms in
 the tracker), or none, lets the estimate stand at once. After a long hint
 (a chord, whose common period is long) a single string's pulses can pair
@@ -71,7 +71,7 @@ The estimate then stands only if:
 
 * the hint is the estimate, or 2 to `fractions` times it, within `agree`;
   or
-* once one lag of the note can be scored (`note.ready()`), it repeats over
+* once one lag of the slice can be scored (`slice.ready()`), it repeats over
   that lag: `periodicity(estimate)` at least `repeat`.
 
 Until then `value()` is 0. It is the estimate in samples once it stands.

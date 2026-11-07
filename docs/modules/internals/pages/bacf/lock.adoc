@@ -56,7 +56,7 @@ A scorer with `fits(lag)`, whether a lag can be scored now, and
 `operator()(lag)`, its mismatches on the full window's scale. Mismatches
 under `limit` hold the lock. Pulses and edges come as lists, newest first,
 with `size()` and `operator[]`. The tracker passes the front end's lists
-and a scorer over the note's window; the tests pass vectors and scripted
+and a scorer over the slice's window; the tests pass vectors and scripted
 scores.
 
 == Acquire
