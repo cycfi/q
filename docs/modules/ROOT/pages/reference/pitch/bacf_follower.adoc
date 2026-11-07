@@ -10,7 +10,7 @@ The BACF follower tracks the lag at which a signal repeats: its period, or a mul
 
 The follower compares the signal with itself one lag back. Each sample becomes one bit, 1 above zero and 0 below (with a little hysteresis), and the XOR of the latest window's bits with the bits one lag back marks each sample where the two disagree. Where the waveform matches itself, few bits differ; that lag is where it repeats, its period.
 
-video::https://media.cycfi.com/q/bacf-pitch-shifter/chord_strobe_v4.mp4[width=750, opts="autoplay,loop,muted"]
+video::https://media.cycfi.com/q/bacf-pitch-shifter/chord_strobe_v5.mp4[width=750, opts="autoplay,loop,muted"]
 
 The video shows an E chord, ringing, as the lag slides from 1 to 30 ms. At the top, the input, low-passed at 1 kHz, with the latest window (blue) and the window one lag back (orange). Below it, the two windows overlaid, and under them their bits, one a sample, with the XOR marking in red each sample where they disagree (see `{bitstream_acf}`). At the bottom, the share of bits that differ at each lag. Most lags leave about half the bits mismatched, the level of chance; where the windows are out of phase, more (89% near 3.6 ms). At 24.3 ms, the period the chord's notes share, only 8% differ. The low E's own period, 12.1 ms, leaves 42%, since the other strings stand elsewhere in their cycles.
 

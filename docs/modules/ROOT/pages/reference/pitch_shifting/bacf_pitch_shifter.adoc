@@ -42,7 +42,7 @@ The splice forward to just behind the input, going down, comes from Katja Vetter
 
 Where the waveform repeats is found by autocorrelation, here by the `{bacf_follower}`. Bitstream autocorrelation, BACF, is a 1-bit autocorrelator: each sample becomes a single bit, 1 above zero and 0 below (see `{bitstream_acf}`). The video below shows the mechanism. The latest bits (blue) are laid over the bits from a moment earlier (orange), and every bit where they differ is marked (red). As the lag slides back, the red shows how much the two differ: less red, closer match.
 
-video::https://media.cycfi.com/q/bacf-pitch-shifter/chord_strobe_v4.mp4[width=750, opts="autoplay,loop,muted"]
+video::https://media.cycfi.com/q/bacf-pitch-shifter/chord_strobe_v5.mp4[width=750, opts="autoplay,loop,muted"]
 
 The green curve plots the share of bits that differ at each lag. Where the waveform best matches itself, the two line up and the red almost vanishes. That lag is where the waveform repeats. Here, an E chord lines up at 24.3 ms, its common period.
 
