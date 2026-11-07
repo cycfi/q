@@ -6,7 +6,6 @@
 #if !defined(CYCFI_Q_BACF_PITCH_SHIFTER_NOVEMBER_1_2026)
 #define CYCFI_Q_BACF_PITCH_SHIFTER_NOVEMBER_1_2026
 
-#include <q/fx/biquad.hpp>
 #include <q/fx/envelope.hpp>
 #include <q/fx/transient_detector.hpp>
 #include <q/fx/varispeed_tap.hpp>
@@ -25,28 +24,26 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // bacf_pitch_shifter: a time-domain pitch shifter on a tracked period,
    // with no need to resolve the note: a period or a multiple of one
-   // splices alike. A varispeed_tap reads the input at the ratio; going up
-   // its delay runs out and it splices back by a period, keeping only the
-   // headroom the next fade needs; going down it falls behind and splices
-   // forward by as many periods as fit, to just behind the input. The
-   // period is the lag a bacf_lag_tracker holds on the input through a
-   // 1 kHz low-pass, one bitstream correlation per zero crossing, smoothed
-   // as the period detectors do (set outright on a new lock or a jump,
-   // else a median of 3 and an average); each splice refines it to the
-   // full band within 4 samples.
+   // splices alike. A varispeed_tap reads at the ratio; going up its delay
+   // runs out and it splices back by a period, keeping only the headroom
+   // the next fade needs; going down it falls behind and splices forward
+   // by as many periods as fit. The whole machinery (the tap, its splices
+   // and the bacf_lag_tracker that gives the period) runs on the input
+   // through a 1 kHz one-pole low-pass, and the output is that low-pass
+   // undone, its exact inverse at 1 kHz times the ratio (the shift moves
+   // the low-pass's shape up with the pitch). The lag is smoothed as the
+   // period detectors do; each splice refines it within 4 samples.
    //
-   // At each transient (transient_detector) the read restarts at the
-   // pick's own start: going down at once, going up as soon as the pick's
-   // period is locked, or after `max_latency` at the latest, which is
-   // what latency() reports. Until then, and through a lost lock, the last
-   // lag stands in. Crossfades are half a period (2 to 8 ms), and no lag
-   // is shorter than 1.25 crossfades or longer than 45 ms (an open G chord
-   // repeats every 41 ms).
+   // At each transient the read restarts at the pick's own start: going
+   // down at once, going up on the pick's first estimate of its period
+   // (the tracker's provisional()), its lock, or after `max_latency` at
+   // the latest, which is what latency() reports. Until then the last lag
+   // stands in. A splice in flight always completes. Crossfades are half
+   // a period (2 to 8 ms); no lag is under 1.25 crossfades or over 45 ms.
    //
    // The ratio may change every sample. Going down, picks come out a
-   // millisecond behind the input. Unshifted, the read returns to the
-   // input at the next pick, or in silence: at rest the output is the
-   // input itself, with no latency, and a pull-up splices from there.
+   // millisecond behind the input. At rest the output is the input
+   // itself, bit for bit, and a pull-up splices from there.
    ////////////////////////////////////////////////////////////////////////////
    class bacf_pitch_shifter
    {
@@ -54,7 +51,7 @@ namespace cycfi::q
 
                            bacf_pitch_shifter(
                               float sps
-                            , duration max_latency = duration{0.020}
+                            , duration max_latency = duration{0.010}
                            );
 
       float                operator()(float s, float ratio);
@@ -73,6 +70,12 @@ namespace cycfi::q
 
       static constexpr float        lag_floor      = 1.25f; // crossfades
       static constexpr float        silence_floor  = 0.001f;
+      static constexpr float        lp_corner      = 1000.0f; // Hz
+      // Below a semitone up the read is near the input: with no period
+      // yet it holds at the headroom (the input's own pitch, the smaller
+      // error), and a splice in flight at a pick turns around. Above,
+      // the last lag stands in and the splice completes.
+      static constexpr float        hold_ratio     = 1.0594631f;
 
       using envelope_follower = peak_envelope_follower;
 
@@ -88,7 +91,11 @@ namespace cycfi::q
       varispeed_tap        _tap;
       envelope_follower    _env;
       transient_detector   _transient;
-      lowpass              _lp;
+      float                _lp_g;              // the one-pole's gain
+      float                _lp = 0.0f;         // its state
+      float                _inv_ratio = 0.0f;  // the inverse's, at its ratio
+      float                _inv_g = 1.0f;
+      float                _inv = 0.0f;
       bacf_lag_tracker     _tracker;
 
       std::size_t          _since;
@@ -96,6 +103,7 @@ namespace cycfi::q
       bool                 _acquired = false;
       float                _lag = 0.0f;
       float                _lag_raw = 0.0f;
+      float                _prov = 0.0f;       // the pick's first estimate
       std::vector<float>   _scratch;           // the refine's windows
       median3              _lag_median;
       exp_moving_average<8> _lag_average;
@@ -120,7 +128,7 @@ namespace cycfi::q
     , _tap{_latency + 4 * _lag_max + _fade_max + 4 * _window}
     , _env{duration{0.1}, sps}
     , _transient{sps}
-    , _lp{frequency{1000.0}, sps}
+    , _lp_g{float(1.0 - std::exp(-2_pi * lp_corner / sps))}
     , _tracker{
          duration{double(lag_lo()) / sps}
        , duration{double(_lag_max) / sps}
@@ -140,12 +148,15 @@ namespace cycfi::q
       _tap.reset();
       _env = envelope_follower{duration{0.1}, _sps};
       _transient = transient_detector{_sps};
-      _lp = lowpass{frequency{1000.0}, _sps};
+      _lp = 0.0f;
+      _inv_ratio = 0.0f;
+      _inv = 0.0f;
       _tracker.reset();
       _since = _tap.max_delay();
       _pending = false;
       _acquired = false;
       _lag = 0.0f;
+      _prov = 0.0f;
       _last_lag = 0.0f;
    }
 
@@ -163,17 +174,24 @@ namespace cycfi::q
       if (_transient(s))
       {
          transient();
+         // A splice in flight is never cut, but near unity its outgoing
+         // read may be at the pick's onset already: the splice turns
+         // around, so the onset plays once, where the read is.
+         if (ratio != 1.0f && ratio < hold_ratio && _tap.splicing()
+            && _tap.delay() <= float(_preroll + fade()))
+            _tap.reverse();
          // A read within a fade of the pick's start plays the pick's onset
          // before a jump could cross away from it, so a restart would play
-         // it twice: the pick plays where the read is. Going up, the read
-         // holds at the headroom until the pick's period locks.
-         if (ratio != 1.0f && _tap.delay() <= float(_preroll + fade()))
+         // it twice: the pick plays where the read is (or lands, with a
+         // splice in flight).
+         if (ratio != 1.0f && _tap.target() <= float(_preroll + fade()))
             _pending = false;
       }
 
       // A lock since the last transient gives the lag; without one, the
-      // last stands in.
-      if (_tracker(_lp(s)))
+      // pick's first estimate or the last lag stands in.
+      _lp += _lp_g * (s - _lp);
+      if (_tracker(_lp))
       {
          // As the period detectors do: a new lock, or a jump (another
          // multiple, a new note), is set outright; otherwise each new
@@ -193,15 +211,18 @@ namespace cycfi::q
          _lag_raw = l;
          _acquired = true;
       }
+      if (!_acquired && _prov == 0.0f)
+         _prov = _tracker.provisional();
 
       // The new pick plays from its own start, a pre-roll before the
       // detection: going down at once (the read never runs out), going
-      // up once its period is locked, or once `max_latency` of it exists.
-      // Unshifted, the pick returns the read to the input itself,
-      // crossfading over the pre-roll, as does silence.
+      // up once it has an estimate or a lock of its period, or once
+      // `max_latency` of it exists. Unshifted, the pick returns the read to
+      // the input itself, crossfading over the pre-roll, as does silence.
+      // A splice in flight is never cut: these wait for it.
       if (ratio == 1.0f)
       {
-         if (_pending)
+         if (_pending && !_tap.splicing())
          {
             _pending = false;
             if (_tap.target() > 0.0f)
@@ -213,22 +234,47 @@ namespace cycfi::q
             _tap.splice(0.0f, _fade_min);
          }
       }
-      if (_pending && (ratio < 1.0f || _acquired || _since >= _latency))
+      if (_pending && !_tap.splicing()
+         && (ratio < 1.0f || _acquired || _prov > 0.0f || _since >= _latency))
       {
          _pending = false;
-         splice(float(_since + _preroll));
+         auto const to = float(_since + _preroll);
+         if (ratio > 1.0f)
+         {
+            // Both reads move at the ratio, so the old one closes on the
+            // pick's start by `ratio` a sample: the fade ends before it.
+            auto const most = (_tap.delay() - to - 4.0f) / ratio;
+            _tap.splice(to, std::size_t(
+               std::clamp(most, 0.0005f * _sps, float(fade()))));
+         }
+         else
+         {
+            splice(to);
+         }
       }
 
-      auto const y = _tap(s, ratio);
-      if (_tap.splicing())
-         return y;
+      auto const y = _tap(_lp, ratio);
+      if (!_tap.splicing())
+      {
+         auto const delay = _tap.delay();
+         if (ratio > 1.0f)
+            up(delay, ratio);
+         else if (ratio < 1.0f)
+            down(delay);
+      }
 
-      auto const delay = _tap.delay();
-      if (ratio > 1.0f)
-         up(delay, ratio);
-      else if (ratio < 1.0f)
-         down(delay);
-      return y;
+      // The low-pass undone, at its corner times the ratio. At rest the
+      // read is the input's own sample, so the input itself goes out.
+      if (ratio != _inv_ratio)
+      {
+         _inv_ratio = ratio;
+         _inv_g = 1.0f - fast_exp(-2_pi * lp_corner * ratio / _sps);
+      }
+      auto const out = _inv + (y - _inv) / _inv_g;
+      _inv = y;
+      if (ratio == 1.0f && !_tap.splicing() && _tap.delay() == 0.0f)
+         return s;
+      return out;
    }
 
    inline void bacf_pitch_shifter::transient()
@@ -238,15 +284,14 @@ namespace cycfi::q
       if (_acquired)
          _last_lag = _lag;
       _acquired = false;
-      _tracker.drop();
-      if (_tap.splicing())          // land it, so the guard can act now
-         _tap.delay(_tap.target());
+      _prov = 0.0f;
+      _tracker.drop(_last_lag);
    }
 
    // Half a period, from the lag in use
    inline std::size_t bacf_pitch_shifter::fade() const
    {
-      auto const lag = _acquired ? _lag : _last_lag;
+      auto const lag = _acquired ? _lag : _prov > 0.0f ? _prov : _last_lag;
       return lag > 0
          ? std::clamp(std::size_t(0.5f * lag), _fade_min, _fade_max)
          : _fade_min;
@@ -264,13 +309,14 @@ namespace cycfi::q
    {
       // The headroom the next fade-out needs: it runs `fade` outputs at
       // the ratio, gaining fade * (ratio - 1) on the input.
-      auto const lag_now = _acquired ? _lag : _last_lag;
+      auto const lag_now = _acquired ? _lag : _prov > 0.0f ? _prov : _last_lag;
       auto const span = lag_now > 0 ? float(fade()) : float(_fade_max);
       auto const reach = span * (ratio - 1.0f) + 4.0f;
       if (_pending)
       {
+         // Behind the pick's start by the restart's whole fade
          auto const keep_off = float(_since + _preroll)
-            + reach + float(_fade_min) * ratio;
+            + reach + float(fade()) * ratio;
          if (delay < keep_off)
          {
             auto const lag = _last_lag > 0 ? _last_lag : float(_lag_max);
@@ -286,8 +332,12 @@ namespace cycfi::q
       {
          if (_acquired)
             splice(refine(delay, delay + _lag));
+         else if (_prov > 0.0f)
+            splice(refine(delay, delay + _prov));
+         else if (_last_lag > 0.0f && ratio >= hold_ratio)
+            splice(refine(delay, delay + _last_lag));
          else
-            _tap.delay(reach);      // no period yet: hold, dry
+            _tap.delay(reach);      // hold, at the input's pitch
       }
    }
 
@@ -348,7 +398,7 @@ namespace cycfi::q
    // the input and falls behind it at the ratio, so it never runs out.
    inline void bacf_pitch_shifter::down(float delay)
    {
-      auto lag = _acquired ? _lag : _last_lag;
+      auto lag = _acquired ? _lag : _prov > 0.0f ? _prov : _last_lag;
       if (lag <= 0)
          lag = float(_lag_max);
       auto const margin = 4.0f;
