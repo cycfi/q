@@ -1,0 +1,111 @@
+= bacf_bitstream
+
+The front end of the xref:bacf/lag_tracker.adoc[BACF lag tracker]: the
+bitstream, its edges and pulses, and the score.
+
+== Include
+
+```c++
+#include <q/pitch/detail/bacf_bitstream.hpp>
+```
+
+== Declaration
+
+```c++
+namespace cycfi::q::detail
+{
+   struct bacf_pulse
+   {
+      std::uint32_t        lead;
+      float                peak;
+      float                width;
+   };
+
+   bool                    similar(bacf_pulse const& a, bacf_pulse const& b);
+
+   class bacf_bitstream
+   {
+   public:
+
+      enum edge_kind { leading, trailing };
+      using edge_list = bacf_list<std::uint32_t>;
+      using pulse_list = bacf_list<bacf_pulse>;
+
+      static constexpr std::size_t  word_size = bitset<>::value_size;
+      static constexpr float        width_level = 0.3f;
+
+                           bacf_bitstream(
+                              float hysteresis
+                            , std::size_t history
+                            , std::size_t capacity
+                           );
+
+                           template <typename F>
+      void                 operator()(float s, F&& on_edge);
+
+      std::uint32_t        now() const;
+      std::size_t          history() const;
+      bool                 has(std::uint32_t lag, std::uint32_t w) const;
+      std::uint32_t        mismatch(std::uint32_t lag, std::uint32_t w) const;
+      edge_list            edges(edge_kind k) const;
+      pulse_list           pulses() const;
+      void                 reset();
+   };
+}
+```
+
+== The bitstream
+
+A comparator with hysteresis turns the signal into one bit a sample: it goes
+high when the signal rises over `hysteresis` and low when it falls under its
+negative. The bits are kept in a `bitset` of twice `history` and a word; when
+it fills, the latest `history` bits slide to its start (`history` is rounded
+up to whole words, so a slide moves whole words and keeps every word's
+alignment).
+
+`history()` counts the bits held, up to `history`. `has(lag, w)` is true
+when they reach the latest `w` bits, `lag` more and a word: enough for
+`mismatch(lag, w)`.
+
+== Edges and pulses
+
+A leading edge is where the bit goes high, a trailing edge where it goes
+low. Each kind is kept in its own ring of `capacity` times, and the pulses,
+one per completed high run, in a third. `edges(k)` and `pulses()` list them
+newest first.
+
+A pulse's `lead` is its leading edge, `peak` its highest sample, and `width`
+the samples from the lead to the first one under `width_level` of the peak
+so far, or to the trailing edge if none is. `similar(a, b)` is the test the
+lock and the provisional use for two pulses of one waveform: heights within
+40%, widths within 15%.
+
+== One sample
+
+`bits(s, on_edge)` calls `on_edge(kind)` at a crossing, at that sample: the
+pulse a trailing edge ends is already in `pulses()`, the edge itself is not
+yet in `edges(kind)`, and the sample's bit is not yet in the history. Then
+the bit is stored and `now()` advances. The callback is a template
+parameter, inlined.
+
+== The score
+
+`mismatch(lag, w)` counts the bits that differ between the latest `w` bits
+and the `w` bits `lag` earlier, with the end of the window aligned down to a
+word, through `bitstream_acf`. `w` is whole words.
+
+== Reset
+
+`reset()` empties the history, the edges and the pulses. The clock runs on.
+
+== Tests
+
+`test/pitch/detail/bacf_bitstream.cpp`:
+
+* edges at the hysteresis crossings, reported at their sample, with the
+  history and clock at the callback, and the edge ring's order;
+* pulse lead, peak and width, with and without a fall under 30%;
+* `mismatch()` against a count one bit at a time, at five lags and three
+  windows, through many slides of the history;
+* `history()`, `has()` and `reset()`;
+* `similar()` at the edges of its tolerances.

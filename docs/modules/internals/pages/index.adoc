@@ -1,0 +1,20 @@
+= Q Internals
+
+These pages are for developers working on Q itself. They describe how the
+implementation is put together: the classes in `detail` namespaces that the
+public classes are built from, their state, the invariants they keep, and how
+they are tested. None of it is public API, and it changes with the
+implementation.
+
+The public documentation does not link here; this page is the entry point.
+
+== BACF lag tracker
+
+* xref:bacf/lag_tracker.adoc[The design]: the parts and how they are wired
+* xref:bacf/bitstream.adoc[bacf_bitstream]: the bitstream, its edges and
+  pulses, and the score
+* xref:bacf/note.adoc[bacf_note]: the note since the last drop, and the
+  window a score runs over
+* xref:bacf/lock.adoc[bacf_lock]: acquiring, tracking and losing the lock
+* xref:bacf/provisional.adoc[bacf_provisional]: a note's first estimate,
+  and the chord check

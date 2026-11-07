@@ -1,0 +1,73 @@
+= bacf_note
+
+The note since the last drop, for the xref:bacf/lag_tracker.adoc[BACF lag
+tracker]: when it began, its hint, its strongest pulse, and the window a
+score may run over.
+
+== Include
+
+```c++
+#include <q/pitch/detail/bacf_note.hpp>
+```
+
+== Declaration
+
+```c++
+namespace cycfi::q::detail
+{
+   class bacf_note
+   {
+   public:
+
+      static constexpr std::uint32_t never = 0x80000000u;
+
+                           bacf_note(
+                              std::uint32_t window
+                            , std::uint32_t min_window
+                           );
+
+      void                 drop(std::uint32_t now, float hint);
+      void                 reset();
+      void                 observe(bacf_pulse const& p);
+
+      bool                 after(std::uint32_t t) const;
+      float                hint() const;
+      float                peak() const;
+      std::uint32_t        one_lag(std::uint32_t lag) const;
+      std::uint32_t        window(std::uint32_t lag, std::uint32_t now) const;
+      bool                 ready(std::uint32_t lag, std::uint32_t now) const;
+   };
+}
+```
+
+== The note
+
+`drop(now, hint)` begins a note at `now` on the sample clock. `hint` is the
+last good lag before it (0 for none); the provisional uses it to tell a
+chord's re-strum. `observe(p)` takes each completed pulse, and `peak()` is
+the highest one since the drop. `after(t)` is true for a time at or after
+the drop, by the clock's difference, so it holds across the wrap.
+
+Before any drop, and after `reset()`, the drop is `never`: half the clock's
+wrap ago. No pulse is after it, and every window is full.
+
+== The window
+
+A score at a lag compares the window ending now with the window one lag
+earlier, so it reaches a lag, the window and a word back. Until all of that
+is after the drop, a full window would mix the note with what came before it.
+
+* `one_lag(lag)`: the lag, at least `min_window`, rounded up to whole words.
+  The shortest score.
+* `window(lag, now)`: `one_lag(lag)` until the full window, the lag and a
+  word are all after the drop; the full window from then on.
+* `ready(lag, now)`: one lag of the note can be scored, that is
+  `one_lag(lag)`, the lag and a word are after the drop.
+
+== Tests
+
+`test/pitch/detail/bacf_note.cpp`: one lag's floor and rounding; the full
+window before any drop; the switch from one lag to the full window at the
+exact sample; `ready()` at its exact sample; the peak since the drop,
+ignoring earlier pulses, and starting over at a new drop; the clock's wrap;
+`reset()`.

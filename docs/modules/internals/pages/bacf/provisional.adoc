@@ -1,0 +1,85 @@
+= bacf_provisional
+
+A note's first estimate of its lag, before any lock, for the
+xref:bacf/lag_tracker.adoc[BACF lag tracker]. The tracker gives it out as
+`provisional()`; the pitch shifter restarts a pick's read on it.
+
+== Include
+
+```c++
+#include <q/pitch/detail/bacf_provisional.hpp>
+```
+
+== Declaration
+
+```c++
+namespace cycfi::q::detail
+{
+   class bacf_provisional
+   {
+   public:
+
+      static constexpr float        strong      = 0.6f;
+      static constexpr int          fractions   = 4;
+      static constexpr float        agree       = 0.02f;
+      static constexpr float        repeat      = 0.85f;
+
+                           bacf_provisional(
+                              std::uint32_t min_lag
+                            , std::uint32_t max_lag
+                            , float long_hint
+                           );
+
+                           template <typename Pulses>
+      void                 estimate(
+                              Pulses const& pulses, bacf_note const& note
+                           );
+
+                           template <typename Periodicity>
+      void                 vet(
+                              bacf_note const& note, std::uint32_t now
+                            , Periodicity const& periodicity
+                           );
+
+      bool                 estimated() const;
+      bool                 pending() const;
+      float                value() const;
+      void                 drop();
+      void                 reset();
+   };
+}
+```
+
+== The estimate
+
+`estimate(pulses, note)` runs at an unlocked edge, until there is an
+estimate. The latest pulse must be after the drop and strong, at least
+`strong` of the note's peak. Its estimate is the span to the nearest like
+pulse before it that is also after the drop, within the lag range (a span
+under `min_lag` is passed over; past `max_lag` the search stops). A pair of
+like pulses exists about two periods into a note, before the lock: on the
+Low E test note, 15 ms after the pick against 40 ms.
+
+== The chord check
+
+`vet(note, now, periodicity)` runs at the end of each sample while an
+estimate is `pending()`. A short hint, at most `long_hint` samples (13 ms in
+the tracker), or none, lets the estimate stand at once. After a long hint
+(a chord, whose common period is long) a single string's pulses can pair
+first, giving that string's period, which does not repeat over the chord.
+The estimate then stands only if:
+
+* the hint is the estimate, or 2 to `fractions` times it, within `agree`;
+  or
+* once one lag of the note can be scored (`note.ready()`), it repeats over
+  that lag: `periodicity(estimate)` at least `repeat`.
+
+Until then `value()` is 0. It is the estimate in samples once it stands.
+
+== Tests
+
+`test/pitch/detail/bacf_provisional.cpp`: the first strong pair after the
+drop, with earlier pulses ignored; only pulses after the drop pairing; a weak
+latest pulse giving none; lags out of range; after a long hint, an estimate
+that agrees standing at once (3 and 4 times it); one that does not, waiting
+for one lag, then standing only once it repeats; `drop()` and `reset()`.

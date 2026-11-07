@@ -1,0 +1,109 @@
+= bacf_lock
+
+The lock of the xref:bacf/lag_tracker.adoc[BACF lag tracker]: the lag at which
+the signal repeats, acquired from like pulses and kept edge by edge.
+
+== Include
+
+```c++
+#include <q/pitch/detail/bacf_lock.hpp>
+```
+
+== Declaration
+
+```c++
+namespace cycfi::q::detail
+{
+   class bacf_lock
+   {
+   public:
+
+      static constexpr int          max_misses  = 2;
+      static constexpr int          sweep       = 2;
+      static constexpr int          multiples   = 2;
+      static constexpr int          partners    = 3;
+      static constexpr std::uint32_t nudge      = 3;
+
+                           bacf_lock(
+                              std::uint32_t min_lag
+                            , std::uint32_t max_lag
+                            , std::uint32_t window
+                            , std::uint32_t limit
+                           );
+
+                           template <typename Pulses, typename Scorer>
+      void                 acquire(Pulses const& pulses, Scorer const& score);
+
+                           template <typename Edges, typename Scorer>
+      void                 track(
+                              Edges const& edges, std::uint32_t now
+                            , Scorer const& score
+                           );
+
+      void                 drop();
+      void                 reset();
+
+      bool                 locked() const;
+      float                lag() const;
+      float                periodicity() const;
+   };
+}
+```
+
+== Inputs
+
+A scorer with `fits(lag)`, whether a lag can be scored now, and
+`operator()(lag)`, its mismatches on the full window's scale. Mismatches
+under `limit` hold the lock. Pulses and edges come as lists, newest first,
+with `size()` and `operator[]`. The tracker passes the front end's lists
+and a scorer over the note's window; the tests pass vectors and scripted
+scores.
+
+== Acquire
+
+Unlocked, `acquire(pulses, score)` scores the latest pulse against the like
+pulses before it (see `similar()`):
+
+* a lag under `min_lag` is passed over; past `max_lag`, or at the first lag
+  that does not fit, the search stops;
+* at most `partners` lags are scored;
+* the best under `limit` becomes the lock, with no fraction.
+
+== Track
+
+Locked, `track(edges, now, score)` runs at each edge:
+
+. **Nudge.** The lag moves to this edge's spacing from the earlier edge of
+  its kind nearest a lag back, if within `nudge` percent (at least 2
+  samples), so the lock follows a bend.
+. **Fit.** If the lag, `sweep` either side, cannot be scored, it is a miss.
+. **Sweep.** The lag and `sweep` either side are scored; the best's
+  fraction of a sample is a parabola through it and its neighbours,
+  clamped to half a sample.
+. **Multiples.** If the best misses, twice the lag and `2 * sweep` either
+  side are scored (up to `multiples` times the lag), since a chord's
+  common period is a multiple of each note's.
+. **Keep or miss.** The best under `limit` is the new lag and clears the
+  misses. Otherwise it is a miss.
+
+`max_misses` misses in a row drop the lock. A lag that cannot be scored
+counts as a miss, so a lag that drifted out of range cannot hold the lock
+for good.
+
+== Outputs
+
+`lag()` is the lag with its fraction; unlocked, the last good one, which
+`drop()` keeps and `reset()` clears. `periodicity()` is one minus the last
+score's mismatches over the window: 1 when the bits repeat exactly, 0.5 for
+noise.
+
+== Tests
+
+`test/pitch/detail/bacf_lock.cpp`, all on scripted scores: acquire on the
+best of the like pulses, with dissimilar pulses passed over and the partner
+limit; no lock without a score under the limit; lags under the range passed
+over, the search stopped past it or at the first that does not fit; the
+nudge to an edge within 3% and the parabola's fraction; no nudge with no
+edge near; twice the lag on a miss; two misses dropping the lock with the
+last lag held; a lag that cannot be scored counting as a miss; a hit
+clearing the misses; `drop()` and `reset()`.
