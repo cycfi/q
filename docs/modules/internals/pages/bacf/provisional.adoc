@@ -62,19 +62,43 @@ Low E test note, 15 ms after the pick against 40 ms.
 
 == The chord check
 
-`vet(slice, now, periodicity)` runs at the end of each sample while an
-estimate is `pending()`. A short hint, at most `long_hint` samples (13 ms in
-the tracker), or none, lets the estimate stand at once. After a long hint
-(a chord, whose common period is long) a single string's pulses can pair
-first, giving that string's period, which does not repeat over the chord.
-The estimate then stands only if:
+The estimate rests on one pair of like pulses. On a single note the pair
+spans the note's period. On a chord it may not: at a re-strum the first pair
+can come from one note of the chord, and the chord as a whole does not
+repeat at that note's period, so a splice on it joins mismatched material.
+In a strummed guitar recording shifted up 12 semitones, a re-strum gave an
+estimate of 5.03 ms, one note's period, and the shifter spliced the chord
+every 5 ms for 42 ms, until the lock found the chord's 24.2 ms. It was heard
+as a thud.
 
-* the hint is the estimate, or 2 to `fractions` times it, within `agree`;
-  or
-* once one lag of the slice can be scored (`slice.ready()`), it repeats over
-  that lag: `periodicity(estimate)` at least `repeat`.
+The check applies only after a chord, which the slice's hint shows: a hint
+(the last good lag before the drop) over `long_hint`, 13 ms in the tracker.
+13 ms is above a guitar's low E period (12.1 ms), so a low single note does
+not count as a chord, and below a chord's common period (24.3 ms for an E
+chord). After a shorter hint, or none, the estimate stands at once: checking
+every estimate cost single notes 1.3 ms of latency at +12 semitones, for
+estimates that were already right.
 
-Until then `value()` is 0. It is the estimate in samples once it stands.
+After a long hint the estimate stands when either holds:
+
+* **It agrees with the hint.** The hint is 1 to `fractions` (4) times the
+  estimate, within `agree` (2%). A chord's common period is a whole multiple
+  of the periods of its notes that divide it, so a re-strum of the same
+  chord whose pair spans the chord's period, or a clean fraction of it such
+  as its lowest note's, passes at once. The 5.03 ms above does not: 24.2 /
+  5.03 is 4.81.
+* **It repeats.** Once one lag of the slice can be scored
+  (`slice.ready()`), the bits over that lag match the lag before at `repeat`
+  (85%) or more (`periodicity(estimate)`). A single note does. One note of a
+  chord does not: in the same recording, the chord's bitstream at a half to a
+  quarter of its period matches 50 to 70%, noise 50%. One lag is the
+  earliest a repeat can be scored after the drop; the full window would
+  wait until 11.6 ms of the slice can be scored, the latency the estimate is
+  there to save.
+
+`vet()` runs at the end of each sample while an estimate is `pending()`.
+Until the estimate stands, `value()` is 0 and the shifter's restart waits
+for the lock or its latency cap.
 
 == Tests
 
