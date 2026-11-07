@@ -215,6 +215,50 @@ TEST_CASE("varispeed_tap: splice targets move at the ratio",
    REQUIRE(tap.delay() == 300.0f);
 }
 
+TEST_CASE("varispeed_tap: reverse turns a splice back without a jump",
+   "[varispeed_tap]")
+{
+   // On a ramp at ratio 1 the output tells the share of each read: at
+   // delay 100 and 400, y = t - 100 - 300 b, b the far read's share. A
+   // splice from 100 to 400 turned back after 20 of its 64 reads runs that
+   // share back down from where it was (the turn holds it one read), and
+   // lands at 100 after 20 more.
+   q::varispeed_tap tap{2000};
+   tap.delay(100);
+   auto share = [](std::size_t t, float y) { return (float(t) - 100 - y) / 300; };
+   float last = 0;
+   for (std::size_t t = 0; t != 1000; ++t)
+      tap(float(t), 1.0f);
+   tap.splice(400, 64);
+   for (std::size_t t = 1000; t != 1020; ++t)
+      last = share(t, tap(float(t), 1.0f));
+   REQUIRE(last > 0.1f);
+   tap.reverse();
+   REQUIRE(tap.splicing());
+   REQUIRE(tap.target() == 100.0f);
+   for (std::size_t t = 1020; t != 1040; ++t)
+   {
+      REQUIRE(tap.splicing());
+      auto const b = share(t, tap(float(t), 1.0f));
+      REQUIRE(b < last + 0.005f);
+      REQUIRE(last - b < 0.06f);
+      last = b;
+   }
+   REQUIRE(!tap.splicing());
+   REQUIRE(tap.delay() == 100.0f);
+   REQUIRE_THAT(tap(1040.0f, 1.0f), WithinAbs(940.0f, 1e-3));
+
+   // Turned back before any of it is heard, the splice is called off;
+   // with none in flight, reverse does nothing.
+   tap.splice(400, 64);
+   tap.reverse();
+   REQUIRE(!tap.splicing());
+   REQUIRE(tap.delay() == 100.0f);
+   tap.reverse();
+   REQUIRE(!tap.splicing());
+   REQUIRE(tap.delay() == 100.0f);
+}
+
 TEMPLATE_TEST_CASE("basic_varispeed_tap: any interpolation policy",
    "[varispeed_tap]"
  , q::sample_interpolation::linear, q::sample_interpolation::hermite)

@@ -39,7 +39,9 @@ namespace cycfi::q
    // splice(to, fade) jumps the read to another delay, crossfading the two
    // reads over `fade` samples with constant-amplitude Hann ramps, both
    // moving at the ratio: a splice for a time-domain pitch shifter, the
-   // jump a period, so the two reads are alike. The material behind the
+   // jump a period, so the two reads are alike. reverse() turns a splice
+   // in flight around: the read goes back to the delay it was leaving, the
+   // crossfade running back from where it is. The material behind the
    // read is there to match: operator[] reads at any delay, interpolated
    // for a float, the sample itself for a whole number.
    ////////////////////////////////////////////////////////////////////////////
@@ -64,6 +66,7 @@ namespace cycfi::q
       void                 reset();
 
       void                 splice(float to, std::size_t fade);
+      void                 reverse();
       bool                 splicing() const;
       float                target() const;
       float                operator[](float delay) const;
@@ -85,7 +88,8 @@ namespace cycfi::q
       std::size_t          _max_delay;
       float                _delay = 0.0f;
       float                _to = 0.0f;
-      std::size_t          _fade = 0;
+      std::size_t          _fade = 0;     // reads left in the splice
+      std::size_t          _length = 0;   // its reads in all
       basic_hann_upward_ramp_gen<float> _ramp{duration{1.0}, 1.0f};
    };
 
@@ -176,7 +180,29 @@ namespace cycfi::q
          _delay = _to;
       _to = std::clamp(to, 0.0f, float(_max_delay));
       _fade = std::max<std::size_t>(fade, 1);
+      _length = _fade;
       _ramp.config(duration{double(_fade)}, 1.0f, true);
+   }
+
+   // The ramp is symmetric (g(k) + g(n - k) = 1 over n reads), so the
+   // splice back is the same ramp from the reads left: as many reads as
+   // were done take the read back, from the gain it has now.
+   template <typename Interpolation, typename Buffer>
+   inline void basic_varispeed_tap<Interpolation, Buffer>::reverse()
+   {
+      if (_fade == 0)
+         return;
+      auto const done = _length - _fade;
+      if (done == 0)
+      {
+         _fade = 0;              // nothing heard of it yet: called off
+         return;
+      }
+      std::swap(_delay, _to);
+      _ramp.config(duration{double(_length)}, 1.0f, true);
+      for (std::size_t i = 0; i != _fade; ++i)
+         _ramp();
+      _fade = done;
    }
 
    template <typename Interpolation, typename Buffer>
