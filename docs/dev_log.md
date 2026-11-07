@@ -13,6 +13,14 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-11-07
 
+`5150439a`: `bacf_lag_tracker` is now `bacf_follower`, after Q's envelope
+followers: BACF names the method, and it follows a lag. Its `operator()`
+returns the lag while locked and 0 while not, Q's "none" as in
+`provisional()` and `get_frequency()`, where it returned only whether it
+was locked; `lag()` still holds the last good lag. The shifter and the
+pages follow; outputs are bit for bit those of before. It was marked
+unstable in the v1.6 beta, so the old name is not kept.
+
 `e6cbf253`, `7cb9bc2e`: two latent faults in the lag tracker, found while
 documenting it. The slice marked "no drop yet" with a fixed clock value
 (`0x80000000`), and `reset()` does not restart the clock, so past 2^31
