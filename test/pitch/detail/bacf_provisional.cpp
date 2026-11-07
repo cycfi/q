@@ -92,8 +92,8 @@ TEST_CASE("bacf_provisional: lags out of range")
 
 TEST_CASE("bacf_provisional: after a long hint, one that agrees stands")
 {
-   // After a chord (a hint over 13 ms) an estimate stands at once if the
-   // hint is it, or 2 to 4 of it, within 2%.
+   // After a long hint (over 13 ms) an estimate stands at once if the hint
+   // is it, or 2 to 4 of it, within 2%.
    pulses const p{{1500, 1.0f, 40.0f}, {1250, 1.0f, 40.0f}};
    for (float k : {1.0f, 2.0f, 3.0f, 4.0f})
    {

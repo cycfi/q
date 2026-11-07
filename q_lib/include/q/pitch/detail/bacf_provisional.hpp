@@ -17,9 +17,11 @@ namespace cycfi::q::detail
    // bacf_provisional: a note's first estimate of its lag, before any
    // lock: the latest pulse, if strong (60% of the peak since the drop),
    // to the nearest like pulse after the drop. It stands at once, unless
-   // the slice's hint is long (over `long_hint` samples: a chord's), when
-   // it stands only if the hint is it or a clean multiple of it (2 to 4,
-   // within 2%), or once it repeats over one lag of the slice (85%).
+   // the slice's hint, the last lag, is long (over `long_hint` samples).
+   // Then the sound before repeated only at a long lag, and a pair of like
+   // pulses alone does not show a repeat: it stands only if the hint is it
+   // or a clean multiple of it (2 to 4, within 2%), or once it repeats over
+   // one lag of the slice (85%).
    //
    // estimate() runs at an unlocked edge; vet(), at the end of each sample
    // while an estimate waits, takes the one-lag periodicity at a lag.

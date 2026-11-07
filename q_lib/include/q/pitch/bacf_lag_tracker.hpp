@@ -38,9 +38,9 @@ namespace cycfi::q
    // drop() starts a new note: until the window holds only the note, the
    // score runs over one lag of it. provisional() is the note's first
    // estimate, before a lock: the latest strong pulse's span to the nearest
-   // similar one. drop's `hint`, the last good lag, guards a chord: after a
-   // long one (over 13 ms), an estimate that is not that lag or a clean
-   // fraction of it must first repeat over one lag.
+   // similar one. drop's `hint` is the last good lag: after a long one
+   // (over 13 ms), an estimate that is not that lag or a clean fraction of
+   // it must first repeat over one lag.
    //
    // The lag is a period or a multiple of one: octaves are not settled.
    // The work is per crossing, flat. Low-pass the input first (about 1 kHz
