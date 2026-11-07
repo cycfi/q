@@ -8,15 +8,15 @@ CAUTION: {unstable}
 
 The BACF follower tracks the lag at which a signal repeats: its period, or a multiple of it. It is built for a time-domain splicer such as the `{bacf_pitch_shifter}`, which splices at how far back the sound repeats, whatever the note. The follower is implemented by a class named `bacf_follower`.
 
-A strobe tuner shows pitch with a pattern lit in time with the note: off pitch, the pattern drifts; on pitch, it stands still. The follower works the same way, with the signal against itself. It compares the latest window of the signal with the window one lag earlier. Slide the lag, and the two windows drift past each other; at the period they line up, and the pattern freezes.
+The follower compares the signal with itself one lag back. Each sample becomes one bit, 1 above zero and 0 below (with a little hysteresis), and the XOR of the latest window's bits with the bits one lag back marks each sample where the two disagree. Where the waveform matches itself, few bits differ; that lag is where it repeats, its period.
 
-video::https://media.cycfi.com/q/bacf-pitch-shifter/chord_strobe_v2.mp4[width=750, opts="autoplay,loop,muted"]
+video::https://media.cycfi.com/q/bacf-pitch-shifter/chord_strobe_v4.mp4[width=750, opts="autoplay,loop,muted"]
 
-The video shows an E chord, ringing, as the lag slides from 1 to 30 ms. The signal, low-passed at 1 kHz, becomes one bit a sample, a bitstream, and the XOR of the two windows' bits marks each sample where they disagree (see `{bitstream_acf}`). Most lags leave about half the bits mismatched, the level of chance; where the windows are out of phase, more (89% near 3.6 ms). At 24.3 ms, the period the chord's notes share, only 8% differ: the pattern freezes. The low E's own period, 12.1 ms, leaves 42% differing, since the other strings stand elsewhere in their cycles.
+The video shows an E chord, ringing, as the lag slides from 1 to 30 ms. At the top, the input, low-passed at 1 kHz, with the latest window (blue) and the window one lag back (orange). Below it, the two windows overlaid, and under them their bits, one a sample, with the XOR marking in red each sample where they disagree (see `{bitstream_acf}`). At the bottom, the share of bits that differ at each lag. Most lags leave about half the bits mismatched, the level of chance; where the windows are out of phase, more (89% near 3.6 ms). At 24.3 ms, the period the chord's notes share, only 8% differ. The low E's own period, 12.1 ms, leaves 42%, since the other strings stand elsewhere in their cycles.
 
-Sliding the lag across the whole range is a search, and the follower searches only to find a lock. After that it keeps the pattern frozen: at each zero crossing, leading and trailing, it scores the lag it holds and two samples either side, moves to the best, and takes the fraction of a sample from a parabola through the scores. A crossing is where the waveform's timing can change, so the follower scores there, and does nothing between crossings.
+Sliding the lag across the whole range is a search, and the follower searches only to find a lock. After that it stays on that match as the period drifts: at each zero crossing, leading and trailing, it scores the lag it holds and two samples either side, moves to the best, and takes the fraction of a sample from a parabola through the scores. A crossing is where the waveform's timing can change, so the follower scores there, and does nothing between crossings.
 
-Twice the period freezes the pattern too, so the lag may be a period or any multiple of one. Octaves are left unsettled on purpose: a splice at twice the period matches as well as one at the period. When the held lag misses, the follower scores twice the lag.
+Twice the period matches too, so the lag may be a period or any multiple of one. Octaves are left unsettled on purpose: a splice at twice the period matches as well as one at the period. When the held lag misses, the follower scores twice the lag.
 
 Low-pass the input first, near the top of its fundamental range (about 1 kHz for a guitar): fewer crossings, and lags that follow the fundamental.
 
