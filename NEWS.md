@@ -3,6 +3,12 @@
 High-level, user-facing changes only. For the day-to-day detail, see
 `docs/dev_log.md` (internal, not part of this file).
 
+## v1.5.5 (2026-11-24)
+
+**QIO on Windows: building with MSVC 14.52.** libremidi, which QIO uses for
+MIDI, did not compile with Visual Studio's 14.52 toolset (cl 19.52). Q's
+copy now carries libremidi's fix.
+
 ## v1.5.4 (2026-10-09)
 
 **QPlug: building a plugin outside Q on Linux.** v1.5.3 could not link a
