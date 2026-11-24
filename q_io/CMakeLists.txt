@@ -53,13 +53,14 @@ unset(CMAKE_DEBUG_POSTFIX CACHE)
 # the platform provides them.
 #
 # Cycfi's fork, branch q-pin: upstream 9d69bfb (v5.4.3 plus the stream and
-# flex data packet fix) and the sizes of the reserved packet types, without
-# which one such packet crashes the input. Back to celtera once that lands.
+# flex data packet fix), the sizes of the reserved packet types, without
+# which one such packet crashes the input, and upstream's build fix for
+# MSVC 14.52.
 
 FetchContent_Declare(
   libremidi
   GIT_REPOSITORY https://github.com/cycfi/libremidi.git
-  GIT_TAG 213b6f7
+  GIT_TAG 8853eb1f608d44a4f23da46952b2da6f1e61309b
 )
 
 FetchContent_MakeAvailable(libremidi)
