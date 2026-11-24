@@ -52,13 +52,13 @@ unset(CMAKE_DEBUG_POSTFIX CACHE)
 # versions over the same backends, and hands over Universal MIDI Packets where
 # the platform provides them.
 #
-# Pinned at the commit that sizes the reserved packet types, without which
-# one such packet crashes the input.
+# Pinned at a commit that sizes the reserved packet types, without which
+# one such packet crashes the input, and that builds with MSVC 14.52.
 
 FetchContent_Declare(
   libremidi
   GIT_REPOSITORY https://github.com/celtera/libremidi.git
-  GIT_TAG 996a73c216756de2dd6d58e66245ecae4830f9ff
+  GIT_TAG 1f62921ad06ea7cde180d3dd392d24e6b3e07627
 )
 
 # QIO opens MIDI through libremidi's default API, which is never JACK, so
