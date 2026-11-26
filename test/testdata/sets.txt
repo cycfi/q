@@ -8,3 +8,4 @@
 # A published version is never overwritten: a change is a new version.
 # testdata.cmake fetches a set when a test that needs it runs; publish.py
 # packs and uploads a new one and prints its line for this file.
+multistring 1 public c8b20719f985b288d8a8d549a76db69d3851476ebda1060f560e505fcafd51b6
