@@ -10,7 +10,7 @@ Produces, in docs/modules/ROOT/images/:
                              (spectral_flux, 4 kHz, 1 ms, as the detector
                              uses it), with the detection; bottom, a
                              strummed E chord
-                             (example/whammy/audio/E Chord.wav) and its
+                             (experiments/whammy/audio/E Chord.wav) and its
                              detections, one a strum.
 
 The data comes from the real q::transient_detector and q::spectral_flux:
@@ -44,7 +44,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(HERE))
 OUT_DIR = os.path.join(HERE, '..', 'modules', 'ROOT', 'images')
 NOTE = os.path.join(REPO, 'test', 'audio_files', '1a-Low-E.wav')
-CHORD = os.path.join(REPO, 'example', 'whammy', 'audio', 'E Chord.wav')
+CHORD = os.path.join(REPO, 'experiments', 'whammy', 'audio', 'E Chord.wav')
 
 # Reads "n sps", then n samples; prints the flux level and the detections.
 PROBE = r'''

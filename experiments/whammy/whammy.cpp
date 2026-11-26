@@ -43,7 +43,7 @@
 // given an audio file and a bend track, it learns from that file and
 // plays it:
 //
-//    example_whammy [audio.wav bend.mid]
+//    experiment_whammy [audio.wav bend.mid]
 ///////////////////////////////////////////////////////////////////////////////
 
 namespace q = cycfi::q;

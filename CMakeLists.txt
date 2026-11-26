@@ -35,6 +35,7 @@ endif()
 include(FetchContent)
 
 option(Q_BUILD_EXAMPLES "build Q library examples" ON)
+option(Q_BUILD_EXPERIMENTS "build Q experiments" OFF)
 option(Q_BUILD_TEST "build Q library tests" ON)
 option(Q_BUILD_IO "build Q IO library" ON)
 
@@ -78,10 +79,14 @@ if (Q_BUILD_PLUG)
 endif()
 
 ###############################################################################
-# Examples and Tests
+# Examples, Experiments and Tests
 
 if (Q_BUILD_EXAMPLES)
    add_subdirectory(example)
+endif()
+
+if (Q_BUILD_EXPERIMENTS AND Q_BUILD_IO)
+   add_subdirectory(experiments)
 endif()
 
 if (Q_BUILD_TEST)

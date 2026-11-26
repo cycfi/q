@@ -210,7 +210,7 @@ for (auto& s : in)
 <3> The pedal in semitones: 0 at the heel, 12 at the toe.
 <4> Shift by the ratio for those semitones. Back at the heel, the smoothed value settles to a ratio of exactly 1 within about 30 ms, and the shifter passes the input through.
 
-See `example/whammy` in the Q repository for a complete program: it plays guitar recordings through the shifter, driven by the pitch bend of an e-Whammy recorded as MIDI.
+See `experiments/whammy` in the Q repository for a complete program: it plays guitar recordings through the shifter, driven by the pitch bend of an e-Whammy recorded as MIDI.
 
 == Implementation Details
 
