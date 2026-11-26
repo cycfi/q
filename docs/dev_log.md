@@ -11,6 +11,17 @@ commits; the feature branches they first cited were squash-merged and no
 longer resolve. The full text before the trim: `git show
 308ddccb:docs/dev_log.md`.
 
+## 2026-11-26
+
+`91a6ec50`: `wav_reader` opens FLAC as well as WAV, trying WAV first and
+then FLAC, so the file's contents decide and every caller reads FLAC as
+is. `dr_flac` is vendored beside `dr_wav` from mackron/dr_libs at
+`d89ecf1d0f` (2026-09-18): the last release, v0.13.3, lacks this year's
+seek fixes, and the next was then a week old. Counts stay in interleaved
+samples for both formats; Ogg FLAC is left out; `wav_writer` still writes
+WAV. FLAC is how test audio will be stored: lossless, bit exact on every
+platform, about a third of the WAV.
+
 ## 2026-11-07
 
 `5150439a`: `bacf_lag_tracker` is now `bacf_follower`, after Q's envelope
