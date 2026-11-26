@@ -85,6 +85,8 @@ set(APP_SOURCES
    synth/va/osc_saw.cpp
    synth/va/osc_triangle.cpp
    synth/osc_sample_hold.cpp
+   synth/waveguide.cpp
+   synth/waveguide_junction.cpp
 
    synth/gen/gen_sin_cos.cpp
    synth/gen/gen_hamming.cpp
@@ -371,3 +373,5 @@ add_test(NAME test_dx_patcher_voice COMMAND test_dx_patcher_voice)
 add_test(NAME test_dx_patcher COMMAND test_dx_patcher)
 add_test(NAME test_dx_sysex COMMAND test_dx_sysex)
 add_test(NAME test_osc_sample_hold COMMAND test_osc_sample_hold)
+add_test(NAME test_waveguide COMMAND test_waveguide)
+add_test(NAME test_waveguide_junction COMMAND test_waveguide_junction)
