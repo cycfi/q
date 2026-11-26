@@ -13,6 +13,25 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-11-26
 
+`592bab51`: test data now lives on Cloudflare R2, never in git.
+`test/testdata/sets.txt` pins each set by name, version, access and the
+SHA-256 of its zip; `q_testdata(<test> <set>)` adds a fixture that fetches
+the set into a per-user cache (`~/.cache/cycfi/testdata`, or
+`$CYCFI_TESTDATA`) only when a test that needs it runs. A set that cannot be
+fetched skips its tests (exit 77) and says why; it never passes them. Public
+sets come from `media.cycfi.com/testdata/`, private ones from the
+`cycfi-testdata` bucket with credentials. `publish.py` packs a set
+reproducibly, refuses to overwrite a published version, uploads and pins it;
+`testdata.py` gives Python the same pins and cache. The audio already in
+`test/audio_files` stays in git.
+
+`8707ca3e`: the first set, `multistring` v1 (public): a Nu V2 in Fabio
+Mittino's guitar, NST tuning, six strings as six channels of one 48 kHz
+16-bit FLAC, raw and with its crosstalk. Multistring files put the highest
+string on channel 1, so more bass strings add channels at the end; each
+folder of test audio keeps its own manifest, here
+`test/audio_files/multistring/MANIFEST.md`.
+
 `91a6ec50`: `wav_reader` opens FLAC as well as WAV, trying WAV first and
 then FLAC, so the file's contents decide and every caller reads FLAC as
 is. `dr_flac` is vendored beside `dr_wav` from mackron/dr_libs at
