@@ -108,6 +108,71 @@ TEST_CASE("seek and restart move the read position, in samples")
    CHECK(wav.read(tail) == 4);
 }
 
+////////////////////////////////////////////////////////////////////////////
+// wav_reader opens FLAC too, telling it by the file's contents.
+// sin_440_stereo.flac is sin_440.wav on the left and its negative on the
+// right, both 16 bit, so each sample must read exactly as the WAV's.
+////////////////////////////////////////////////////////////////////////////
+TEST_CASE("A FLAC file reads the samples of its WAV")
+{
+   q::wav_reader ref{"audio_files/sin_440.wav"};
+   REQUIRE(bool(ref));
+   std::vector<float> mono(ref.length());
+   REQUIRE(ref.read(mono) == mono.size());
+
+   q::wav_reader flac{"audio_files/sin_440_stereo.flac"};
+   REQUIRE(bool(flac));
+   CHECK(flac.sps() == ref.sps());
+   CHECK(flac.num_channels() == 2);
+   CHECK(flac.length() == 2 * mono.size());     // samples, both channels
+   CHECK(flac.position() == 0);
+
+   std::vector<float> stereo(flac.length());
+   CHECK(flac.read(stereo) == stereo.size());
+   CHECK(flac.position() == stereo.size());
+
+   std::size_t mismatched = 0;
+   for (std::size_t i = 0; i != mono.size(); ++i)
+   {
+      if (stereo[2*i] != mono[i] || stereo[2*i+1] != -mono[i])
+         ++mismatched;
+   }
+   CHECK(mismatched == 0);
+
+   // At the end there is nothing more.
+   CHECK(flac.read(stereo) == 0);
+}
+
+TEST_CASE("seek and restart work on FLAC, in samples")
+{
+   q::wav_reader ref{"audio_files/sin_440.wav"};
+   REQUIRE(bool(ref));
+   std::vector<float> mono(ref.length());
+   REQUIRE(ref.read(mono) == mono.size());
+
+   q::wav_reader flac{"audio_files/sin_440_stereo.flac"};
+   REQUIRE(bool(flac));
+
+   // Sample 2000 is frame 1000, left.
+   REQUIRE(flac.seek(2000));
+   CHECK(flac.position() == 2000);
+   float one[2];
+   CHECK(flac.read(one, 2) == 2);
+   CHECK(one[0] == mono[1000]);
+   CHECK(one[1] == -mono[1000]);
+   CHECK(flac.position() == 2002);
+
+   REQUIRE(flac.restart());
+   CHECK(flac.position() == 0);
+   CHECK(flac.read(one, 2) == 2);
+   CHECK(one[0] == mono[0]);
+
+   // A partial read at the tail returns what is left.
+   REQUIRE(flac.seek(flac.length() - 4));
+   std::vector<float> tail(10);
+   CHECK(flac.read(tail) == 4);
+}
+
 TEST_CASE("A file that does not exist reads as nothing")
 {
    q::wav_reader wav{"results/no_such_file.wav"};

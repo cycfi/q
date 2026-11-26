@@ -72,6 +72,7 @@ In the C++ tests these come from `notes::` in `pitch.hpp` (`low_e = E[2]`, etc.)
 | `gk Low E`            | `low_e`  | 82.41     | pickup sample            |
 | `sweep Low E`         | `low_e`  | 82.41     | pitch sweep              |
 | `sin_440`             | `d`      | 146.83    | synthetic tone (440 Hz)  |
+| `sin_440_stereo.flac` | n/a      | n/a       | FLAC reader test         |
 | `sin_envelope`        | `a`      | 110.00    | synthetic envelope tone  |
 | `harmonics_261`       | n/a      | ~261      | harmonic content (C4)    |
 | `harmonics_329`       | n/a      | ~329      | harmonic content (E4)    |
