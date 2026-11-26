@@ -1,0 +1,10 @@
+# Test data sets hosted on Cloudflare R2, never in git.
+#
+# One line per set: name, version, access, SHA-256 of the zip.
+#
+#   public   https://media.cycfi.com/testdata/<name>/<name>_v<version>.zip
+#   private  s3://cycfi-testdata/<name>/<name>_v<version>.zip (credentials)
+#
+# A published version is never overwritten: a change is a new version.
+# testdata.cmake fetches a set when a test that needs it runs; publish.py
+# packs and uploads a new one and prints its line for this file.

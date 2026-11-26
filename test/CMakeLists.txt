@@ -222,6 +222,7 @@ file(
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/results/golden)
 
 include(CTest)
+include(testdata/testdata.cmake)
 add_test(NAME test_fft COMMAND test_fft)
 add_test(NAME test_fft_native COMMAND test_fft_native)
 add_test(NAME test_stft COMMAND test_stft)
