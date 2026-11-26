@@ -48,6 +48,7 @@ set(APP_SOURCES
    midi/midi2_flex.cpp
    midi/midi2_per_note.cpp
    midi/midi2_stream.cpp
+   midi/midi2_clip_reader.cpp
    midi/midi_ci.cpp
    midi/midi_ci_initiator.cpp
    midi/midi_ci_profile_initiator.cpp
@@ -274,6 +275,7 @@ add_test(NAME test_midi2_utility COMMAND test_midi2_utility)
 add_test(NAME test_midi2_flex COMMAND test_midi2_flex)
 add_test(NAME test_midi2_per_note COMMAND test_midi2_per_note)
 add_test(NAME test_midi2_stream COMMAND test_midi2_stream)
+add_test(NAME test_midi2_clip_reader COMMAND test_midi2_clip_reader)
 add_test(NAME test_midi_ci COMMAND test_midi_ci)
 add_test(NAME test_midi_ci_initiator COMMAND test_midi_ci_initiator)
 add_test(NAME test_midi_ci_profile_initiator COMMAND test_midi_ci_profile_initiator)
